@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <stdexcept>
 #include <random>
+#include <queue>
 
 using namespace std;
 using VecDouble_t = vector<double>; //Neurona
@@ -97,11 +98,16 @@ struct NeuralNetwork_t{
     }
 
     constexpr auto delta(VecDouble_t const& x,double const y,auto layer,auto neuron) const{
+        double delta;
         if(layer==m_layers.size()-1){
-            return deltaOutputLayer(x,y,layer,neuron);
+            delta=deltaOutputLayer(x,y,layer,neuron);
         }else{
-            return deltaHiddenLayers(x,layer,neuron);
+            delta=deltaHiddenLayers(x,layer,neuron);
         }
+
+        deltaQueue.front()[neuron]=delta;
+
+        return delta;
     }
 
     constexpr auto errorDerivateFunction(auto hx, auto y) const{
@@ -164,6 +170,15 @@ struct NeuralNetwork_t{
 
     //Actualiza los pesos de una capa
     void updateLayer(VecDouble_t const& x,double const y,auto layer){
+        //Eliminamos el delta desfasado
+        if(deltaQueue.size()>=2){
+            deltaQueue.pop();
+        }
+
+        //Añadimos el delta de la capa actual
+        VecDouble_t newDeltas(m_layers[layer].size());
+        deltaQueue.push(newDeltas);
+
         for(size_t i=0;i<m_layers[layer].size();i++){
             updateNeuron(x,y,layer,i);
         }
@@ -258,6 +273,7 @@ struct NeuralNetwork_t{
 
 private:
     vector<MatDouble_t> m_layers;
+    queue<VecDouble_t> deltaQueue;
     uint16_t learningRate=0.1;
 };
 
