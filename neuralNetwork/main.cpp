@@ -89,7 +89,7 @@ struct NeuralNetwork_t{
 
         for(size_t i=0;i<=layer+1;i++){
             //FALTA DELTA DE LA NEURONA i DE CAPA SIGUIENTE
-            m_layers[layer+1][i][neuron]*deltaDeIDeLaCapaSiguiente;
+            m_layers[layer+1][i][neuron]/* *deltaDeIDeLaCapaSiguiente */;
         }
         return -1;
     }
@@ -153,7 +153,11 @@ struct NeuralNetwork_t{
 
     //Actualiza los pesos de una neurona
     void updateNeuron(VecDouble_t const& x,double const y,auto layer,auto neuron){
-        subVectors(m_layers[layer][neuron],multiplyIntVectors(learningRate,errorDerivateParcialFunctions(x,y,layer,neuron)));
+        VecDouble_t result = errorDerivateParcialFunctions(x,y,layer,neuron);
+
+        multiplyIntVectors(learningRate,result);
+        
+        subVectors(m_layers[layer][neuron],result);
     }
 
     //Actualiza los pesos de una capa
@@ -191,7 +195,7 @@ struct NeuralNetwork_t{
             i++;
         }
 
-        return -1;
+        return result;
     }
 
     double feedforwardinneuron(VecDouble_t const& x,auto layer,auto neuron){
