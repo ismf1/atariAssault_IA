@@ -66,6 +66,121 @@ struct NeuralNetwork_t{
     constexpr auto sigmoid(auto x) const{
         return 1 / (1 + exp(-x));
     }
+    /*-------------------------------NUEVO--------------------------------*/
+    constexpr auto sigmoidDeriv(auto x) const{
+        return sigmoid(x)*(1-x);
+    }
+
+    constexpr auto deltaOutputLayer(auto layer,auto neuron,auto beforeNeuron) const{
+
+    }
+
+    constexpr auto deltaHiddenLayers(auto layer,auto neuron,auto beforeNeuron) const{
+
+    }
+
+    constexpr auto delta(auto layer,auto neuron,auto beforeNeuron) const{
+        if(layer==m_layers.size()-1){
+            return deltaOutputLayer(layer,neuron,beforeNeuron);
+        }else{
+            return deltaHiddenLayers(layer,neuron,beforeNeuron);
+        }
+    }
+
+    //Esto solo vale si la dimension de Y es 1
+    constexpr auto errorFunction(auto hx, auto y) const{
+        return pow(hx-y,2);
+    }
+
+    constexpr auto errorFunctionVector(MatDouble_t const& X, VecDouble_t const& Y) const{
+        uint16_t errorCont=0;
+
+        //FALTA
+
+        return -1;
+    }
+
+
+    double errorDerivateParcialFunction(VecDouble_t const& x,auto layer,auto neuron,auto beforeNeuron) const{
+        return delta(layer,neuron,beforeNeuron)*feedforwardinneuron(x,layer-1,beforeNeuron);
+    }
+
+    //Devuelve vector de las derivadas parciales de la funcion de error de 1 neurona
+    VecDouble_t errorDerivateFunction(VecDouble_t const& x,auto layer,auto neuron) const{
+        VecDouble_t res(m_layers[layer][neuron].size());
+
+        for(size_t i=0;i<res.size();i++){
+            res[i]=errorDerivateParcialFunction(x,layer,neuron,i);
+        }
+
+        return res;
+    }
+
+    void multiplyIntVectors(auto n, auto &v) const{
+        for(size_t i=0;i<v.size();i++){
+            v[i]=v[i]*n;
+        }
+    }
+
+    void subVectors(auto &v1,auto &v2){
+        if(v1.size()!=v2.size()){
+            throw length_error("Vectors must have the same size when sub.");
+        }
+
+        for(size_t i=0;i<v1.size();i++){
+            v1[i]-=v2[i];
+        }
+    }
+
+    //Actualiza los pesos de una neurona
+    void updateNeuron(VecDouble_t const& x,auto layer,auto neuron){
+        subVectors(m_layers[layer][neuron],multiplyIntVectors(learningRate,errorDerivateFunction(x,layer,neuron)));
+    }
+
+    //Actualiza los pesos de una capa
+    void updateLayer(VecDouble_t const& x,auto layer){
+        for(size_t i=0;i<m_layers[layer].size();i++){
+            updateNeuron(x,layer,i);
+        }
+    }
+
+    //Actualiza los pesos de la red
+    void updateWeights(VecDouble_t const& x){
+        //De la ultima capa a la primera para backpropagation
+        for(size_t i=m_layers.size()-1;i>=0;i--){
+            updateLayer(x,i);
+        }
+    }
+
+    VecDouble_t feedforwardinlayer(VecDouble_t const& x,auto layer) const{
+        //MAL --> FALTA ACABAR
+
+        //r1 = sigmoid(x*m_layers[0])
+        //r2 = sigmoid(r1*m_layers[1])
+        //...
+
+        size_t i=0;
+        VecDouble_t result(x);
+        for (auto const& Wi : m_layers){
+            //Capa Wi
+            //Añadimos el x0 = 1
+            result.resize(result.size()+1); //Aumentamos size
+            copy(result.rbegin()+1, result.rend(), result.rbegin()); //Desplazamos los elementos 1 pos a la derecha
+            result[0]=1.0;
+
+            result = sigmoid(multiplyT(result,Wi));
+
+            if(i==layer) return result;
+            i++;
+        }
+
+        return -1;
+    }
+
+    double feedforwardinneuron(VecDouble_t const& x,auto layer,auto neuron){
+        return feedforwardinlayer(x,layer)[neuron];
+    }
+    /*--------------------------------------------------------------------*/
 
     VecDouble_t sigmoid (VecDouble_t const& vec) const{
         VecDouble_t result(vec.size(),0.0);
@@ -82,7 +197,7 @@ struct NeuralNetwork_t{
         //r2 = sigmoid(r1*m_layers[1])
         //...
 
-        VecDouble_t result(x);
+        /*VecDouble_t result(x);
         for (auto const& Wi : m_layers){
             //Capa Wi
             //Añadimos el x0 = 1
@@ -93,7 +208,9 @@ struct NeuralNetwork_t{
             result = sigmoid(multiplyT(result,Wi));
         }
 
-        return result;
+        return result;*/
+        return feedforwardinlayer(x,m_layers.size()-1);
+        
     }
 
 
@@ -118,6 +235,7 @@ struct NeuralNetwork_t{
 
 private:
     vector<MatDouble_t> m_layers;
+    uint16_t learningRate=0.1;
 };
 
 MatDouble_t X {
