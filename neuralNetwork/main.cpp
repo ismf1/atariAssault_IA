@@ -88,16 +88,16 @@ struct NeuralNetwork_t{
         double m1=sigmoidDeriv(feedforwardinneuron(x,layer,neuron));
         double m2=0;
 
-        for(size_t i=0;i<=layer+1;i++){
+        for(size_t i=0;i<=m_layers[layer].size()+1;i++){
             //FALTA DELTA DE LA NEURONA i DE CAPA SIGUIENTE
-            m2+=m_layers[layer+1][i][neuron]/* *deltaDeIDeLaCapaSiguiente */;
+            m2+=m_layers[layer+1][i][neuron]*deltaQueue.back()[i];
         }
 
 
         return m1*m2;
     }
 
-    constexpr auto delta(VecDouble_t const& x,double const y,auto layer,auto neuron) const{
+    auto delta(VecDouble_t const& x,double const y,auto layer,auto neuron){
         double delta;
         if(layer==m_layers.size()-1){
             delta=deltaOutputLayer(x,y,layer,neuron);
@@ -128,12 +128,12 @@ struct NeuralNetwork_t{
     }*/
 
     //Derivada parcial para el peso m_layers[layer][neuron][beforeNeuron]
-    double errorDerivateParcialFunction(VecDouble_t const& x,double const y,auto layer,auto neuron,auto beforeNeuron) const{
+    double errorDerivateParcialFunction(VecDouble_t const& x,double const y,auto layer,auto neuron,auto beforeNeuron){
         return delta(x,y,layer,neuron)*feedforwardinneuron(x,layer-1,beforeNeuron);
     }
 
     //Devuelve vector de las derivadas parciales de la funcion de error de 1 neurona
-    VecDouble_t errorDerivateParcialFunctions(VecDouble_t const& x,double const y,auto layer,auto neuron) const{
+    VecDouble_t errorDerivateParcialFunctions(VecDouble_t const& x,double const y,auto layer,auto neuron){
         VecDouble_t res(m_layers[layer][neuron].size());
 
         for(size_t i=0;i<res.size();i++){
