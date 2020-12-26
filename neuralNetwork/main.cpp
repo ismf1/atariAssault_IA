@@ -4,6 +4,8 @@
 #include <stdexcept>
 #include <random>
 #include <queue>
+#include <iostream>
+using namespace std;
 
 using namespace std;
 using VecDouble_t = vector<double>; //Neurona
@@ -85,15 +87,17 @@ struct NeuralNetwork_t{
     }
 
     constexpr auto deltaHiddenLayers(VecDouble_t const& x,auto layer,auto neuron) const{
+        cout << "1" << endl;    //BORRAR
         double m1=sigmoidDeriv(feedforwardinneuron(x,layer,neuron));
         double m2=0;
+        cout << "1.5" << endl;    //BORRAR
 
+        //FALLA
         for(size_t i=0;i<=m_layers[layer].size()+1;i++){
-            //FALTA DELTA DE LA NEURONA i DE CAPA SIGUIENTE
             m2+=m_layers[layer+1][i][neuron]*deltaQueue.back()[i];
         }
 
-
+        cout << "2" << endl;    //BORRAR
         return m1*m2;
     }
 
