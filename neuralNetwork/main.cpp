@@ -71,20 +71,24 @@ struct NeuralNetwork_t{
         return sigmoid(x)*(1-x);
     }
 
-    constexpr auto deltaOutputLayer(auto layer,auto neuron,auto beforeNeuron) const{
+    constexpr auto deltaOutputLayer(VecDouble_t const& x,double const y,auto layer,auto neuron,auto beforeNeuron) const{
+        return errorDerivateFunction(feedforwardinneuron(x,layer,neuron)-y)*sigmoidDeriv();
+    }
+
+    constexpr auto deltaHiddenLayers(VecDouble_t const& x,auto layer,auto neuron,auto beforeNeuron) const{
 
     }
 
-    constexpr auto deltaHiddenLayers(auto layer,auto neuron,auto beforeNeuron) const{
-
-    }
-
-    constexpr auto delta(auto layer,auto neuron,auto beforeNeuron) const{
+    constexpr auto delta(VecDouble_t const& x,double const y,auto layer,auto neuron,auto beforeNeuron) const{
         if(layer==m_layers.size()-1){
-            return deltaOutputLayer(layer,neuron,beforeNeuron);
+            return deltaOutputLayer(x,y,layer,neuron,beforeNeuron);
         }else{
-            return deltaHiddenLayers(layer,neuron,beforeNeuron);
+            return deltaHiddenLayers(x,layer,neuron,beforeNeuron);
         }
+    }
+
+    constexpr auto errorDerivateFunction(auto hx, auto y) const{
+        return 2*(hx-y);
     }
 
     //Esto solo vale si la dimension de Y es 1
@@ -100,17 +104,17 @@ struct NeuralNetwork_t{
         return -1;
     }
 
-
-    double errorDerivateParcialFunction(VecDouble_t const& x,auto layer,auto neuron,auto beforeNeuron) const{
-        return delta(layer,neuron,beforeNeuron)*feedforwardinneuron(x,layer-1,beforeNeuron);
+    //Derivada parcial para el peso m_layers[layer][neuron][beforeNeuron]
+    double errorDerivateParcialFunction(VecDouble_t const& x,double const y,auto layer,auto neuron,auto beforeNeuron) const{
+        return delta(x,y,layer,neuron,beforeNeuron)*feedforwardinneuron(x,layer-1,beforeNeuron);
     }
 
     //Devuelve vector de las derivadas parciales de la funcion de error de 1 neurona
-    VecDouble_t errorDerivateFunction(VecDouble_t const& x,auto layer,auto neuron) const{
+    VecDouble_t errorDerivateParcialFunctions(VecDouble_t const& x,double const y,auto layer,auto neuron) const{
         VecDouble_t res(m_layers[layer][neuron].size());
 
         for(size_t i=0;i<res.size();i++){
-            res[i]=errorDerivateParcialFunction(x,layer,neuron,i);
+            res[i]=errorDerivateParcialFunction(x,y,layer,neuron,i);
         }
 
         return res;
@@ -133,22 +137,22 @@ struct NeuralNetwork_t{
     }
 
     //Actualiza los pesos de una neurona
-    void updateNeuron(VecDouble_t const& x,auto layer,auto neuron){
-        subVectors(m_layers[layer][neuron],multiplyIntVectors(learningRate,errorDerivateFunction(x,layer,neuron)));
+    void updateNeuron(VecDouble_t const& x,double const y,auto layer,auto neuron){
+        subVectors(m_layers[layer][neuron],multiplyIntVectors(learningRate,errorDerivateParcialFunctions(x,y,layer,neuron)));
     }
 
     //Actualiza los pesos de una capa
-    void updateLayer(VecDouble_t const& x,auto layer){
+    void updateLayer(VecDouble_t const& x,double const y,auto layer){
         for(size_t i=0;i<m_layers[layer].size();i++){
-            updateNeuron(x,layer,i);
+            updateNeuron(x,y,layer,i);
         }
     }
 
     //Actualiza los pesos de la red
-    void updateWeights(VecDouble_t const& x){
+    void updateWeights(VecDouble_t const& x,double const y){
         //De la ultima capa a la primera para backpropagation
         for(size_t i=m_layers.size()-1;i>=0;i--){
-            updateLayer(x,i);
+            updateLayer(x,y,i);
         }
     }
 
