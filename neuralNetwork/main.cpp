@@ -218,6 +218,18 @@ struct NeuralNetwork_t{
     double feedforwardinneuron(VecDouble_t const& x,auto layer,auto neuron) const{
         return feedforwardinlayer(x,layer)[neuron];
     }
+
+    void train(MatDouble_t const& X,VecDouble_t const& Y,uint16_t epochs){
+        if(X.size()!=Y.size()){
+            throw length_error("Input and output vector must have the same size.");
+        }
+
+        for(size_t i=0;i<epochs;i++){
+            for(size_t j=0;j<X.size();j++){
+                updateWeights(X[j],Y[j]);
+            }
+        }
+    }
     /*--------------------------------------------------------------------*/
 
     VecDouble_t sigmoid (VecDouble_t const& vec) const{
