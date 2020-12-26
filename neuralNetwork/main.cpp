@@ -341,7 +341,8 @@ void run(){
     initializer_list<uint16_t> layerStruct={2,3,1};
     NeuralNetwork_t net(layerStruct);
     
-    randomTrain(layerStruct,net,X,Y);
+    //randomTrain(layerStruct,net,X,Y);
+    net.train(X,Y,5);
 
     //Predecimos los valores
     auto res = net.feedforward({0.0 , 0.0});
