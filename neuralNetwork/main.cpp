@@ -80,7 +80,7 @@ struct NeuralNetwork_t{
     }
 
     constexpr auto deltaOutputLayer(VecDouble_t const& x,double const y,auto layer,auto neuron) const{
-        return errorDerivateFunction(feedforwardinneuron(x,layer,neuron)-y)*sigmoidDeriv(signal(x,layer,neuron));
+        return errorDerivateFunction(feedforwardinneuron(x,layer,neuron),y)*sigmoidDeriv(signal(x,layer,neuron));
     }
 
     constexpr auto deltaHiddenLayers(VecDouble_t const& x,auto layer,auto neuron) const{
@@ -89,9 +89,11 @@ struct NeuralNetwork_t{
 
         for(size_t i=0;i<=layer+1;i++){
             //FALTA DELTA DE LA NEURONA i DE CAPA SIGUIENTE
-            m_layers[layer+1][i][neuron]/* *deltaDeIDeLaCapaSiguiente */;
+            m2+=m_layers[layer+1][i][neuron]/* *deltaDeIDeLaCapaSiguiente */;
         }
-        return -1;
+
+
+        return m1*m2;
     }
 
     constexpr auto delta(VecDouble_t const& x,double const y,auto layer,auto neuron) const{
@@ -156,7 +158,7 @@ struct NeuralNetwork_t{
         VecDouble_t result = errorDerivateParcialFunctions(x,y,layer,neuron);
 
         multiplyIntVectors(learningRate,result);
-        
+
         subVectors(m_layers[layer][neuron],result);
     }
 
@@ -198,7 +200,7 @@ struct NeuralNetwork_t{
         return result;
     }
 
-    double feedforwardinneuron(VecDouble_t const& x,auto layer,auto neuron){
+    double feedforwardinneuron(VecDouble_t const& x,auto layer,auto neuron) const{
         return feedforwardinlayer(x,layer)[neuron];
     }
     /*--------------------------------------------------------------------*/
