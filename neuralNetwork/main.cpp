@@ -76,7 +76,7 @@ struct NeuralNetwork_t{
 
     constexpr auto signal(VecDouble_t const& x,auto layer,auto neuron) const{
         double res=0;
-        for(size_t i;i<=m_layers[layer-1].size();i++){
+        for(size_t i=0;i<m_layers[layer-1].size();i++){
             res+=feedforwardinneuron(x,layer-1,i)*m_layers[layer][neuron][i];
         }
         return res;
@@ -87,17 +87,12 @@ struct NeuralNetwork_t{
     }
 
     constexpr auto deltaHiddenLayers(VecDouble_t const& x,auto layer,auto neuron) const{
-        cout << "1" << endl;    //BORRAR
         double m1=sigmoidDeriv(feedforwardinneuron(x,layer,neuron));
         double m2=0;
-        cout << "1.5" << endl;    //BORRAR
 
-        //FALLA
-        for(size_t i=0;i<=m_layers[layer].size()+1;i++){
-            m2+=m_layers[layer+1][i][neuron]*deltaQueue.back()[i];
+        for(size_t i=0;i<m_layers[layer+1].size();i++){
+            m2+=m_layers[layer+1][i][neuron]*deltaQueue.front()[i];
         }
-
-        cout << "2" << endl;    //BORRAR
         return m1*m2;
     }
 
@@ -109,7 +104,7 @@ struct NeuralNetwork_t{
             delta=deltaHiddenLayers(x,layer,neuron);
         }
 
-        deltaQueue.front()[neuron]=delta;
+        deltaQueue.back()[neuron]=delta;
 
         return delta;
     }
@@ -167,13 +162,57 @@ struct NeuralNetwork_t{
     void updateNeuron(VecDouble_t const& x,double const y,auto layer,auto neuron){
         VecDouble_t result = errorDerivateParcialFunctions(x,y,layer,neuron);
 
+        //Borrar----------------------
+        /*cout << "Resultado antes: ";
+        for(size_t i=0;i<result.size();i++){
+            cout << m_layers[layer][neuron][i] << ", ";
+        }
+        cout << endl;
+
+        cout << "Antes: ";
+        for(size_t i=0;i<result.size();i++){
+            cout << result[i] << ", ";
+        }*/
+
         multiplyIntVectors(learningRate,result);
 
+        /*cout << endl << "Medio: ";
+        for(size_t i=0;i<result.size();i++){
+            cout << result[i] << ", ";
+        }
+        cout << endl;*/
+        //------------------------------
+
         subVectors(m_layers[layer][neuron],result);
+
+        //Borrar-------------------------
+        /*cout << "Resultado despues: ";
+        for(size_t i=0;i<result.size();i++){
+            cout << m_layers[layer][neuron][i] << ", ";
+        }
+        cout << endl << endl;*/
+        //------------------------------
     }
 
     //Actualiza los pesos de una capa
     void updateLayer(VecDouble_t const& x,double const y,auto layer){
+        //Borrar------------------------------------------
+        /*if(deltaQueue.size()>0){
+            cout << endl;
+            cout << "Cabeza: ";
+            for(size_t i=0;i<deltaQueue.front().size();i++){
+                cout << deltaQueue.front()[i] << " , ";
+            }
+            cout << endl;
+            cout << "Cola: ";
+            for(size_t i=0;i<deltaQueue.back().size();i++){
+                cout << deltaQueue.back()[i] << " , ";
+            }
+            
+            cout << endl;
+        }*/
+        //------------------------------------------------
+
         //Eliminamos el delta desfasado
         if(deltaQueue.size()>=2){
             deltaQueue.pop();
@@ -183,15 +222,24 @@ struct NeuralNetwork_t{
         VecDouble_t newDeltas(m_layers[layer].size());
         deltaQueue.push(newDeltas);
 
+
+        //cout << "Updating layer..." << endl;    //BORRAR
+
         for(size_t i=0;i<m_layers[layer].size();i++){
             updateNeuron(x,y,layer,i);
         }
+
+        //cout << "Layer updated" << endl << endl;
+
     }
 
     //Actualiza los pesos de la red
     void updateWeights(VecDouble_t const& x,double const y){
+        while(deltaQueue.size()>0) deltaQueue.pop();    //Reseteamos los deltas
+
         //De la ultima capa a la primera para backpropagation
-        for(size_t i=m_layers.size()-1;i>=0;i--){
+        for(size_t i=m_layers.size()-1;(i+1)>0;i--){    //(i+1)>0 porque size_t no puede ser negativo // Es identico a i>=0
+            //cout << "Layer " << i << endl;
             updateLayer(x,y,i);
         }
     }
@@ -228,11 +276,16 @@ struct NeuralNetwork_t{
             throw length_error("Input and output vector must have the same size.");
         }
 
+        //cout << "Training " << epochs << " epochs..." << endl;
+
         for(size_t i=0;i<epochs;i++){
             for(size_t j=0;j<X.size();j++){
+                //cout << "Data " << j << endl;
                 updateWeights(X[j],Y[j]);
             }
         }
+
+        //cout << "Trained" << endl;
     }
     /*--------------------------------------------------------------------*/
 
@@ -290,7 +343,7 @@ struct NeuralNetwork_t{
 private:
     vector<MatDouble_t> m_layers;
     queue<VecDouble_t> deltaQueue;
-    uint16_t learningRate=0.1;
+    float learningRate=0.1;
 };
 
 MatDouble_t X {
@@ -346,17 +399,17 @@ void run(){
     NeuralNetwork_t net(layerStruct);
     
     //randomTrain(layerStruct,net,X,Y);
-    net.train(X,Y,5);
+    net.train(X,Y,50);
 
     //Predecimos los valores
     auto res = net.feedforward({0.0 , 0.0});
-    printf("0.0 xor 0.0 = %i\n",(int)(res[0]+0.5));
+    printf("0.0 xor 0.0 = %f -> %i\n",res[0],(int)(res[0]+0.5));
     res = net.feedforward({0.0 , 1.0});
-    printf("0.0 xor 1.0 = %i\n",(int)(res[0]+0.5));
+    printf("0.0 xor 1.0 = %f -> %i\n",res[0],(int)(res[0]+0.5));
     res = net.feedforward({1.0 , 0.0});
-    printf("1.0 xor 0.0 = %i\n",(int)(res[0]+0.5));
+    printf("1.0 xor 0.0 = %f -> %i\n",res[0],(int)(res[0]+0.5));
     res = net.feedforward({1.0 , 1.0});
-    printf("1.0 xor 1.0 = %i\n",(int)(res[0]+0.5));
+    printf("1.0 xor 1.0 = %f -> %i\n",res[0],(int)(res[0]+0.5));
 }
 
 int main(){
