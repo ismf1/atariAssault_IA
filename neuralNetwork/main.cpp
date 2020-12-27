@@ -163,56 +163,13 @@ struct NeuralNetwork_t{
     void updateNeuron(VecDouble_t const& x,double const y,auto layer,auto neuron){    //Creo que funciona
         VecDouble_t result = errorDerivateParcialFunctions(x,y,layer,neuron);
 
-        //Borrar----------------------
-        /*cout << "Resultado antes: ";
-        for(size_t i=0;i<result.size();i++){
-            cout << m_layers[layer][neuron][i] << ", ";
-        }
-        cout << endl;
-
-        cout << "Antes: ";
-        for(size_t i=0;i<result.size();i++){
-            cout << result[i] << ", ";
-        }*/
-
         multiplyIntVectors(learningRate,result);
 
-        /*cout << endl << "Medio: ";
-        for(size_t i=0;i<result.size();i++){
-            cout << result[i] << ", ";
-        }
-        cout << endl;*/
-        //------------------------------
-
         subVectors(m_layers[layer][neuron],result);
-
-        //Borrar-------------------------
-        /*cout << "Resultado despues: ";
-        for(size_t i=0;i<result.size();i++){
-            cout << m_layers[layer][neuron][i] << ", ";
-        }
-        cout << endl << endl;*/
-        //------------------------------
     }
 
     //Actualiza los pesos de una capa
     void updateLayer(VecDouble_t const& x,double const y,auto layer){
-        //Borrar------------------------------------------
-        /*if(deltaQueue.size()>0){
-            cout << endl;
-            cout << "Cabeza: ";
-            for(size_t i=0;i<deltaQueue.front().size();i++){
-                cout << deltaQueue.front()[i] << " , ";
-            }
-            cout << endl;
-            cout << "Cola: ";
-            for(size_t i=0;i<deltaQueue.back().size();i++){
-                cout << deltaQueue.back()[i] << " , ";
-            }
-            
-            cout << endl;
-        }*/
-        //------------------------------------------------
 
         //Eliminamos el delta desfasado
         if(deltaQueue.size()>=2){
@@ -223,14 +180,9 @@ struct NeuralNetwork_t{
         VecDouble_t newDeltas(m_layers[layer].size());
         deltaQueue.push(newDeltas);
 
-
-        //cout << "Updating layer..." << endl;    //BORRAR
-
         for(size_t i=0;i<m_layers[layer].size();i++){
             updateNeuron(x,y,layer,i);
         }
-
-        //cout << "Layer updated" << endl << endl;
 
     }
 
@@ -279,16 +231,12 @@ struct NeuralNetwork_t{
             throw length_error("Input and output vector must have the same size.");
         }
 
-        //cout << "Training " << epochs << " epochs..." << endl;
-
         for(size_t i=0;i<epochs;i++){
             for(size_t j=0;j<X.size();j++){
                 //cout << "Data " << j << endl;
                 updateWeights(X[j],Y[j]);
             }
         }
-
-        //cout << "Trained" << endl;
     }
     /*--------------------------------------------------------------------*/
 
