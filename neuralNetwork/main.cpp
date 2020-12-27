@@ -159,19 +159,44 @@ struct NeuralNetwork_t{
         }
     }
 
+    void multiplyIntMatrix(auto n, auto &v) const{   //New
+        for(size_t i=0;i<v.size();i++){
+            for(size_t j=0;j<v[i].size();j++){
+                for(size_t k=0;k<v[i][j].size();k++){
+                    v[i][j][k]=v[i][j][k]*n;
+                }
+            }
+        }
+    }
+
+    void subMatrix(auto &v1,auto &v2){   //New
+        if(v1.size()!=v2.size()){
+            throw length_error("Vectors must have the same size when sub.");
+        }
+
+        for(size_t i=0;i<v1.size();i++){
+            for(size_t j=0;j<v1[i].size();j++){
+                for(size_t k=0;k<v1[i][j].size();k++){
+                    v1[i][j][k]=v1[i][j][k]-v2[i][j][k];
+                }
+            }
+        }
+    }
+
     //Actualiza los pesos de una neurona
-    void updateNeuron(VecDouble_t const& x,double const y,auto layer,auto neuron){    //PROBLEMA: Primero actualizamos y luego usamos el valor de delta anterior
+    VecDouble_t updateNeuron(VecDouble_t const& x,double const y,auto layer,auto neuron){    //PROBLEMA: Primero actualizamos y luego usamos el valor de delta anterior
         VecDouble_t result = errorDerivateParcialFunctions(x,y,layer,neuron);
 
-        //Solucion: return result;
+        return result;   //New
 
-        multiplyIntVectors(learningRate,result);
+        /*multiplyIntVectors(learningRate,result);   //New
 
-        subVectors(m_layers[layer][neuron],result);
+        subVectors(m_layers[layer][neuron],result);*/   //New
     }
 
     //Actualiza los pesos de una capa
-    void updateLayer(VecDouble_t const& x,double const y,auto layer){
+    MatDouble_t updateLayer(VecDouble_t const& x,double const y,auto layer){
+        MatDouble_t layerVector;   //New
 
         //Eliminamos el delta desfasado
         if(deltaQueue.size()>=2){
@@ -183,23 +208,28 @@ struct NeuralNetwork_t{
         deltaQueue.push(newDeltas);
 
         for(size_t i=0;i<m_layers[layer].size();i++){
-            updateNeuron(x,y,layer,i);
-            //Solucion: layerVector.push(updateNeuron(x,y,layer,i));
+            //updateNeuron(x,y,layer,i);   //New
+            layerVector.push_back(updateNeuron(x,y,layer,i));   //New
         }
+
+        return layerVector;
 
     }
 
     //Actualiza los pesos de la red
     void updateWeights(VecDouble_t const& x,double const y){
+        vector<MatDouble_t> layersVector(m_layers.size());   //New
+
         while(deltaQueue.size()>0) deltaQueue.pop();    //Reseteamos los deltas
 
         //De la ultima capa a la primera para backpropagation
         for(size_t i=m_layers.size()-1;(i+1)>0;i--){    //(i+1)>0 porque size_t no puede ser negativo // Es identico a i>=0
-            updateLayer(x,y,i);
-            //Solucion: layersVector.push(updateLayer(x,y,i))
+            //updateLayer(x,y,i);   //New
+            layersVector[i]=updateLayer(x,y,i);   //New
         }
 
-        //Solucion: Update weights
+        multiplyIntMatrix(learningRate,layersVector);   //New
+        subMatrix(m_layers,layersVector);   //New
     }
 
     VecDouble_t feedforwardinlayer(VecDouble_t const& x,auto layer) const{  //FUNCIONA
