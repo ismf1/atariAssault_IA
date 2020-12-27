@@ -160,8 +160,10 @@ struct NeuralNetwork_t{
     }
 
     //Actualiza los pesos de una neurona
-    void updateNeuron(VecDouble_t const& x,double const y,auto layer,auto neuron){    //Creo que funciona
+    void updateNeuron(VecDouble_t const& x,double const y,auto layer,auto neuron){    //PROBLEMA: Primero actualizamos y luego usamos el valor de delta anterior
         VecDouble_t result = errorDerivateParcialFunctions(x,y,layer,neuron);
+
+        //Solucion: return result;
 
         multiplyIntVectors(learningRate,result);
 
@@ -182,6 +184,7 @@ struct NeuralNetwork_t{
 
         for(size_t i=0;i<m_layers[layer].size();i++){
             updateNeuron(x,y,layer,i);
+            //Solucion: layerVector.push(updateNeuron(x,y,layer,i));
         }
 
     }
@@ -192,9 +195,11 @@ struct NeuralNetwork_t{
 
         //De la ultima capa a la primera para backpropagation
         for(size_t i=m_layers.size()-1;(i+1)>0;i--){    //(i+1)>0 porque size_t no puede ser negativo // Es identico a i>=0
-            //cout << "Layer " << i << endl;
             updateLayer(x,y,i);
+            //Solucion: layersVector.push(updateLayer(x,y,i))
         }
+
+        //Solucion: Update weights
     }
 
     VecDouble_t feedforwardinlayer(VecDouble_t const& x,auto layer) const{  //FUNCIONA
