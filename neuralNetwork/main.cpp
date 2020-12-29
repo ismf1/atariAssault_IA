@@ -28,7 +28,7 @@ void fillVectorNoRandom(auto& vec, auto i, auto seed){
     size_t j=0;
     for (auto& v : vec){
         j++;
-        v=seed*i*j;
+        v=(double)(seed*i*j)*0.1;
     }
 }
 
@@ -51,7 +51,7 @@ struct NeuralNetwork_t{
             for(size_t i=0; i<*it ; i++){
                 //Neurona i
                 VecDouble_t neuron_w(input_size+1); //El 0 es el bias
-                fillVectorRandom(neuron_w,-10.0,10.0);
+                fillVectorRandom(neuron_w,-5.0,5.0);
                 //fillVectorNoRandom(neuron_w,i+1,7);    //Solo para las pruebas
 
                 matrix_w[i]=neuron_w;
@@ -82,7 +82,7 @@ struct NeuralNetwork_t{
     }
     /*-------------------------------NUEVO--------------------------------*/
     constexpr auto sigmoidDeriv(auto x) const{  //Funciona
-        return sigmoid(x)*(1-x);
+        return sigmoid(x)*(1-sigmoid(x));
     }
 
     constexpr auto signal(VecDouble_t const& x,auto layer,auto neuron) const{   //FUNCIONA
@@ -404,7 +404,7 @@ void run(){
     NeuralNetwork_t net(layerStruct);
     
     //randomTrain(layerStruct,net,X,Y);
-    net.train(X,Y,200);
+    net.train(X,Y,2000);
 
     //Predecimos los valores
     auto res = net.feedforward({0.0 , 0.0});
