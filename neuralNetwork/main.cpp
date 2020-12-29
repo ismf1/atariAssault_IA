@@ -24,6 +24,14 @@ double randDouble(double min, double max){
     return dist(rng);
 }
 
+void fillVectorNoRandom(auto& vec, auto i, auto seed){
+    size_t j=0;
+    for (auto& v : vec){
+        j++;
+        v=seed*i*j;
+    }
+}
+
 void fillVectorRandom(auto& vec, double min, double max){
     for (auto& v : vec){
         v=randDouble(min,max);
@@ -44,6 +52,7 @@ struct NeuralNetwork_t{
                 //Neurona i
                 VecDouble_t neuron_w(input_size+1); //El 0 es el bias
                 fillVectorRandom(neuron_w,-10.0,10.0);
+                //fillVectorNoRandom(neuron_w,i+1,7);    //Solo para las pruebas
 
                 matrix_w[i]=neuron_w;
             }
@@ -68,10 +77,11 @@ struct NeuralNetwork_t{
     }
 
     constexpr auto sigmoid(auto x) const{
+        if((1 + exp(-x))==0) throw out_of_range("Division entre 0 en funcion sigmoidea.");
         return 1 / (1 + exp(-x));
     }
     /*-------------------------------NUEVO--------------------------------*/
-    constexpr auto sigmoidDeriv(auto x) const{  //Creo que funciona
+    constexpr auto sigmoidDeriv(auto x) const{  //Funciona
         return sigmoid(x)*(1-x);
     }
 
@@ -83,12 +93,13 @@ struct NeuralNetwork_t{
         return res;
     }
 
-    constexpr auto deltaOutputLayer(VecDouble_t const& x,double const y,auto layer,auto neuron) const{  //Creo que funciona
+    constexpr auto deltaOutputLayer(VecDouble_t const& x,double const y,auto layer,auto neuron) const{  //Funciona
         return errorDerivateFunction(feedforwardinneuron(x,layer,neuron),y)*sigmoidDeriv(signal(x,layer,neuron));
     }
 
-    constexpr auto deltaHiddenLayers(VecDouble_t const& x,auto layer,auto neuron) const{    //Creo que funciona
-        double m1=sigmoidDeriv(feedforwardinneuron(x,layer,neuron));
+    constexpr auto deltaHiddenLayers(VecDouble_t const& x,auto layer,auto neuron) const{    //Funciona
+        double m1=feedforwardinneuron(x,layer,neuron);
+        m1=sigmoidDeriv(m1);
         double m2=0;
 
         for(size_t i=0;i<m_layers[layer+1].size();i++){
@@ -97,7 +108,8 @@ struct NeuralNetwork_t{
         return m1*m2;
     }
 
-    auto delta(VecDouble_t const& x,double const y,auto layer,auto neuron){    //Creo que funciona
+    auto delta(VecDouble_t const& x,double const y,auto layer,auto neuron){    //Funciona
+        //Posible optimizacion: Comprobar si ya tenemos el delta guardado en la cola antes de recalcular
         double delta;
         if(layer==m_layers.size()-1){
             delta=deltaOutputLayer(x,y,layer,neuron);
@@ -110,7 +122,7 @@ struct NeuralNetwork_t{
         return delta;
     }
 
-    constexpr auto errorDerivateFunction(auto hx, auto y) const{    //Creo que funciona
+    constexpr auto errorDerivateFunction(auto hx, auto y) const{    //Funciona
         return 2*(hx-y);
     }
 
@@ -128,12 +140,19 @@ struct NeuralNetwork_t{
     }*/
 
     //Derivada parcial para el peso m_layers[layer][neuron][beforeNeuron]
-    double errorDerivateParcialFunction(VecDouble_t const& x,double const y,auto layer,auto neuron,auto beforeNeuron){    //Creo que funciona
-        return delta(x,y,layer,neuron)*feedforwardinneuron(x,layer-1,beforeNeuron);
+    double errorDerivateParcialFunction(VecDouble_t const& x,double const y,auto layer,auto neuron,auto beforeNeuron){    //Funciona
+        double deltaV;
+        if(beforeNeuron==0){
+            return delta(x,y,layer,neuron);
+        }else{
+            beforeNeuron--;
+            deltaV=delta(x,y,layer,neuron)*feedforwardinneuron(x,layer-1,beforeNeuron);
+            return deltaV;
+        }
     }
 
     //Devuelve vector de las derivadas parciales de la funcion de error de 1 neurona
-    VecDouble_t errorDerivateParcialFunctions(VecDouble_t const& x,double const y,auto layer,auto neuron){    //Creo que funciona
+    VecDouble_t errorDerivateParcialFunctions(VecDouble_t const& x,double const y,auto layer,auto neuron){    //Funciona
         VecDouble_t res(m_layers[layer][neuron].size());
 
         for(size_t i=0;i<res.size();i++){
@@ -159,7 +178,7 @@ struct NeuralNetwork_t{
         }
     }
 
-    void multiplyIntMatrix(auto n, auto &v) const{   //New
+    void multiplyIntMatrix(auto n, auto &v) const{   //Funciona
         for(size_t i=0;i<v.size();i++){
             for(size_t j=0;j<v[i].size();j++){
                 for(size_t k=0;k<v[i][j].size();k++){
@@ -169,7 +188,7 @@ struct NeuralNetwork_t{
         }
     }
 
-    void subMatrix(auto &v1,auto &v2){   //New
+    void subMatrix(auto &v1,auto &v2){   //Funciona
         if(v1.size()!=v2.size()){
             throw length_error("Vectors must have the same size when sub.");
         }
@@ -184,7 +203,7 @@ struct NeuralNetwork_t{
     }
 
     //Actualiza los pesos de una neurona
-    VecDouble_t updateNeuron(VecDouble_t const& x,double const y,auto layer,auto neuron){    //PROBLEMA: Primero actualizamos y luego usamos el valor de delta anterior
+    VecDouble_t updateNeuron(VecDouble_t const& x,double const y,auto layer,auto neuron){    //Funciona
         VecDouble_t result = errorDerivateParcialFunctions(x,y,layer,neuron);
 
         return result;   //New
@@ -257,7 +276,7 @@ struct NeuralNetwork_t{
         return result;
     }
 
-    double feedforwardinneuron(VecDouble_t const& x,auto layer,auto neuron) const{
+    double feedforwardinneuron(VecDouble_t const& x,auto layer,auto neuron) const{  //Funciona
         return feedforwardinlayer(x,layer)[neuron];
     }
 
