@@ -87,8 +87,14 @@ struct NeuralNetwork_t{
 
     constexpr auto signal(VecDouble_t const& x,auto layer,auto neuron) const{   //FUNCIONA
         double res=m_layers[layer][neuron][0];
-        for(size_t i=0;i<m_layers[layer-1].size();i++){
-            res+=feedforwardinneuron(x,layer-1,i)*m_layers[layer][neuron][i+1];
+        if(layer>0){
+            for(size_t i=0;i<m_layers[layer-1].size();i++){
+                res+=feedforwardinneuron(x,layer-1,i)*m_layers[layer][neuron][i+1];
+            }
+        }else{
+            for(size_t i=0;i<x.size();i++){
+                res+=x[i]*m_layers[layer][neuron][i+1];
+            }
         }
         return res;
     }
@@ -98,8 +104,10 @@ struct NeuralNetwork_t{
     }
 
     constexpr auto deltaHiddenLayers(VecDouble_t const& x,auto layer,auto neuron) const{    //Funciona
-        double m1=feedforwardinneuron(x,layer,neuron);
+        //double m1=feedforwardinneuron(x,layer,neuron);
+        double m1=signal(x,layer,neuron);   //No se si es esta o la linea comentada de arriba
         m1=sigmoidDeriv(m1);
+        //if(sigmoidDeriv(signal(x,layer,neuron))!=(feedforwardinneuron(x,layer,neuron)*(1-feedforwardinneuron(x,layer,neuron)))) cout << "¡¡¡FALLA!!!" << endl;
         double m2=0;
 
         for(size_t i=0;i<m_layers[layer+1].size();i++){
