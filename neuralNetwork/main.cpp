@@ -100,8 +100,8 @@ struct NeuralNetwork_t{
         return res;
     }
 
-    constexpr auto deltaOutputLayer(VecDouble_t const& x,double const y,auto layer,auto neuron) const{  //Funciona
-        return errorDerivateFunction(feedforwardinneuron(x,layer,neuron),y)*sigmoidDeriv(signal(x,layer,neuron));
+    constexpr auto deltaOutputLayer(VecDouble_t const& x,VecDouble_t const y,auto layer,auto neuron) const{  //Funciona
+        return errorDerivateFunction(feedforwardinneuron(x,layer,neuron),y[neuron],y.size())*sigmoidDeriv(signal(x,layer,neuron));
     }
 
     constexpr auto deltaHiddenLayers(VecDouble_t const& x,auto layer,auto neuron) const{    //Funciona
@@ -117,7 +117,7 @@ struct NeuralNetwork_t{
         return m1*m2;
     }
 
-    auto delta(VecDouble_t const& x,double const y,auto layer,auto neuron){    //Funciona
+    auto delta(VecDouble_t const& x,VecDouble_t const y,auto layer,auto neuron){    //Funciona
         //Posible optimizacion: Comprobar si ya tenemos el delta guardado en la cola antes de recalcular
         double delta;
         if(layer==m_layers.size()-1){
@@ -131,21 +131,31 @@ struct NeuralNetwork_t{
         return delta;
     }
 
-    constexpr auto errorDerivateFunction(auto hx, auto y) const{    //Funciona
-        return 2*(hx-y);
+    //Cambiar para y multidimensional
+    constexpr auto errorDerivateFunction(auto hx, auto y,auto size_y) const{    //Funciona
+        return 2*(hx-y)/size_y;
     }
 
-    //Esto solo vale si la dimension de Y es 1
-    constexpr auto errorFunction(auto hx, auto y) const{
+    //Cambiar para y multidimensional
+    constexpr auto errorFunctionInNeuron(double hx, double y) const{
         return pow(hx-y,2);
     }
 
-    //Cambiar para mas de una neurona en capa de  ([0])
-    double errorFunctionVector(MatDouble_t const& X, VecDouble_t const& Y) const{
+    auto errorFunction(const VecDouble_t hx,const VecDouble_t y) const{
+        double error=0;
+        for(size_t i=0;i<y.size();i++){
+            error+=errorFunctionInNeuron(hx[i],y[i]);
+        }
+        error=error/y.size();
+        return error;
+    }
+
+    //Cambiar para y multidimensional
+    double errorFunctionVector(MatDouble_t const& X, MatDouble_t const& Y) const{
         double errorCont=0;
 
         for(size_t i=0; i<X.size() ; i++){
-            errorCont+=errorFunction(feedforward(X[i])[0],Y[i]);
+            errorCont+=errorFunction(feedforward(X[i]),Y[i]);
         }
         errorCont=errorCont/X.size();
 
@@ -153,7 +163,7 @@ struct NeuralNetwork_t{
     }
 
     //Derivada parcial para el peso m_layers[layer][neuron][beforeNeuron]
-    double errorDerivateParcialFunction(VecDouble_t const& x,double const y,auto layer,auto neuron,auto beforeNeuron){    //Funciona
+    double errorDerivateParcialFunction(VecDouble_t const& x,VecDouble_t const y,auto layer,auto neuron,auto beforeNeuron){    //Funciona
         double deltaV;
         if(beforeNeuron==0){
             return delta(x,y,layer,neuron);
@@ -165,7 +175,7 @@ struct NeuralNetwork_t{
     }
 
     //Devuelve vector de las derivadas parciales de la funcion de error de 1 neurona
-    VecDouble_t errorDerivateParcialFunctions(VecDouble_t const& x,double const y,auto layer,auto neuron){    //Funciona
+    VecDouble_t errorDerivateParcialFunctions(VecDouble_t const& x,VecDouble_t const y,auto layer,auto neuron){    //Funciona
         VecDouble_t res(m_layers[layer][neuron].size());
 
         for(size_t i=0;i<res.size();i++){
@@ -216,7 +226,7 @@ struct NeuralNetwork_t{
     }
 
     //Actualiza los pesos de una neurona
-    VecDouble_t updateNeuron(VecDouble_t const& x,double const y,auto layer,auto neuron){    //Funciona
+    VecDouble_t updateNeuron(VecDouble_t const& x,VecDouble_t const y,auto layer,auto neuron){    //Funciona
         VecDouble_t result = errorDerivateParcialFunctions(x,y,layer,neuron);
 
         return result;   //New
@@ -227,7 +237,7 @@ struct NeuralNetwork_t{
     }
 
     //Actualiza los pesos de una capa
-    MatDouble_t updateLayer(VecDouble_t const& x,double const y,auto layer){
+    MatDouble_t updateLayer(VecDouble_t const& x,VecDouble_t const y,auto layer){
         MatDouble_t layerVector;   //New
 
         //Eliminamos el delta desfasado
@@ -249,7 +259,7 @@ struct NeuralNetwork_t{
     }
 
     //Actualiza los pesos de la red
-    void updateWeights(VecDouble_t const& x,double const y){
+    void updateWeights(VecDouble_t const& x,VecDouble_t const y){
         vector<MatDouble_t> layersVector(m_layers.size());   //New
 
         while(deltaQueue.size()>0) deltaQueue.pop();    //Reseteamos los deltas
@@ -293,7 +303,7 @@ struct NeuralNetwork_t{
         return feedforwardinlayer(x,layer)[neuron];
     }
 
-    void train(MatDouble_t const& X,VecDouble_t const& Y,uint16_t epochs){
+    void train(MatDouble_t const& X,MatDouble_t const& Y,uint16_t epochs){
         if(X.size()!=Y.size()){
             throw length_error("Input and output vector must have the same size.");
         }
@@ -380,11 +390,11 @@ MatDouble_t X {
     {1.0, 1.0}
 };
 
-VecDouble_t Y {
-    0.0,
-    1.0,
-    1.0,
-    0.0
+MatDouble_t Y {
+    {0.0,0.0},
+    {1.0,1.1},
+    {1.0,1.1},
+    {0.0,0.0}
 };
 
 double evaluateNet(NeuralNetwork_t& net,MatDouble_t const& X, VecDouble_t const& Y){
@@ -422,7 +432,7 @@ void randomTrain(initializer_list<uint16_t> layerStruct, NeuralNetwork_t& bestNe
 }
 
 void run(){
-    initializer_list<uint16_t> layerStruct={2,3,3,1};
+    initializer_list<uint16_t> layerStruct={2,3,3,2};
     float learningRate=0.15;
     NeuralNetwork_t net(layerStruct,learningRate);
     
