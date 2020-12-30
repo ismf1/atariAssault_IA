@@ -39,7 +39,8 @@ void fillVectorRandom(auto& vec, double min, double max){
 }
 
 struct NeuralNetwork_t{
-    explicit NeuralNetwork_t(initializer_list<uint16_t> const& layers) {
+    explicit NeuralNetwork_t(initializer_list<uint16_t> const& layers,float learningR) {
+        learningRate=learningR;
         //Al menos deben haber 2 capas
         if(layers.size()<2) throw out_of_range("Number of layers can not be less than 2");
         
@@ -51,7 +52,7 @@ struct NeuralNetwork_t{
             for(size_t i=0; i<*it ; i++){
                 //Neurona i
                 VecDouble_t neuron_w(input_size+1); //El 0 es el bias
-                fillVectorRandom(neuron_w,-5.0,5.0);
+                fillVectorRandom(neuron_w,-3.0,3.0);
                 //fillVectorNoRandom(neuron_w,i+1,7);    //Solo para las pruebas
 
                 matrix_w[i]=neuron_w;
@@ -139,13 +140,17 @@ struct NeuralNetwork_t{
         return pow(hx-y,2);
     }
 
-    /*constexpr auto errorFunctionVector(MatDouble_t const& X, VecDouble_t const& Y) const{
-        uint16_t errorCont=0;
+    //Cambiar para mas de una neurona en capa de  ([0])
+    double errorFunctionVector(MatDouble_t const& X, VecDouble_t const& Y) const{
+        double errorCont=0;
 
-        //FALTA
+        for(size_t i=0; i<X.size() ; i++){
+            errorCont+=errorFunction(feedforward(X[i])[0],Y[i]);
+        }
+        errorCont=errorCont/X.size();
 
-        return -1;
-    }*/
+        return errorCont;
+    }
 
     //Derivada parcial para el peso m_layers[layer][neuron][beforeNeuron]
     double errorDerivateParcialFunction(VecDouble_t const& x,double const y,auto layer,auto neuron,auto beforeNeuron){    //Funciona
@@ -293,10 +298,19 @@ struct NeuralNetwork_t{
             throw length_error("Input and output vector must have the same size.");
         }
 
+        double errorF;
+
         for(size_t i=0;i<epochs;i++){
             for(size_t j=0;j<X.size();j++){
                 //cout << "Data " << j << endl;
                 updateWeights(X[j],Y[j]);
+            }
+            errorF=errorFunctionVector(X,Y);
+            cout << "Error cuadratico medio: " << errorF << endl;
+            //¿Borrar?:
+            if(errorF<0.1){
+                cout << "Epocas necesarias: " << i << endl;
+                break;   
             }
         }
     }
@@ -356,7 +370,7 @@ struct NeuralNetwork_t{
 private:
     vector<MatDouble_t> m_layers;
     queue<VecDouble_t> deltaQueue;
-    float learningRate=0.1;
+    float learningRate=0.2;
 };
 
 MatDouble_t X {
@@ -388,14 +402,14 @@ double evaluateNet(NeuralNetwork_t& net,MatDouble_t const& X, VecDouble_t const&
     return fails;
 }
 
-void randomTrain(initializer_list<uint16_t> layerStruct, NeuralNetwork_t& bestNet,MatDouble_t const& X, VecDouble_t const& Y){
+void randomTrain(initializer_list<uint16_t> layerStruct, NeuralNetwork_t& bestNet,MatDouble_t const& X, VecDouble_t const& Y,float learningR){
     double lessFails=pow(X.size(),2);
     double fails=0;
 
 
     for(size_t i=0;i<5000;i++){
         //Iteracion i
-        NeuralNetwork_t net(layerStruct);
+        NeuralNetwork_t net(layerStruct,learningR);
         
         fails=evaluateNet(net,X,Y);
         //Si es la mejor la guardamos
@@ -408,11 +422,13 @@ void randomTrain(initializer_list<uint16_t> layerStruct, NeuralNetwork_t& bestNe
 }
 
 void run(){
-    initializer_list<uint16_t> layerStruct={2,3,1};
-    NeuralNetwork_t net(layerStruct);
+    initializer_list<uint16_t> layerStruct={2,3,3,1};
+    float learningRate=0.15;
+    NeuralNetwork_t net(layerStruct,learningRate);
     
     //randomTrain(layerStruct,net,X,Y);
-    net.train(X,Y,2000);
+    net.train(X,Y,10000);
+
 
     //Predecimos los valores
     auto res = net.feedforward({0.0 , 0.0});
