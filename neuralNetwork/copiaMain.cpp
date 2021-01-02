@@ -352,17 +352,14 @@ struct NeuralNetwork_t{
                 //cout << "Data " << j << endl;
                 updateWeights(X[j],Y[j]);
             }
-            cout << "Epoca " << i << endl;
-            /*errorF=errorFunctionVector(X,Y);
+            errorF=errorFunctionVector(X,Y);
             cout << "Error cuadratico medio: " << errorF << endl;
             //¿Borrar?:
             if(errorF<0.1){
                 cout << "Epocas necesarias: " << i << endl;
                 break;   
-            }*/
+            }
         }
-        errorF=errorFunctionVector(X,Y);
-        cout << "Error cuadratico medio: " << errorF << endl;
     }
     /*--------------------------------------------------------------------*/
 
