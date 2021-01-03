@@ -60,6 +60,8 @@ NNet::NNet(const std::vector<int16_t> &topology, const ActFunc &actf)
         nn.push_back(NeuralLayer(topology[i], topology[i + 1], actf));
 }
 
+NNet::NNet() {}
+
 void NNet::train(const Mat2d &X, const Mat2d &y, const CostFunc &costf, size_t epochs, double lr)
 {
 
@@ -87,6 +89,22 @@ void NNet::test(const Mat2d &X, const Mat2d &y) const
             acc++;
 
     std::cout << "Acc: " << (acc * 100.f / r.size()) << "%" << std::endl;
+}
+
+NNet::VecWeights NNet::getWeights() const {
+    VecWeights vecW;
+
+    for (size_t i = 0; i < size(); i++)
+        vecW.push_back(nn[i].getWeights());
+
+    return vecW;
+}
+
+void NNet::load(const NNet::VecWeights &vecW) {
+    nn.clear();
+
+    for (auto &layer : vecW)
+        nn.push_back(NeuralLayer(layer));
 }
 
 auto NNet::begin() const

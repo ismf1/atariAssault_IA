@@ -4,6 +4,9 @@
 #include <Types.hpp>
 
 struct NeuralLayer {
+
+    using Weights = std::vector<std::vector<double>>;
+
     int16_t nconn;
     int16_t nneur;
     ActFunc actf;
@@ -11,7 +14,8 @@ struct NeuralLayer {
     Vec2d b;
 
     explicit NeuralLayer(int16_t nconn, int16_t nneur, ActFunc actf);
+    explicit NeuralLayer(Weights w);
+    Weights getWeights() const;
 
-    std::ostream& toStream(std::ostream&) const;
     friend std::ostream& operator<<(std::ostream &os, const NeuralLayer &nl);
 };

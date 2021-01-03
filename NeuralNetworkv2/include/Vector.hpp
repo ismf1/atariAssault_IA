@@ -21,7 +21,8 @@ class Vector {
 
     explicit Vector(size_t size) : v(size) {}
     Vector(const Vector& x) : v(x.v) {}
-    Vector(const std::initializer_list<double>& x) : v(x) {}
+    Vector(const std::initializer_list<W>& x) : v(x) {}
+    Vector(const std::vector<W>& x) : v(x) {}
     explicit Vector() : v() {}
 
     explicit Vector(size_t size, auto&& lambda) : v(size) {

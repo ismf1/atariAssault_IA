@@ -36,10 +36,19 @@ public:
             row = Vector<W>(ncol, lambda);
     }
 
-    explicit Matrix(const std::initializer_list<Vector<W>> mat) : mat(mat)
+    explicit Matrix(const std::initializer_list<Vector<W>> &mat) : mat(mat)
     {
         this->nrow = this->mat.size();
         this->ncol = this->mat[0].size();
+    }
+
+    explicit Matrix(const std::vector<std::vector<W>> &mat) : mat(mat.size())
+    {
+        this->nrow = this->mat.size();
+        this->ncol = mat[0].size();
+        
+        for (size_t i = 0; i < mat.size(); i++)
+            this->mat[i] = Vector<W>(mat[i]);
     }
     
     Matrix(const Matrix &other)
@@ -268,7 +277,7 @@ public:
 
         return v;
     }
-    
+
     Matrix transpose() const
     {
         Matrix temp(ncol, nrow);
@@ -278,6 +287,22 @@ public:
                 temp[j][i] = mat[i][j];
 
         return temp;
+    }
+
+    std::vector<std::vector<W>> toSTLVector() {
+        std::vector<std::vector<W>> v(size());
+
+        for (size_t i = 0; i < size(); i++) {
+            v[i] = std::vector<W>(ncol);
+            for (size_t j = 0; j < ncol; j++)
+                v[i][j] = mat[i][j];
+        }
+
+        return v;
+    }
+
+    auto insert(size_t index, const Vector<W> &e) {
+        return mat.insert(mat.begin() + index, e); 
     }
 
     void shape()

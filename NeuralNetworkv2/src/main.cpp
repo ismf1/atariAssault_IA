@@ -1,6 +1,18 @@
 #include <NeuralNet.hpp>
 #include <Functions.hpp>
 
+void print(std::vector<std::vector<std::vector<double>>> v) {
+    for (auto &i : v) {
+        for (auto &j : i) {
+            for (auto &e : j) {
+                std::cout << e  << " ";
+            }
+            std::cout << std::endl;
+        }
+        std::cout << std::endl;
+    }
+}
+
 int main() {
 
     Mat2d X(
@@ -637,8 +649,18 @@ int main() {
     ActFunc  actf  { Functions::sigm, Functions::sigmD };
 
     NNet nn(topology, actf);
-    nn.train(X, y, costf, 2500, 0.1f);
-    nn.test(x_test, y_test);
+    nn.train(X, y, costf, 500, 0.1f);
+    // nn.test(x_test, y_test);
+
+    std::cout << nn << std::endl;
+
+    print(nn.getWeights());
+
+    std::cout << "----------" << std::endl; 
+    auto a = nn.getWeights();
+    nn.load(a);
+    auto b = nn.getWeights();
+    print(b);
 
     return 0;
 }
