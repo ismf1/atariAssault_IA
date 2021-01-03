@@ -17,3 +17,13 @@ std::ostream& operator<<(std::ostream &os, const NeuralLayer &nl) {
 
     return os;
 }
+
+std::ostream& NeuralLayer::toStream(std::ostream &os) const {
+
+    std::ostream a(w.toStream(os));
+
+    os << nconn << std::endl
+       << nneur << std::endl
+       <<  << std::endl;
+
+}

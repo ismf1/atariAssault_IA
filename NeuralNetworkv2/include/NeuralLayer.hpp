@@ -12,5 +12,6 @@ struct NeuralLayer {
 
     explicit NeuralLayer(int16_t nconn, int16_t nneur, ActFunc actf);
 
+    std::ostream& toStream(std::ostream&) const;
     friend std::ostream& operator<<(std::ostream &os, const NeuralLayer &nl);
 };

@@ -3,20 +3,19 @@
 
 NNet::VecFordward NNet::forwardPass(const Mat2d &X) const
 {
-    VecFordward out;
+    VecFordward vecA({ X });
 
-    out.push_back(X);
-
-    for (size_t i = 0; i < nn.size(); i++)
+    for (auto const& layer : nn)
     {
-        auto [actf, actfD] = nn[i].actf;
-        auto lastA = out.back();
-        auto z = lastA * nn[i].w + nn[i].b;
+        auto [actf, actfD] = layer.actf;
+        auto lastA = vecA.back();
+        auto z = lastA * layer.w + layer.b;
         auto a = z.apply(actf);
-        out.push_back(a);
+
+        vecA.push_back(a);
     }
 
-    return out;
+    return vecA;
 }
 
 Mat2d NNet::ttrain(const Mat2d &X, const Mat2d &y, const CostFunc &costf, double lr)
@@ -33,7 +32,7 @@ Mat2d NNet::ttrain(const Mat2d &X, const Mat2d &y, const CostFunc &costf, double
     for (int l = nn.size() - 1; l >= 0; l--)
     {
         auto [actf, actfD] = nn[l].actf;
-        auto a = out[l + 1];
+        auto a  = out[l + 1];
         auto al = out[l];
 
         if (static_cast<size_t>(l) == nn.size() - 1)
@@ -41,7 +40,7 @@ Mat2d NNet::ttrain(const Mat2d &X, const Mat2d &y, const CostFunc &costf, double
         else
             deltas.push_front(deltas.front() * _W.transpose() ^ a.apply(actfD));
 
-        _W = nn[l].w;
+        _W      = nn[l].w;
         nn[l].b = nn[l].b - deltas.front().mean(1) * lr;
         nn[l].w = nn[l].w - (al.transpose() * deltas.front()).mult(lr);
     }
@@ -80,21 +79,14 @@ void NNet::train(const Mat2d &X, const Mat2d &y, const CostFunc &costf, size_t e
 
 void NNet::test(const Mat2d &X, const Mat2d &y) const
 {
-    double acc = 0;
-    double err = 0;
-
     Mat2d r = forwardPass(X).back().apply([](double n) { return (int)(n + 0.5); });
+    double acc = 0;
 
     for (size_t i = 0; i < r.size(); i++)
-    {
-        std::cout << y[i] << "==" << r[i] << std::endl;
         if (y[i] == r[i])
             acc++;
-        else
-            err++;
-    }
 
-    std::cout << "Resultado de testing: " << (acc * 100.f / r.size()) << "%" << std::endl;
+    std::cout << "Acc: " << (acc * 100.f / r.size()) << "%" << std::endl;
 }
 
 auto NNet::begin() const

@@ -242,16 +242,9 @@ public:
         Matrix temp(nrow, other.ncol);
 
         for (size_t i = 0; i < nrow; i++)
-        {
-            for (size_t j = 0; j < other.ncol; j++)
-            {
-                temp[i][j] = 0;
-                for (size_t k = 0; k < ncol; k++)
-                {
+            for (size_t k = 0; k < ncol; k++)
+                for (size_t j = 0; j < other.ncol; j++)
                     temp[i][j] += mat[i][k] * other[k][j];
-                }
-            }
-        }
 
         return temp;
     }
@@ -275,7 +268,7 @@ public:
 
         return v;
     }
-
+    
     Matrix transpose() const
     {
         Matrix temp(ncol, nrow);
