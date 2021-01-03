@@ -305,7 +305,11 @@ public:
         return mat.insert(mat.begin() + index, e); 
     }
 
-    void shape()
+    auto push_back(const Vector<W> &e) {
+        return mat.push_back(e);
+    }
+
+    void shape() const
     {
         std::cout << "(" << nrow << ", " << ncol << ")" << std::endl;
     }

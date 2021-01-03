@@ -29,6 +29,8 @@ Mat2d NNet::ttrain(const Mat2d &X, const Mat2d &y, const CostFunc &costf, double
     auto [cost, costD] = costf;
     Mat2d _W;
 
+    using namespace std;
+
     for (int l = nn.size() - 1; l >= 0; l--)
     {
         auto [actf, actfD] = nn[l].actf;
@@ -36,7 +38,7 @@ Mat2d NNet::ttrain(const Mat2d &X, const Mat2d &y, const CostFunc &costf, double
         auto al = out[l];
 
         if (static_cast<size_t>(l) == nn.size() - 1)
-            deltas.push_front(costD(a, y) * a.apply(actfD));
+            deltas.push_front(costD(a, y) ^ a.apply(actfD));
         else
             deltas.push_front(deltas.front() * _W.transpose() ^ a.apply(actfD));
 
@@ -70,7 +72,7 @@ void NNet::train(const Mat2d &X, const Mat2d &y, const CostFunc &costf, size_t e
 
         Mat2d pY = ttrain(X, y, costf, lr);
 
-        if (i % 25 == 0)
+        if (i % 1 == 0)
         {
             auto [cost, costD] = costf;
             auto loss = cost(pY, y);
@@ -84,9 +86,11 @@ void NNet::test(const Mat2d &X, const Mat2d &y) const
     Mat2d r = forwardPass(X).back().apply([](double n) { return (int)(n + 0.5); });
     double acc = 0;
 
-    for (size_t i = 0; i < r.size(); i++)
+    for (size_t i = 0; i < r.size(); i++) {
+        std::cout << y[i]  << "==" << r[i] << std::endl; 
         if (y[i] == r[i])
             acc++;
+    }
 
     std::cout << "Acc: " << (acc * 100.f / r.size()) << "%" << std::endl;
 }
