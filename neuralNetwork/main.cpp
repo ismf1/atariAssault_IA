@@ -408,9 +408,19 @@ struct NeuralNetwork_t{
     VecDouble_t activeFunction (VecDouble_t const& vec, auto layer){
         switch(functionsAct[layer]){
             case ActF::SIGMOID: return sigmoid(vec);
-            //case ActF::RELU: return relu(vec);
+            case ActF::RELU: return relu(vec);
             default: break;
         }
+    }
+
+    VecDouble_t relu (VecDouble_t const& vec) const{
+        VecDouble_t result(vec.size(),0.0);
+
+        for(size_t i=0; i<vec.size() ; i++){
+            result[i]=relu(vec[i]);
+        }
+
+        return result;
     }
 
     VecDouble_t sigmoid (VecDouble_t const& vec) const{
