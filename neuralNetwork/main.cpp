@@ -40,6 +40,9 @@ void fillVectorRandom(auto& vec, double min, double max){
 
 struct NeuralNetwork_t{
     explicit NeuralNetwork_t(initializer_list<uint16_t> const& layers,float learningR) {
+        for(size_t i=0;i<layers.size();i++){
+            functionsAct.push(ActF.SIGMOID);
+        }
         learningRate=learningR;
         //Al menos deben haber 2 capas
         if(layers.size()<2) throw out_of_range("Number of layers can not be less than 2");
@@ -62,6 +65,12 @@ struct NeuralNetwork_t{
         }
     }
 
+    void setActiveFunctions(Vector<ActF> v){
+        for(size_t i=0;i<v.size();i++){
+            functionsAct[i]=v[i];
+        }
+    }
+
     VecDouble_t multiplyT(VecDouble_t const& input,MatDouble_t const& W) const{
         if(input.size()!=W[0].size()) throw length_error("Input and weight vector must have the same size.");
 
@@ -77,6 +86,14 @@ struct NeuralNetwork_t{
         return result;
     }
 
+    auto activeFunction(auto x, auto layer) const{
+        switch(functionsAct[layer]){
+            case ActF.SIGMOID: return sigmoid(x);
+            case ActF.RELU: return relu(x);
+            default: break;
+        }
+    }
+
     constexpr auto sigmoid(auto x) const{
         return 1 / (1 + exp(-x));
     }
@@ -84,6 +101,14 @@ struct NeuralNetwork_t{
         return max(0,x);
     }
     /*-------------------------------NUEVO--------------------------------*/
+    auto activeFunctionDeriv(auto x, auto layer) const{
+        switch(functionsAct[layer]){
+            case ActF.SIGMOID: return sigmoidDeriv(x);
+            case ActF.RELU: return reluDeriv(x);
+            default: break;
+        }
+    }
+
     constexpr auto sigmoidDeriv(auto x) const{  //Funciona
         return sigmoid(x)*(1-sigmoid(x));
     }
@@ -109,13 +134,13 @@ struct NeuralNetwork_t{
 
     constexpr auto deltaOutputLayer(VecDouble_t const& x,VecDouble_t const y,auto layer,auto neuron){  //Funciona
         //return errorDerivateFunction(feedforwardinneuron(x,layer,neuron),y[neuron],y.size())*sigmoidDeriv(signal(x,layer,neuron));
-        return errorDerivateFunction(feedforwardMat[layer][neuron],y[neuron],y.size())*sigmoidDeriv(signal(x,layer,neuron));
+        return errorDerivateFunction(feedforwardMat[layer][neuron],y[neuron],y.size())*activeFunctionDeriv(signal(x,layer,neuron),layer);
     }
 
     constexpr auto deltaHiddenLayers(VecDouble_t const& x,auto layer,auto neuron){    //Funciona
         //double m1=feedforwardinneuron(x,layer,neuron);
         double m1=signal(x,layer,neuron);   //No se si es esta o la linea comentada de arriba
-        m1=sigmoidDeriv(m1);
+        m1=activeFunctionDeriv(m1,layer);
         //if(sigmoidDeriv(signal(x,layer,neuron))!=(feedforwardinneuron(x,layer,neuron)*(1-feedforwardinneuron(x,layer,neuron)))) cout << "¡¡¡FALLA!!!" << endl;
         double m2=0;
 
@@ -310,7 +335,7 @@ struct NeuralNetwork_t{
             copy(result.rbegin()+1, result.rend(), result.rbegin()); //Desplazamos los elementos 1 pos a la derecha
             result[0]=1.0;
 
-            result = sigmoid(multiplyT(result,Wi));
+            result = activeFunction(multiplyT(result,Wi),i);
             feedforwardMat[i]=result;
             /*VecDouble_t r(result);
             feedforwardMat[i] = r;*/
@@ -335,7 +360,7 @@ struct NeuralNetwork_t{
             copy(result.rbegin()+1, result.rend(), result.rbegin()); //Desplazamos los elementos 1 pos a la derecha
             result[0]=1.0;
 
-            result = sigmoid(multiplyT(result,Wi));
+            result = activeFunction(multiplyT(result,Wi),i);
             
 
             if(i==layer){
@@ -429,11 +454,14 @@ struct NeuralNetwork_t{
     }
 
 private:
+    vector<ActF> functionsAct;
     MatDouble_t feedforwardMat;
     vector<MatDouble_t> m_layers;
     queue<VecDouble_t> deltaQueue;
     float learningRate=0.2;
 };
+
+Enum class ActF{SIGMOID,RELU};
 
 /*MatDouble_t X {
     {0.0, 0.0},
