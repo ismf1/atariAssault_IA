@@ -40,6 +40,9 @@ void fillVectorRandom(auto& vec, double min, double max){
 
 struct NeuralNetwork_t{
     explicit NeuralNetwork_t(initializer_list<uint16_t> const& layers,float learningR) {
+        for(size_t i=0;i<layers.size();i++){
+            functionsAct.push(ActF.SIGMOID);
+        }
         learningRate=learningR;
         //Al menos deben haber 2 capas
         if(layers.size()<2) throw out_of_range("Number of layers can not be less than 2");
@@ -62,6 +65,12 @@ struct NeuralNetwork_t{
         }
     }
 
+    void setActiveFunctions(Vector<ActF> v){
+        for(size_t i=0;i<v.size();i++){
+            functionsAct[i]=v[i];
+        }
+    }
+
     VecDouble_t multiplyT(VecDouble_t const& input,MatDouble_t const& W) const{
         if(input.size()!=W[0].size()) throw length_error("Input and weight vector must have the same size.");
 
@@ -77,6 +86,11 @@ struct NeuralNetwork_t{
         return result;
     }
 
+    //FALTA
+    auto activeFunction(auto x, auto layer) const{
+        
+    }
+
     constexpr auto sigmoid(auto x) const{
         return 1 / (1 + exp(-x));
     }
@@ -84,6 +98,11 @@ struct NeuralNetwork_t{
         return max(0,x);
     }
     /*-------------------------------NUEVO--------------------------------*/
+    //FALTA
+    auto activeFunctionDeriv(auto x, auto layer) const{
+
+    }
+
     constexpr auto sigmoidDeriv(auto x) const{  //Funciona
         return sigmoid(x)*(1-sigmoid(x));
     }
@@ -429,11 +448,14 @@ struct NeuralNetwork_t{
     }
 
 private:
+    vector<ActF> functionsAct;
     MatDouble_t feedforwardMat;
     vector<MatDouble_t> m_layers;
     queue<VecDouble_t> deltaQueue;
     float learningRate=0.2;
 };
+
+Enum class ActF{SIGMOID,RELU};
 
 /*MatDouble_t X {
     {0.0, 0.0},
