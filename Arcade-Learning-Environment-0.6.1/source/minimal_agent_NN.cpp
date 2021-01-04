@@ -13,6 +13,7 @@
 #include <string>
 #include <fstream>
 #include <tuple>
+#include <unistd.h>
 
 #define get_elem_i_ct(i, t)                                                                \
     std::get<i>(t);                                                                        \
@@ -616,7 +617,7 @@ int main(int argc, char **argv)
       //showRAM();
       //cout << endl;
       showState();
-
+      usleep(400);
       //saveStateInFile();
    }
 
