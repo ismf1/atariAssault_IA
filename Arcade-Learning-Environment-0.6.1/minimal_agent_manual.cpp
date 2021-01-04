@@ -4,6 +4,7 @@
 #include <SDL/SDL.h>
 #include <fstream>
 #include <vector>
+#include <unistd.h>
 using namespace std;
 
 // Global vars
@@ -331,6 +332,7 @@ int main(int argc, char **argv) {
 
       saveStateInFile();
       compareRAM();
+      usleep(400);
    }
 
    std::cout << "Steps: " << step << std::endl;
