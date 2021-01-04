@@ -10,7 +10,7 @@
 class NNet
 {
     using NeuralNetwork = std::vector<NeuralLayer>;
-    using VecFordward   = std::vector<Mat2d>;
+    using VecFordward   = std::vector<std::tuple<Mat2d, Mat2d>>;
     using VecWeights    = std::vector<std::vector<std::vector<double>>>;
 
 private:
@@ -27,7 +27,8 @@ public:
     void train(const Mat2d &X, const Mat2d &y, const CostFunc &costf, size_t epochs, double lr);
     void test(const Mat2d &X, const Mat2d &y) const;
     std::vector<double> predict(const Mat2d &X) const {
-        Mat2d r = forwardPass(X).back().apply([](double n) { return (int)(n + 0.5); });
+        auto [z, a] = forwardPass(X).back();
+        Mat2d r = a.apply([](double n) { return (int)(n + 0.5); });
         return r.toSTLVector()[0];
     };
 

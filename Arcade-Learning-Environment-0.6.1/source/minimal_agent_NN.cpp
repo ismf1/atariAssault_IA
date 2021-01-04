@@ -241,13 +241,8 @@ Data readCsv(std::string fileName) {
         tempY.push_back(std::get<62>(row));
         tempY.push_back(std::get<63>(row));
         
-        if (i < 22000) {
-            X.push_back(tempX);
-            y.push_back(tempY);
-        } else {
-            X_test.push_back(tempX);
-            y_test.push_back(tempY);
-        }
+         X.push_back(tempX);
+         y.push_back(tempY);
         i++;
     }
 

@@ -3,16 +3,18 @@
 
 NNet::VecFordward NNet::forwardPass(const Mat2d &X) const
 {
-    VecFordward vecA({ X });
+    VecFordward vecA;
+
+    vecA.push_back({ Mat2d(), X });
 
     for (auto const& layer : nn)
     {
         auto [actf, actfD] = layer.actf;
-        auto lastA = vecA.back();
+        auto [lastZ, lastA] = vecA.back();
         auto z = lastA * layer.w + layer.b;
         auto a = z.apply(actf);
 
-        vecA.push_back(a);
+        vecA.push_back({ z, a });
     }
 
     return vecA;
@@ -34,20 +36,21 @@ Mat2d NNet::ttrain(const Mat2d &X, const Mat2d &y, const CostFunc &costf, double
     for (int l = nn.size() - 1; l >= 0; l--)
     {
         auto [actf, actfD] = nn[l].actf;
-        auto a  = out[l + 1];
-        auto al = out[l];
+        auto [z, a]  = out[l + 1];
+        auto [zl, al] = out[l];
 
         if (static_cast<size_t>(l) == nn.size() - 1)
-            deltas.push_front(costD(a, y) ^ a.apply(actfD));
+            deltas.push_front(costD(a, y) ^ z.apply(actfD));
         else
-            deltas.push_front(deltas.front() * _W.transpose() ^ a.apply(actfD));
+            deltas.push_front(deltas.front() * _W.transpose() ^ z.apply(actfD));
 
         _W      = nn[l].w;
         nn[l].b = nn[l].b - deltas.front().mean(1) * lr;
         nn[l].w = nn[l].w - (al.transpose() * deltas.front()).mult(lr);
     }
 
-    return out.back();
+    auto [Z, A] = out.back();
+    return A;
 }
 
 NNet::NNet(const std::vector<int16_t> &topology, const VecActFunc &vecAct)
@@ -85,7 +88,8 @@ void NNet::train(const Mat2d &X, const Mat2d &y, const CostFunc &costf, size_t e
 
 void NNet::test(const Mat2d &X, const Mat2d &y) const
 {
-    Mat2d r = forwardPass(X).back().apply([](double n) { return (int)(n + 0.5); });
+    auto [z, a] = forwardPass(X).back();
+    Mat2d r = a.apply([](double n) { return (int)(n + 0.5); });
     double acc = 0;
 
     for (size_t i = 0; i < r.size(); i++) {
