@@ -26,6 +26,10 @@ public:
 
     void train(const Mat2d &X, const Mat2d &y, const CostFunc &costf, size_t epochs, double lr);
     void test(const Mat2d &X, const Mat2d &y) const;
+    std::vector<double> predict(const Mat2d &X) const {
+        Mat2d r = forwardPass(X).back().apply([](double n) { return (int)(n + 0.5); });
+        return r.toSTLVector()[0];
+    };
 
     auto begin()  const;
     auto end()    const;

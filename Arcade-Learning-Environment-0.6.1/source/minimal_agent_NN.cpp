@@ -1,6 +1,6 @@
 #include <iostream>
 #include <cmath>
-#include "src/ale_interface.hpp"
+#include "../src/ale_interface.hpp"
 #include <SDL/SDL.h>
 #include <fstream>
 #include <string>
