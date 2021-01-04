@@ -171,7 +171,12 @@ struct NeuralNetwork_t{
             return delta(x,y,layer,neuron);
         }else{
             beforeNeuron--;
-            deltaV=delta(x,y,layer,neuron)*feedforwardinneuron(x,layer-1,beforeNeuron);
+            //deltaV=delta(x,y,layer,neuron)*feedforwardinneuron(x,layer-1,beforeNeuron);
+            if(layer>0){
+                deltaV=delta(x,y,layer,neuron)*feedforwardMat[layer-1][beforeNeuron];
+            }else{
+                deltaV=delta(x,y,layer,neuron)*x[beforeNeuron];
+            }
             return deltaV;
         }
     }
@@ -353,10 +358,10 @@ struct NeuralNetwork_t{
                 updateWeights(X[j],Y[j]);
             }
             cout << "Epoca " << i << endl;
-            /*errorF=errorFunctionVector(X,Y);
+            errorF=errorFunctionVector(X,Y);
             cout << "Error cuadratico medio: " << errorF << endl;
             //¿Borrar?:
-            if(errorF<0.1){
+            /*if(errorF<0.1){
                 cout << "Epocas necesarias: " << i << endl;
                 break;   
             }*/
