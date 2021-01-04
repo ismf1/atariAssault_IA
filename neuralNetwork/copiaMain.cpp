@@ -78,12 +78,18 @@ struct NeuralNetwork_t{
     }
 
     constexpr auto sigmoid(auto x) const{
-        if((1 + exp(-x))==0) throw out_of_range("Division entre 0 en funcion sigmoidea.");
         return 1 / (1 + exp(-x));
+    }
+    constexpr auto relu(auto x) const{
+        return max(0,x);
     }
     /*-------------------------------NUEVO--------------------------------*/
     constexpr auto sigmoidDeriv(auto x) const{  //Funciona
         return sigmoid(x)*(1-sigmoid(x));
+    }
+    constexpr auto reluDeriv(auto x) const{
+        if(x<0) return 0;
+        else return 1;
     }
 
     constexpr auto signal(VecDouble_t const& x,auto layer,auto neuron){   //FUNCIONA
@@ -171,7 +177,12 @@ struct NeuralNetwork_t{
             return delta(x,y,layer,neuron);
         }else{
             beforeNeuron--;
-            deltaV=delta(x,y,layer,neuron)*feedforwardinneuron(x,layer-1,beforeNeuron);
+            //deltaV=delta(x,y,layer,neuron)*feedforwardinneuron(x,layer-1,beforeNeuron);
+            if(layer>0){
+                deltaV=delta(x,y,layer,neuron)*feedforwardMat[layer-1][beforeNeuron];
+            }else{
+                deltaV=delta(x,y,layer,neuron)*x[beforeNeuron];
+            }
             return deltaV;
         }
     }
@@ -352,14 +363,17 @@ struct NeuralNetwork_t{
                 //cout << "Data " << j << endl;
                 updateWeights(X[j],Y[j]);
             }
+            cout << "Epoca " << i << endl;
             errorF=errorFunctionVector(X,Y);
             cout << "Error cuadratico medio: " << errorF << endl;
             //¿Borrar?:
-            if(errorF<0.1){
+            /*if(errorF<0.1){
                 cout << "Epocas necesarias: " << i << endl;
                 break;   
-            }
+            }*/
         }
+        errorF=errorFunctionVector(X,Y);
+        cout << "Error cuadratico medio: " << errorF << endl;
     }
     /*--------------------------------------------------------------------*/
 

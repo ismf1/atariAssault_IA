@@ -78,12 +78,18 @@ struct NeuralNetwork_t{
     }
 
     constexpr auto sigmoid(auto x) const{
-        if((1 + exp(-x))==0) throw out_of_range("Division entre 0 en funcion sigmoidea.");
         return 1 / (1 + exp(-x));
+    }
+    constexpr auto relu(auto x) const{
+        return max(0,x);
     }
     /*-------------------------------NUEVO--------------------------------*/
     constexpr auto sigmoidDeriv(auto x) const{  //Funciona
         return sigmoid(x)*(1-sigmoid(x));
+    }
+    constexpr auto reluDeriv(auto x) const{
+        if(x<0) return 0;
+        else return 1;
     }
 
     constexpr auto signal(VecDouble_t const& x,auto layer,auto neuron){   //FUNCIONA
