@@ -171,7 +171,7 @@ void ALEInterface::loadROM(std::string rom_file = "") {
   loadSettings(rom_file, theOSystem);
   romSettings.reset(buildRomRLWrapper(rom_file));
   environment.reset(new StellaEnvironment(theOSystem.get(), romSettings.get()));
-  max_num_frames = theOSystem->settings().getInt("max_num_frames_per_episode");
+  max_num_frames = 10;
   environment->reset();
 #ifndef __USE_SDL
   if (theOSystem->p_display_screen != NULL) {
