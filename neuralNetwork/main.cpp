@@ -15,6 +15,7 @@ using VecDouble_t = vector<double>; //Neurona
         [ ............ ]
         [ wn(........) ]*/
 using MatDouble_t = vector<VecDouble_t>;    //Capa
+enum class ActF{SIGMOID,RELU};
 
 double randDouble(double min, double max){
     static random_device dev;  //Coge numero de dispositivo hardware preparado para generacion de aleatorios
@@ -41,7 +42,7 @@ void fillVectorRandom(auto& vec, double min, double max){
 struct NeuralNetwork_t{
     explicit NeuralNetwork_t(initializer_list<uint16_t> const& layers,float learningR) {
         for(size_t i=0;i<layers.size();i++){
-            functionsAct.push(ActF.SIGMOID);
+            functionsAct.push_back(ActF::SIGMOID);
         }
         learningRate=learningR;
         //Al menos deben haber 2 capas
@@ -65,7 +66,7 @@ struct NeuralNetwork_t{
         }
     }
 
-    void setActiveFunctions(Vector<ActF> v){
+    void setActiveFunctions(vector<ActF> v){
         for(size_t i=0;i<v.size();i++){
             functionsAct[i]=v[i];
         }
@@ -86,25 +87,27 @@ struct NeuralNetwork_t{
         return result;
     }
 
-    auto activeFunction(auto x, auto layer) const{
+    //FALTA UNA PARA ACTIVEFUNCTION(VECTOR)
+    double activeFunction(auto x, auto layer) const{
         switch(functionsAct[layer]){
-            case ActF.SIGMOID: return sigmoid(x);
-            case ActF.RELU: return relu(x);
+            case ActF::SIGMOID: return sigmoid(x);
+            case ActF::RELU: return relu(x);
             default: break;
         }
     }
 
-    constexpr auto sigmoid(auto x) const{
+    constexpr double sigmoid(auto x) const{
         return 1 / (1 + exp(-x));
     }
-    constexpr auto relu(auto x) const{
-        return max(0,x);
+    constexpr double relu(double x) const{
+        if(0>x) return 0;
+        else return x;
     }
     /*-------------------------------NUEVO--------------------------------*/
-    auto activeFunctionDeriv(auto x, auto layer) const{
+    double activeFunctionDeriv(auto x, auto layer) const{
         switch(functionsAct[layer]){
-            case ActF.SIGMOID: return sigmoidDeriv(x);
-            case ActF.RELU: return reluDeriv(x);
+            case ActF::SIGMOID: return sigmoidDeriv(x);
+            case ActF::RELU: return reluDeriv(x);
             default: break;
         }
     }
@@ -401,6 +404,14 @@ struct NeuralNetwork_t{
         cout << "Error cuadratico medio: " << errorF << endl;
     }
     /*--------------------------------------------------------------------*/
+    //FALTA FUNCION RELU PARA VECTORES
+    VecDouble_t activeFunction (VecDouble_t const& vec, auto layer){
+        switch(functionsAct[layer]){
+            case ActF::SIGMOID: return sigmoid(vec);
+            //case ActF::RELU: return relu(vec);
+            default: break;
+        }
+    }
 
     VecDouble_t sigmoid (VecDouble_t const& vec) const{
         VecDouble_t result(vec.size(),0.0);
@@ -460,8 +471,6 @@ private:
     queue<VecDouble_t> deltaQueue;
     float learningRate=0.2;
 };
-
-Enum class ActF{SIGMOID,RELU};
 
 /*MatDouble_t X {
     {0.0, 0.0},
