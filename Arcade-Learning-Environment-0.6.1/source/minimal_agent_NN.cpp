@@ -590,12 +590,13 @@ int main(int argc, char **argv)
    CostFunc costf{Functions::mse, Functions::mseD};
    ActFunc actfRelu{Functions::relu, Functions::reluD};
    ActFunc actfSigm{Functions::sigm, Functions::sigmD};
-   VecActFunc actf{
+   VecActFunc actf {
        actfSigm,
        actfRelu,
        actfRelu,
        actfRelu,
-       actfSigm};
+       actfSigm
+   };
    auto [X, y, X_test, y_test] = readCsv("dataBuena.txt");
 
    // std::cout << X << std::endl;

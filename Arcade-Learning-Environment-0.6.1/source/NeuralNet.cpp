@@ -31,8 +31,6 @@ Mat2d NNet::ttrain(const Mat2d &X, const Mat2d &y, const CostFunc &costf, double
     auto [cost, costD] = costf;
     Mat2d _W;
 
-    using namespace std;
-
     for (int l = nn.size() - 1; l >= 0; l--)
     {
         auto [actf, actfD] = nn[l].actf;
@@ -40,9 +38,9 @@ Mat2d NNet::ttrain(const Mat2d &X, const Mat2d &y, const CostFunc &costf, double
         auto [zl, al] = out[l];
 
         if (static_cast<size_t>(l) == nn.size() - 1)
-            deltas.push_front(costD(a, y) ^ z.apply(actfD));
+            deltas.push_front(costD(a, y) ^ a.apply(actfD));
         else
-            deltas.push_front(deltas.front() * _W.transpose() ^ z.apply(actfD));
+            deltas.push_front(deltas.front() * _W.transpose() ^ a.apply(actfD));
 
         _W      = nn[l].w;
         nn[l].b = nn[l].b - deltas.front().mean(1) * lr;
