@@ -537,21 +537,6 @@ MatDouble_t Y {
         ,{1},{1},{0},{1},{1},{1},{1},{0},{1},{1},{0},{1},{1},{0},{1},{0},{1},{1},{0}
     };
 
-double evaluateNet(NeuralNetwork_t& net,MatDouble_t const& X, VecDouble_t const& Y){
-    int j=0;
-    double fails=0;
-    for (auto const& xi : X){
-        //Probamos con la entrada xi (iterador j)
-        auto res = net.feedforward(xi);
-
-        fails += pow(Y[j]-res[0],2);
-        
-        j++;
-    }
-
-    return fails;
-}
-
 void randomTrain(initializer_list<uint16_t> layerStruct, NeuralNetwork_t& bestNet,MatDouble_t const& X, VecDouble_t const& Y,float learningR){
     double lessFails=pow(X.size(),2);
     double fails=0;
@@ -561,7 +546,7 @@ void randomTrain(initializer_list<uint16_t> layerStruct, NeuralNetwork_t& bestNe
         //Iteracion i
         NeuralNetwork_t net(layerStruct,learningR);
         
-        fails=evaluateNet(net,X,Y);
+        fails=net.evaluateNet(X,Y);
         //Si es la mejor la guardamos
         if(fails<lessFails){
             lessFails=fails;

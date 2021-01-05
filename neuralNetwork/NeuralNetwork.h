@@ -20,6 +20,8 @@ enum class ActF{SIGMOID,RELU};
 struct NeuralNetwork_t{
     explicit NeuralNetwork_t(initializer_list<uint16_t> const& layers,float learningR);
 
+    double evaluateNet(MatDouble_t const& X, VecDouble_t const& Y);
+
     void setActiveFunctions(initializer_list<ActF> v);
 
     VecDouble_t multiplyT(VecDouble_t const& input,MatDouble_t const& W) const;

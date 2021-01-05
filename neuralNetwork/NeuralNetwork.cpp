@@ -50,6 +50,21 @@ NeuralNetwork_t::NeuralNetwork_t(initializer_list<uint16_t> const& layers,float 
     if(m_layers.size()!=functionsAct.size()) throw length_error("En el constructor: La lista de funciones de activacion debe ser del tamaño del numero de capas-1");
 }
 
+double NeuralNetwork_t::evaluateNet(MatDouble_t const& X, VecDouble_t const& Y){
+    int j=0;
+    double fails=0;
+    for (auto const& xi : X){
+        //Probamos con la entrada xi (iterador j)
+        auto res = feedforward(xi);
+
+        fails += pow(Y[j]-res[0],2);
+        
+        j++;
+    }
+
+    return fails;
+}
+
 void NeuralNetwork_t::setActiveFunctions(initializer_list<ActF> v){
     if (v.size()!=functionsAct.size()) throw length_error("La lista de funciones de activacion debe ser del tamaño del numero de capas-1");
     size_t i=0;
