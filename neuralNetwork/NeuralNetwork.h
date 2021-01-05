@@ -30,7 +30,7 @@ struct NeuralNetwork_t{
 
     constexpr double sigmoid(auto x) const;
     constexpr double relu(double x) const;
-    /*-------------------------------NUEVO--------------------------------*/
+
     double activeFunctionDeriv(auto x, auto layer) const;
 
     constexpr auto sigmoidDeriv(auto x) const;
@@ -60,14 +60,6 @@ struct NeuralNetwork_t{
     //Devuelve vector de las derivadas parciales de la funcion de error de 1 neurona
     VecDouble_t errorDerivateParcialFunctions(VecDouble_t const& x,VecDouble_t const y,auto layer,auto neuron);
 
-    void multiplyIntVectors(auto n, auto &v) const;
-
-    void subVectors(auto &v1,auto &v2);
-
-    void multiplyIntMatrix(auto n, auto &v) const;
-
-    void subMatrix(auto &v1,auto &v2);
-
     //Actualiza los pesos de una capa
     MatDouble_t updateLayer(VecDouble_t const& x,VecDouble_t const y,auto layer);
 
@@ -81,7 +73,7 @@ struct NeuralNetwork_t{
     double feedforwardinneuron(VecDouble_t const& x,auto layer,auto neuron);
 
     void train(MatDouble_t const& X,MatDouble_t const& Y,uint16_t epochs);
-    /*--------------------------------------------------------------------*/
+
     VecDouble_t activeFunction (VecDouble_t const& vec, auto layer);
 
     VecDouble_t relu (VecDouble_t const& vec) const;

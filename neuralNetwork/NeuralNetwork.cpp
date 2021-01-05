@@ -4,6 +4,46 @@
 #include "NeuralNetwork.h"
 
 
+void multiplyIntVectors(auto n, auto &v){
+    for(size_t i=0;i<v.size();i++){
+        v[i]=v[i]*n;
+    }
+}
+
+void subVectors(auto &v1,auto &v2){
+    if(v1.size()!=v2.size()){
+        throw length_error("Vectors must have the same size when sub.");
+    }
+
+    for(size_t i=0;i<v1.size();i++){
+        v1[i]=v1[i]-v2[i];
+    }
+}
+
+void multiplyIntMatrix(auto n, auto &v){
+    for(size_t i=0;i<v.size();i++){
+        for(size_t j=0;j<v[i].size();j++){
+            for(size_t k=0;k<v[i][j].size();k++){
+                v[i][j][k]=v[i][j][k]*n;
+            }
+        }
+    }
+}
+
+void subMatrix(auto &v1,auto &v2){
+    if(v1.size()!=v2.size()){
+        throw length_error("Vectors must have the same size when sub.");
+    }
+
+    for(size_t i=0;i<v1.size();i++){
+        for(size_t j=0;j<v1[i].size();j++){
+            for(size_t k=0;k<v1[i][j].size();k++){
+                v1[i][j][k]=v1[i][j][k]-v2[i][j][k];
+            }
+        }
+    }
+}
+
 double randDouble(double min, double max){
     static random_device dev;  //Coge numero de dispositivo hardware preparado para generacion de aleatorios
     static mt19937 rng(dev()); //Algoritmo pseudoaleatorio
@@ -65,7 +105,6 @@ VecDouble_t NeuralNetwork_t::multiplyT(VecDouble_t const& input,MatDouble_t cons
     return result;
 }
 
-//FALTA UNA PARA ACTIVEFUNCTION(VECTOR)
 double NeuralNetwork_t::activeFunction(auto x, auto layer) const{
     switch(functionsAct[layer]){
         case ActF::SIGMOID: return sigmoid(x);
@@ -83,7 +122,7 @@ constexpr double NeuralNetwork_t::relu(double x) const{
     if(0>x) return 0;
     else return x;
 }
-/*-------------------------------NUEVO--------------------------------*/
+
 double NeuralNetwork_t::activeFunctionDeriv(auto x, auto layer) const{
     switch(functionsAct[layer]){
         case ActF::SIGMOID: return sigmoidDeriv(x);
@@ -94,7 +133,7 @@ double NeuralNetwork_t::activeFunctionDeriv(auto x, auto layer) const{
     return -1;
 }
 
-constexpr auto NeuralNetwork_t::sigmoidDeriv(auto x) const{  //Funciona
+constexpr auto NeuralNetwork_t::sigmoidDeriv(auto x) const{
     return sigmoid(x)*(1-sigmoid(x));
 }
 constexpr auto NeuralNetwork_t::reluDeriv(auto x) const{
@@ -102,11 +141,10 @@ constexpr auto NeuralNetwork_t::reluDeriv(auto x) const{
     else return 1;
 }
 
-constexpr auto NeuralNetwork_t::signal(VecDouble_t const& x,auto layer,auto neuron){   //FUNCIONA
+constexpr auto NeuralNetwork_t::signal(VecDouble_t const& x,auto layer,auto neuron){
     double res=m_layers[layer][neuron][0];
     if(layer>0){
         for(size_t i=0;i<m_layers[layer-1].size();i++){
-            //res+=feedforwardinneuron(x,layer-1,i)*m_layers[layer][neuron][i+1];
             res+=feedforwardMat[layer-1][i]*m_layers[layer][neuron][i+1];
         }
     }else{
@@ -118,15 +156,12 @@ constexpr auto NeuralNetwork_t::signal(VecDouble_t const& x,auto layer,auto neur
 }
 
 constexpr auto NeuralNetwork_t::deltaOutputLayer(VecDouble_t const& x,VecDouble_t const y,auto layer,auto neuron){  //Funciona
-    //return errorDerivateFunction(feedforwardinneuron(x,layer,neuron),y[neuron],y.size())*sigmoidDeriv(signal(x,layer,neuron));
     return errorDerivateFunction(feedforwardMat[layer][neuron],y[neuron],y.size())*activeFunctionDeriv(signal(x,layer,neuron),layer);
 }
 
 constexpr auto NeuralNetwork_t::deltaHiddenLayers(VecDouble_t const& x,auto layer,auto neuron){    //Funciona
-    //double m1=feedforwardinneuron(x,layer,neuron);
     double m1=signal(x,layer,neuron);   //No se si es esta o la linea comentada de arriba
     m1=activeFunctionDeriv(m1,layer);
-    //if(sigmoidDeriv(signal(x,layer,neuron))!=(feedforwardinneuron(x,layer,neuron)*(1-feedforwardinneuron(x,layer,neuron)))) cout << "¡¡¡FALLA!!!" << endl;
     double m2=0;
 
     for(size_t i=0;i<m_layers[layer+1].size();i++){
@@ -136,7 +171,6 @@ constexpr auto NeuralNetwork_t::deltaHiddenLayers(VecDouble_t const& x,auto laye
 }
 
 auto NeuralNetwork_t::delta(VecDouble_t const& x,VecDouble_t const y,auto layer,auto neuron){    //Funciona
-    //Posible optimizacion: Comprobar si ya tenemos el delta guardado en la cola antes de recalcular
     double delta;
     if(layer==m_layers.size()-1){
         delta=deltaOutputLayer(x,y,layer,neuron);
@@ -149,12 +183,10 @@ auto NeuralNetwork_t::delta(VecDouble_t const& x,VecDouble_t const y,auto layer,
     return delta;
 }
 
-//Cambiar para y multidimensional
 constexpr auto NeuralNetwork_t::errorDerivateFunction(auto hx, auto y,auto size_y) const{    //Funciona
     return 2*(hx-y)/size_y;
 }
 
-//Cambiar para y multidimensional
 constexpr auto NeuralNetwork_t::errorFunctionInNeuron(double hx, double y) const{
     return pow(hx-y,2);
 }
@@ -168,7 +200,6 @@ auto NeuralNetwork_t::errorFunction(const VecDouble_t hx,const VecDouble_t y) co
     return error;
 }
 
-//Cambiar para y multidimensional
 double NeuralNetwork_t::errorFunctionVector(MatDouble_t const& X, MatDouble_t const& Y){
     double errorCont=0;
 
@@ -187,7 +218,6 @@ double NeuralNetwork_t::errorDerivateParcialFunction(VecDouble_t const& x,VecDou
         return delta(x,y,layer,neuron);
     }else{
         beforeNeuron--;
-        //deltaV=delta(x,y,layer,neuron)*feedforwardinneuron(x,layer-1,beforeNeuron);
         if(layer>0){
             deltaV=delta(x,y,layer,neuron)*feedforwardMat[layer-1][beforeNeuron];
         }else{
@@ -208,49 +238,9 @@ VecDouble_t NeuralNetwork_t::errorDerivateParcialFunctions(VecDouble_t const& x,
     return res;
 }
 
-void NeuralNetwork_t::multiplyIntVectors(auto n, auto &v) const{ //FUNCIONA
-    for(size_t i=0;i<v.size();i++){
-        v[i]=v[i]*n;
-    }
-}
-
-void NeuralNetwork_t::subVectors(auto &v1,auto &v2){ //FUNCIONA
-    if(v1.size()!=v2.size()){
-        throw length_error("Vectors must have the same size when sub.");
-    }
-
-    for(size_t i=0;i<v1.size();i++){
-        v1[i]=v1[i]-v2[i];
-    }
-}
-
-void NeuralNetwork_t::multiplyIntMatrix(auto n, auto &v) const{   //Funciona
-    for(size_t i=0;i<v.size();i++){
-        for(size_t j=0;j<v[i].size();j++){
-            for(size_t k=0;k<v[i][j].size();k++){
-                v[i][j][k]=v[i][j][k]*n;
-            }
-        }
-    }
-}
-
-void NeuralNetwork_t::subMatrix(auto &v1,auto &v2){   //Funciona
-    if(v1.size()!=v2.size()){
-        throw length_error("Vectors must have the same size when sub.");
-    }
-
-    for(size_t i=0;i<v1.size();i++){
-        for(size_t j=0;j<v1[i].size();j++){
-            for(size_t k=0;k<v1[i][j].size();k++){
-                v1[i][j][k]=v1[i][j][k]-v2[i][j][k];
-            }
-        }
-    }
-}
-
 //Actualiza los pesos de una capa
 MatDouble_t NeuralNetwork_t::updateLayer(VecDouble_t const& x,VecDouble_t const y,auto layer){
-    MatDouble_t layerVector;   //New
+    MatDouble_t layerVector;
 
     //Eliminamos el delta desfasado
     if(deltaQueue.size()>=2){
@@ -262,8 +252,7 @@ MatDouble_t NeuralNetwork_t::updateLayer(VecDouble_t const& x,VecDouble_t const 
     deltaQueue.push(newDeltas);
 
     for(size_t i=0;i<m_layers[layer].size();i++){
-        //updateNeuron(x,y,layer,i);   //New
-        layerVector.push_back(errorDerivateParcialFunctions(x,y,layer,i));   //New
+        layerVector.push_back(errorDerivateParcialFunctions(x,y,layer,i));
     }
 
     return layerVector;
@@ -272,7 +261,7 @@ MatDouble_t NeuralNetwork_t::updateLayer(VecDouble_t const& x,VecDouble_t const 
 
 //Actualiza los pesos de la red
 void NeuralNetwork_t::updateWeights(VecDouble_t const& x,VecDouble_t const y){
-    vector<MatDouble_t> layersVector(m_layers.size());   //New
+    vector<MatDouble_t> layersVector(m_layers.size());
 
     calculateFeedForwardMat(x);
 
@@ -280,12 +269,11 @@ void NeuralNetwork_t::updateWeights(VecDouble_t const& x,VecDouble_t const y){
 
     //De la ultima capa a la primera para backpropagation
     for(size_t i=m_layers.size()-1;(i+1)>0;i--){    //(i+1)>0 porque size_t no puede ser negativo // Es identico a i>=0
-        //updateLayer(x,y,i);   //New
-        layersVector[i]=updateLayer(x,y,i);   //New
+        layersVector[i]=updateLayer(x,y,i);
     }
 
-    multiplyIntMatrix(learningRate,layersVector);   //New
-    subMatrix(m_layers,layersVector);   //New
+    multiplyIntMatrix(learningRate,layersVector);
+    subMatrix(m_layers,layersVector);
 }
 
 void NeuralNetwork_t::calculateFeedForwardMat(VecDouble_t const& x){
@@ -311,15 +299,12 @@ void NeuralNetwork_t::calculateFeedForwardMat(VecDouble_t const& x){
 
         result = activeFunction(multiplyT(result,Wi),i);
         feedforwardMat[i]=result;
-        /*VecDouble_t r(result);
-        feedforwardMat[i] = r;*/
-        //feedforwardMat[i] = result;
         
         i++;
     }
 }
 
-VecDouble_t NeuralNetwork_t::feedforwardinlayer(VecDouble_t const& x,auto layer){  //FUNCIONA
+VecDouble_t NeuralNetwork_t::feedforwardinlayer(VecDouble_t const& x,auto layer){
     //r1 = sigmoid(x*m_layers[0])
     //r2 = sigmoid(r1*m_layers[1])
     //...
@@ -359,7 +344,6 @@ void NeuralNetwork_t::train(MatDouble_t const& X,MatDouble_t const& Y,uint16_t e
 
     for(size_t i=0;i<epochs;i++){
         for(size_t j=0;j<X.size();j++){
-            //cout << "Data " << j << endl;
             updateWeights(X[j],Y[j]);
         }
         cout << "Epoca " << i << endl;
@@ -374,8 +358,7 @@ void NeuralNetwork_t::train(MatDouble_t const& X,MatDouble_t const& Y,uint16_t e
     errorF=errorFunctionVector(X,Y);
     cout << "Error cuadratico medio: " << errorF << endl;
 }
-/*--------------------------------------------------------------------*/
-//FALTA FUNCION RELU PARA VECTORES
+
 VecDouble_t NeuralNetwork_t::activeFunction (VecDouble_t const& vec, auto layer){
     switch(functionsAct[layer]){
         case ActF::SIGMOID: return sigmoid(vec);
