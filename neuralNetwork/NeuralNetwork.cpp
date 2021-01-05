@@ -72,6 +72,8 @@ double NeuralNetwork_t::activeFunction(auto x, auto layer) const{
         case ActF::RELU: return relu(x);
         default: break;
     }
+
+    return -1;
 }
 
 constexpr double NeuralNetwork_t::sigmoid(auto x) const{
@@ -88,6 +90,8 @@ double NeuralNetwork_t::activeFunctionDeriv(auto x, auto layer) const{
         case ActF::RELU: return reluDeriv(x);
         default: break;
     }
+
+    return -1;
 }
 
 constexpr auto NeuralNetwork_t::sigmoidDeriv(auto x) const{  //Funciona
@@ -378,6 +382,9 @@ VecDouble_t NeuralNetwork_t::activeFunction (VecDouble_t const& vec, auto layer)
         case ActF::RELU: return relu(vec);
         default: break;
     }
+
+    VecDouble_t v;
+    return v;
 }
 
 VecDouble_t NeuralNetwork_t::relu (VecDouble_t const& vec) const{
