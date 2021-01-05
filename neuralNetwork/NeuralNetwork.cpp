@@ -419,4 +419,19 @@ vector<MatDouble_t> NeuralNetwork_t::getm_layers(){
     return res;
 }
 
+double NeuralNetwork_t::evaluateNet(MatDouble_t const& X, VecDouble_t const& Y){
+    int j=0;
+    double fails=0;
+    for (auto const& xi : X){
+        //Probamos con la entrada xi (iterador j)
+        auto res = feedforward(xi);
+
+        fails += pow(Y[j]-res[0],2);
+        
+        j++;
+    }
+
+    return fails;
+}
+
 #endif

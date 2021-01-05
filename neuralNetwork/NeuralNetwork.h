@@ -87,6 +87,8 @@ struct NeuralNetwork_t{
 
     vector<MatDouble_t> getm_layers();
 
+    double evaluateNet(MatDouble_t const& X, VecDouble_t const& Y);
+
 private:
     vector<ActF> functionsAct;
     MatDouble_t feedforwardMat;
