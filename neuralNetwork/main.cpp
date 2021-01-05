@@ -7,6 +7,7 @@
 #include <queue>
 #include <iostream>
 #include "NeuralNetwork.h"
+#include "Data.h"
 using namespace std;
 
 /*MatDouble_t X {
@@ -16,7 +17,7 @@ using namespace std;
     {1.0, 1.0}
 };*/
 
-MatDouble_t X {{ 0.91319236,  0.43039519},
+/*MatDouble_t X {{ 0.91319236,  0.43039519},
     {-0.48777018 , 0.92974249},
     {-0.12155395 ,-1.06319069},
     {-0.20430496 , 0.45936301},
@@ -515,7 +516,7 @@ MatDouble_t X {{ 0.91319236,  0.43039519},
     {-0.82979143 ,-0.69226335},
     { 0.4561244  ,-0.28495257},
     {-0.2063582  ,-0.38724486},
-    {-1.04152175 , 0.14525613}};
+    {-1.04152175 , 0.14525613}};*/
 
 /*MatDouble_t Y {
     {0.0,0.0},
@@ -524,7 +525,7 @@ MatDouble_t X {{ 0.91319236,  0.43039519},
     {0.0,0.0}
 };*/
 
-MatDouble_t Y {
+/*MatDouble_t Y {
         {0},{0},{0},{1},{1},{0},{0},{0},{1},{0},{0},{0},{0},{1},{1},{1},{0},{1},{0},{0},{0},{0},{1},{1},{0},{1},{0},{0},{0},{1},{0},{1},{0},{0},{0},{0},{0}
         ,{1},{1},{1},{0},{0},{1},{1},{1},{1},{1},{0},{1},{1},{1},{0},{1},{1},{1},{1},{0},{0},{0},{0},{1},{1},{0},{1},{0},{1},{0},{0},{0},{0},{1},{0},{0},{1}
         ,{0},{1},{1},{0},{0},{1},{1},{1},{1},{1},{0},{0},{0},{0},{1},{0},{0},{0},{0},{1},{1},{1},{1},{1},{0},{0},{1},{0},{1},{1},{1},{1},{1},{0},{1},{1},{0}
@@ -539,7 +540,7 @@ MatDouble_t Y {
         ,{1},{1},{1},{0},{0},{1},{1},{0},{0},{1},{0},{0},{0},{0},{1},{1},{0},{1},{1},{0},{0},{1},{0},{1},{1},{1},{0},{1},{1},{0},{0},{1},{0},{1},{0},{1},{0}
         ,{0},{1},{0},{1},{1},{1},{0},{0},{1},{1},{1},{0},{0},{0},{1},{0},{0},{1},{1},{0},{1},{0},{1},{0},{1},{1},{0},{0},{0},{1},{0},{0},{1},{0},{0},{1},{0}
         ,{1},{1},{0},{1},{1},{1},{1},{0},{1},{1},{0},{1},{1},{0},{1},{0},{1},{1},{0}
-    };
+    };*/
 
 /*void randomTrain(initializer_list<uint16_t> layerStruct, NeuralNetwork_t& bestNet,MatDouble_t const& X, VecDouble_t const& Y,float learningR){
     double lessFails=pow(X.size(),2);
@@ -560,24 +561,46 @@ MatDouble_t Y {
     }
 }*/
 
+MatDouble_t vectorOfVectorsToMatDouble(const auto &vv){
+    MatDouble_t m;
+
+    for(size_t i=0;i<vv.size();i++){
+        vector<double> vd;
+        for(size_t j=0;j<vv[i].size();j++){
+            vd.push_back(vv[i][j]);
+        }
+        m.push_back(vd);
+    }
+
+    return m;
+}
+
 void run(){
-    initializer_list<uint16_t> layerStruct={2,4,8,1};
+    //Leemos los datos
+    Data data;
+    data.init("dataBuena.txt",59,5);
+
+    //Generamos la red neuronal
+    initializer_list<uint16_t> layerStruct={data.tamXi,128,64,data.tamYi};
     float learningRate=0.1;
+
     NeuralNetwork_t net(layerStruct,learningRate);
     
-    //randomTrain(layerStruct,net,X,Y);
-    net.train(X,Y,2500);
+    //Entrenamos la red neuronal
+    net.train(vectorOfVectorsToMatDouble(data.X),
+              vectorOfVectorsToMatDouble(data.Y),
+              250);
 
 
     //Predecimos los valores
-    auto res = net.feedforward({0.0 , 0.0});
+    /*auto res = net.feedforward({0.0 , 0.0});
     printf("0.0 xor 0.0 = %f -> %i\n",res[0],(int)(res[0]+0.5));
     res = net.feedforward({0.0 , 1.0});
     printf("0.0 xor 1.0 = %f -> %i\n",res[0],(int)(res[0]+0.5));
     res = net.feedforward({1.0 , 0.0});
     printf("1.0 xor 0.0 = %f -> %i\n",res[0],(int)(res[0]+0.5));
     res = net.feedforward({1.0 , 1.0});
-    printf("1.0 xor 1.0 = %f -> %i\n",res[0],(int)(res[0]+0.5));
+    printf("1.0 xor 1.0 = %f -> %i\n",res[0],(int)(res[0]+0.5));*/
 }
 
 int main(){
