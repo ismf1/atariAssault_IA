@@ -907,10 +907,6 @@ int main() {
     // NNet nn(topology, actf);
     NSave saver("prueba.model");
     NNet nn;
-    std::vector<std::vector<std::vector<double>>> xxxx = {{{0}}};
-
-    using namespace std;
-
     // cout << saver.read()[0][0][0] << endl;
     nn.load(saver.read());
     // std::cout << nn << std::endl;

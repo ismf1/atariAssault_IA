@@ -1,50 +1,48 @@
-#include "NSave.hpp"
+#include <NSave.hpp>
 #include <iostream>
 #include <fstream>
-#include <vector>
-#include <string>
 
+void NSave::write(const NSave::Data &v) const {
 
-void NSave::escribir(const std::vector< std::vector< std::vector<double> > > v,const std::string s) const{
-
-    std::ofstream ficheroSalida;
-    ficheroSalida.open (s);
-    ficheroSalida << "[";
-    for(int i=0;i<v.size();i++){
-        ficheroSalida << "[";
-        for(int j=0;j<v[i].size();j++){
-            ficheroSalida << "[";
-            for(int k=0;k<v[i][j].size();k++){
-                ficheroSalida << v[i][j][k];
+    std::ofstream fileOut;
+    fileOut.open (fileName);
+    fileOut << "[";
+    for(size_t i = 0; i < v.size();i++){
+        fileOut << "[";
+        for(size_t j = 0; j < v[i].size();j++){
+            fileOut << "[";
+            for(size_t k = 0; k < v[i][j].size();k++){
+                fileOut << v[i][j][k];
 
                 if(v[i][j].size()-1>k)
-                    ficheroSalida <<" ";
+                    fileOut <<" ";
             }
-            ficheroSalida << "]";
+            fileOut << "]";
         }
-        ficheroSalida << "]";
+        fileOut << "]";
     }
-    ficheroSalida << "]";
+    fileOut << "]";
     
-    ficheroSalida.close();
+    fileOut.close();
 
 }
 
-std::vector< std::vector< std::vector<double> > > NSave::leer(const std::string fichero) const{
-    std::vector<  std::vector<  std::vector<double> > > x;
-    std::vector<  std::vector<double> > y;
+NSave::Data NSave::read() const {
+    Data x;
+    std::vector<std::vector<double>> y;
     std::vector<double> z;
     std::string s;
-
-    std::ifstream ficheroEntrada;
+    std::ifstream fileEntrada;
     char letra;
-    ficheroEntrada.open (fichero);
-    ficheroEntrada >> letra;
-    while (! ficheroEntrada.eof() ) {
-        ficheroEntrada >> letra;
+    
+    fileEntrada.open (fileName);
+    fileEntrada >> letra;
+
+    while (! fileEntrada.eof() ) {
+        fileEntrada >> letra;
         while(letra!=']'){
             while(letra!=']'){
-                ficheroEntrada >> letra;
+                fileEntrada >> letra;
                 if(letra!=' ' && letra!=']' && letra!='['){
                     s=letra;
                     z.push_back(atof(s.c_str()));
@@ -52,14 +50,14 @@ std::vector< std::vector< std::vector<double> > > NSave::leer(const std::string 
             }
             y.push_back(z);
             z.clear();
-            ficheroEntrada >> letra;
+            fileEntrada >> letra;
         }
         if(y.size()>0){
             x.push_back(y);
             y.clear();
         }
     }
-    ficheroEntrada.close();
+    fileEntrada.close();
 
     return x;
 }
