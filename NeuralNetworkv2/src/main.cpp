@@ -7,11 +7,6 @@
 #include <tuple>
 #include <NSave.hpp>
 
-#define get_elem_i_ct(i, t)                                                                \
-    std::get<i>(t);                                                                        \
-    static_assert(std::is_integral<decltype(i)>::value, #i " must be an integral type");   \
-    static_assert(std::is_same<decltype(t), std::tuple<char, char>>::value, #t " must be a tuple");
-
 void print(std::vector<std::vector<std::vector<double>>> v) {
     for (auto &i : v) {
         for (auto &j : i) {
@@ -149,13 +144,7 @@ typename csv<fields...>::iterator csv<fields...>::end() {
 }
 
 using Data = std::tuple<Mat2d, Mat2d, Mat2d, Mat2d>;
-using CSVFile = csv<float, float, float, float, float, float, float, float, float, float, 
-                    float, float, float, float, float, float, float, float, float, float, 
-                    float, float, float, float, float, float, float, float, float, float,
-                    float, float, float, float, float, float, float, float, float, float, 
-                    float, float, float, float, float, float, float, float, float, float, 
-                    float, float, float, float, float, float, float, float, float, float, 
-                    float, float, float, float>;
+using CSVFile = csv<float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float,float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float>;
 
 using namespace csvtools;
 
@@ -257,7 +246,7 @@ Data readCsv(std::string fileName) {
 }
 
 
-int main() {
+int main(int argc, char *argv[]) {
 
     // Mat2d X(
     // {{ 0.91319236,  0.43039519},
@@ -887,43 +876,44 @@ int main() {
     //     {1},{1},{1},{1},{0},{1},{1},{0},{1},{1},{0},{0},{1},{0},{0},{0},{0},{1},{0},{0},{0},{1},{0},{0},{0},{1}
     // });
 
-    int16_t p = 60; 
-    std::vector<int16_t> topology = { p, 128, 64, 32, 16, 4};
-    CostFunc costf { Functions::mse, Functions::mseD };
-    ActFunc  actfRelu  { Functions::relu, Functions::reluD };
-    ActFunc  actfSigm  { Functions::sigm, Functions::sigmD };
-    VecActFunc  actf  {
-        actfSigm,
-        actfRelu,
-        actfRelu,
-        actfRelu,
-        actfSigm
-    };
-    auto [ X, y, X_test, y_test] = readCsv("dataBuena.txt");
+    if (argc < 3) {
+        std::cerr << "ERROR: Params" << std::endl
+                  << "<program> -t dataFile outModelFile" << std::endl
+                  << "<program> -l modelFile" << std::endl;
+    }
 
-    // std::cout << X << std::endl;
-    // std::cout << y << std::endl;
+    std::string opt  = argv[1];
+    std::string file = argv[2];
 
-    // NNet nn(topology, actf);
-    NSave saver("prueba.model");
-    NNet nn;
-    // cout << saver.read()[0][0][0] << endl;
-    nn.load(saver.read());
-    // std::cout << nn << std::endl;
-    // nn.load(saver.read());
-    // nn.train(X, y, costf, 10, 5e-6f);
-    // nn.test(X_test, y_test);
-    // saver.write(nn.getWeights());
+    if (opt == "-t") {
 
-    // std::cout << nn << std::endl;
-
-    // print(nn.getWeights());
-
-    // std::cout << "----------" << std::endl; 
-    // auto a = nn.getWeights();
-    // nn.load(a);
-    // auto b = nn.getWeights();
-    // print(b);
+        std::string fileModel = argv[3];
+        int16_t p = 60; 
+        std::vector<int16_t> topology = { p, 128, 64, 32, 16, 4};
+        CostFunc costf     { Functions::mse, Functions::mseD };
+        ActFunc  actfRelu  { Functions::relu, Functions::reluD };
+        ActFunc  actfSigm  { Functions::sigm, Functions::sigmD };
+        VecActFunc  actf  {
+            actfSigm,
+            actfRelu,
+            actfRelu,
+            actfRelu,
+            actfSigm
+        };
+        
+        auto [ X, y, X_test, y_test] = readCsv(file);
+        NNet nn(topology, actf);
+        nn.train(X, y, costf, 10, 5e-6f);
+    } 
+    else if (opt == "-l") {
+        NNet nn;
+        NSave saver(file);
+        nn.load(saver.read());
+    } else {
+        std::cerr << "ERROR: Params" << std::endl
+            << "<program> -t dataFile outModelFile" << std::endl
+            << "<program> -l modelFile" << std::endl;
+    }
 
     return 0;
 }
