@@ -3,6 +3,7 @@
 #include <fstream>
 #include <vector>
 #include <string>
+#include <cstring>
 
 
 void NSave::escribir(const std::vector< std::vector< std::vector<double> > > v,const std::string s) const{
@@ -18,7 +19,7 @@ void NSave::escribir(const std::vector< std::vector< std::vector<double> > > v,c
                 ficheroSalida << v[i][j][k];
 
                 if(v[i][j].size()-1>k)
-                    ficheroSalida <<" ";
+                    ficheroSalida <<",";
             }
             ficheroSalida << "]";
         }
@@ -35,9 +36,11 @@ std::vector< std::vector< std::vector<double> > > NSave::leer(const std::string 
     std::vector<  std::vector<double> > y;
     std::vector<double> z;
     std::string s;
+    s="";
 
     std::ifstream ficheroEntrada;
     char letra;
+
     ficheroEntrada.open (fichero);
     ficheroEntrada >> letra;
     while (! ficheroEntrada.eof() ) {
@@ -45,10 +48,17 @@ std::vector< std::vector< std::vector<double> > > NSave::leer(const std::string 
         while(letra!=']'){
             while(letra!=']'){
                 ficheroEntrada >> letra;
-                if(letra!=' ' && letra!=']' && letra!='['){
-                    s=letra;
-                    z.push_back(atof(s.c_str()));
+                if(letra=='['){
+                    ficheroEntrada >> letra;
                 }
+                if(letra==']' || letra==','){
+                    std::cout << s << std::endl;
+                    z.push_back(atof(s.c_str()));
+                    s="";
+                }else{
+                    s+=letra;
+                }
+                
             }
             y.push_back(z);
             z.clear();
@@ -60,6 +70,7 @@ std::vector< std::vector< std::vector<double> > > NSave::leer(const std::string 
         }
     }
     ficheroEntrada.close();
+    escribir(x,"leida");
 
     return x;
 }
