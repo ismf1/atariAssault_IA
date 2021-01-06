@@ -19,6 +19,14 @@ class Functions {
         return dist(rng);
     }
 
+    static double relu(double x) {
+        return x > 0? x : 0;
+    }
+
+    static double reluD(double x) {
+        return x <= 0? 0 : 1;
+    }
+
     static double sigm(double x) {
         return 1.f / (1.f + std::pow(std::exp(1.f), -x));
     }

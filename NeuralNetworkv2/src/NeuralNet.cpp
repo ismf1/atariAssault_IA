@@ -52,8 +52,10 @@ Mat2d NNet::ttrain(const Mat2d &X, const Mat2d &y, const CostFunc &costf, double
 
 NNet::NNet(const std::vector<int16_t> &topology, const VecActFunc &vecAct)
 {
-    for (size_t i = 0; i < topology.size() - 1; i++)
+    for (size_t i = 0; i < topology.size() - 1; i++) {
+        std::cout << i << std::endl;
         nn.push_back(NeuralLayer(topology[i], topology[i + 1], vecAct[i]));
+    }
 }
 
 NNet::NNet(const std::vector<int16_t> &topology, const ActFunc &actf)

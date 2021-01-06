@@ -5,6 +5,7 @@
 #include <string>
 #include <fstream>
 #include <tuple>
+#include <NSave.hpp>
 
 #define get_elem_i_ct(i, t)                                                                \
     std::get<i>(t);                                                                        \
@@ -889,15 +890,34 @@ int main() {
     int16_t p = 60; 
     std::vector<int16_t> topology = { p, 128, 64, 32, 16, 4};
     CostFunc costf { Functions::mse, Functions::mseD };
-    ActFunc  actf  { Functions::sigm, Functions::sigmD };
+    ActFunc  actfRelu  { Functions::relu, Functions::reluD };
+    ActFunc  actfSigm  { Functions::sigm, Functions::sigmD };
+    VecActFunc  actf  {
+        actfSigm,
+        actfRelu,
+        actfRelu,
+        actfRelu,
+        actfSigm
+    };
     auto [ X, y, X_test, y_test] = readCsv("dataBuena.txt");
 
     // std::cout << X << std::endl;
     // std::cout << y << std::endl;
 
-    NNet nn(topology, actf);
-    nn.train(X, y, costf, 50, 0.00001f);
-    nn.test(X_test, y_test);
+    // NNet nn(topology, actf);
+    NSave saver("prueba.model");
+    NNet nn;
+    std::vector<std::vector<std::vector<double>>> xxxx = {{{0}}};
+
+    using namespace std;
+
+    // cout << saver.read()[0][0][0] << endl;
+    nn.load(saver.read());
+    // std::cout << nn << std::endl;
+    // nn.load(saver.read());
+    // nn.train(X, y, costf, 10, 5e-6f);
+    // nn.test(X_test, y_test);
+    // saver.write(nn.getWeights());
 
     // std::cout << nn << std::endl;
 

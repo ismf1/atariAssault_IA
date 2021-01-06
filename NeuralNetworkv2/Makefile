@@ -3,11 +3,12 @@ CXXFLAGS := -pedantic-errors -Wall -Wextra -std=c++2a -fconcepts -O3 -funroll-lo
 LDFLAGS  := -L/usr/lib -lstdc++ -lm
 BUILD    := ./build
 OBJ_DIR  := $(BUILD)/obj
-APP_DIR  := $(BUILD)/apps
+APP_DIR  := .
 TARGET   := nn
-INCLUDE  := -Iinclude/
+INCLUDE  := -Iinclude/ -I../guardar
 SRC      :=                      \
-   $(wildcard src/*.cpp)         
+   $(wildcard src/*.cpp)         \
+   $(wildcard ../guardar/*.cpp) 
 
 OBJECTS  := $(SRC:%.cpp=$(OBJ_DIR)/%.o)
 DEPENDENCIES := $(OBJECTS:.o=.d)
@@ -38,7 +39,6 @@ release: all
 
 clean:
 	-@rm -rvf $(OBJ_DIR)/*
-	-@rm -rvf $(APP_DIR)/*
 
 info:
    @echo "[*] Application dir: ${APP_DIR}     "
