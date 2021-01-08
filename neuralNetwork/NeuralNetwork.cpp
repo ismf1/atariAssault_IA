@@ -158,11 +158,11 @@ constexpr auto NeuralNetwork_t::signal(VecDouble_t const& x,auto layer,auto neur
 }
 
 constexpr auto NeuralNetwork_t::deltaOutputLayer(VecDouble_t const& x,VecDouble_t const y,auto layer,auto neuron){  //Funciona
-    return errorDerivateFunction(feedforwardMat[layer][neuron],y[neuron],y.size())*activeFunctionDeriv(signal(x,layer,neuron),layer);
+    return errorDerivateFunction(feedforwardMat[layer][neuron],y[neuron],y.size())*activeFunctionDeriv(signalMat[layer][neuron],layer);
 }
 
 constexpr auto NeuralNetwork_t::deltaHiddenLayers(VecDouble_t const& x,auto layer,auto neuron){    //Funciona
-    double m1=signal(x,layer,neuron);   //No se si es esta o la linea comentada de arriba
+    double m1=signalMat[layer][neuron];   //No se si es esta o la linea comentada de arriba
     m1=activeFunctionDeriv(m1,layer);
     double m2=0;
 
@@ -282,12 +282,14 @@ void NeuralNetwork_t::updateWeights(VecDouble_t const& x,VecDouble_t const y){
 
 void NeuralNetwork_t::calculateFeedForwardMat(VecDouble_t const& x){
     feedforwardMat.resize(0);
+    signalMat.resize(0);
     for(size_t i=0; i< m_layers.size();i++){
         VecDouble_t v(m_layers[i].size());
         for(size_t j=0; j<m_layers[i].size();j++){
             v[j]=999999;
         }
         feedforwardMat.push_back(v);
+        signalMat.push_back(v);
     }
 
     size_t i=0;
@@ -300,8 +302,10 @@ void NeuralNetwork_t::calculateFeedForwardMat(VecDouble_t const& x){
         result.resize(result.size()+1); //Aumentamos size
         copy(result.rbegin()+1, result.rend(), result.rbegin()); //Desplazamos los elementos 1 pos a la derecha
         result[0]=1.0;
+        
 
-        result = activeFunction(multiplyT(result,Wi),i);
+        signalMat[i]=multiplyT(result,Wi);
+        result = activeFunction(signalMat[i],i);
         feedforwardMat[i]=result;
         
         i++;

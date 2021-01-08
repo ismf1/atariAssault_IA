@@ -92,6 +92,7 @@ struct NeuralNetwork_t{
 private:
     vector<ActF> functionsAct;
     MatDouble_t feedforwardMat;
+    MatDouble_t signalMat;
     vector<MatDouble_t> m_layers;
     queue<VecDouble_t> deltaQueue;
     float learningRate=0.2;
