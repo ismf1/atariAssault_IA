@@ -90,6 +90,7 @@ void NeuralNetwork_t::setActiveFunctions(vector<ActF> v){
     }
 }
 
+//OPTIMIZACION: Devolver por referencia
 VecDouble_t NeuralNetwork_t::multiplyT(VecDouble_t const& input,MatDouble_t const& W) const{
     if(input.size()!=W[0].size()) throw length_error("Input and weight vector must have the same size.");
 
@@ -141,6 +142,7 @@ constexpr auto NeuralNetwork_t::reluDeriv(auto x) const{
     else return 1;
 }
 
+//Meter en matriz l hacer forwardPropagation para evitar calculos innecesarios: OPTIMIZACION
 constexpr auto NeuralNetwork_t::signal(VecDouble_t const& x,auto layer,auto neuron){
     double res=m_layers[layer][neuron][0];
     if(layer>0){
@@ -228,6 +230,7 @@ double NeuralNetwork_t::errorDerivateParcialFunction(VecDouble_t const& x,VecDou
 }
 
 //Devuelve vector de las derivadas parciales de la funcion de error de 1 neurona
+//Devolver por referencia: OPTIMIZACION
 VecDouble_t NeuralNetwork_t::errorDerivateParcialFunctions(VecDouble_t const& x,VecDouble_t const y,auto layer,auto neuron){    //Funciona
     VecDouble_t res(m_layers[layer][neuron].size());
 
@@ -239,6 +242,7 @@ VecDouble_t NeuralNetwork_t::errorDerivateParcialFunctions(VecDouble_t const& x,
 }
 
 //Actualiza los pesos de una capa
+//Devolver por referencia: OPTIMIZACION
 MatDouble_t NeuralNetwork_t::updateLayer(VecDouble_t const& x,VecDouble_t const y,auto layer){
     MatDouble_t layerVector;
 
@@ -304,6 +308,7 @@ void NeuralNetwork_t::calculateFeedForwardMat(VecDouble_t const& x){
     }
 }
 
+//Devolver por referencia: OPTIMIZACION
 VecDouble_t NeuralNetwork_t::feedforwardinlayer(VecDouble_t const& x,auto layer){
     //r1 = sigmoid(x*m_layers[0])
     //r2 = sigmoid(r1*m_layers[1])
@@ -359,6 +364,7 @@ void NeuralNetwork_t::train(MatDouble_t const& X,MatDouble_t const& Y,uint16_t e
     cout << "Error cuadratico medio: " << errorF << endl;
 }
 
+//Devolver por referencia: OPTIMIZACION
 VecDouble_t NeuralNetwork_t::activeFunction (VecDouble_t const& vec, auto layer){
     switch(functionsAct[layer]){
         case ActF::SIGMOID: return sigmoid(vec);
@@ -370,6 +376,7 @@ VecDouble_t NeuralNetwork_t::activeFunction (VecDouble_t const& vec, auto layer)
     return v;
 }
 
+//Devolver por referencia: OPTIMIZACION
 VecDouble_t NeuralNetwork_t::relu (VecDouble_t const& vec) const{
     VecDouble_t result(vec.size(),0.0);
 
@@ -380,6 +387,7 @@ VecDouble_t NeuralNetwork_t::relu (VecDouble_t const& vec) const{
     return result;
 }
 
+//Devolver por referencia: OPTIMIZACION
 VecDouble_t NeuralNetwork_t::sigmoid (VecDouble_t const& vec) const{
     VecDouble_t result(vec.size(),0.0);
 
@@ -390,6 +398,7 @@ VecDouble_t NeuralNetwork_t::sigmoid (VecDouble_t const& vec) const{
     return result;
 }
 
+//Devolver por referencia: OPTIMIZACION
 VecDouble_t NeuralNetwork_t::feedforward(VecDouble_t const& x){
     //r1 = sigmoid(x*m_layers[0])
     //r2 = sigmoid(r1*m_layers[1])
