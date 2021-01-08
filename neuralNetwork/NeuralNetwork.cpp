@@ -185,11 +185,15 @@ auto NeuralNetwork_t::delta(VecDouble_t const& x,VecDouble_t const y,auto layer,
     return delta;
 }
 
+//FALTA: Pasar Yneg y Ypos por parametros y sesgar error
 constexpr auto NeuralNetwork_t::errorDerivateFunction(auto hx, auto y,auto size_y) const{    //Funciona
+    //(m-n)/m
     return 2*(hx-y)/size_y;
 }
 
+//FALTA: Pasar Yneg y Ypos por parametros y sesgar error
 constexpr auto NeuralNetwork_t::errorFunctionInNeuron(double hx, double y) const{
+    //(m-n)/m
     return pow(hx-y,2);
 }
 
