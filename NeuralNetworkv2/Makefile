@@ -1,6 +1,6 @@
 CXX      := -c++
-CXXFLAGS := -pedantic-errors -Wall -Wextra -std=c++2a -fconcepts -funroll-loops
-LDFLAGS  := -L/usr/lib -lstdc++ -lm
+CXXFLAGS := -pedantic-errors -Wall -Wextra -std=c++2a -fconcepts -funroll-loops -fopenmp
+LDFLAGS  := -L/usr/lib -lstdc++ -lm 
 BUILD    := ./build
 OBJ_DIR  := $(BUILD)/obj
 APP_DIR  := .
@@ -34,7 +34,7 @@ build:
 debug: CXXFLAGS += -DDEBUG -g
 debug: all
 
-release: CXXFLAGS += -O2
+release: CXXFLAGS += -O3
 release: all
 
 clean:

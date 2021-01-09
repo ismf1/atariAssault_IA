@@ -1,63 +1,75 @@
-#include <NSave.hpp>
+#include "NSave.hpp"
 #include <iostream>
 #include <fstream>
+#include <vector>
+#include <string>
+#include <cstring>
 
-void NSave::write(const NSave::Data &v) const {
 
-    std::ofstream fileOut;
-    fileOut.open (fileName);
-    fileOut << "[";
-    for(size_t i = 0; i < v.size();i++){
-        fileOut << "[";
-        for(size_t j = 0; j < v[i].size();j++){
-            fileOut << "[";
-            for(size_t k = 0; k < v[i][j].size();k++){
-                fileOut << v[i][j][k];
+void NSave::write(const Data &v) const{
+
+    std::ofstream outFile;
+    outFile.open (fileName);
+    outFile << "[";
+    for(size_t i=0;i<v.size();i++){
+        outFile << "[";
+        for(size_t j=0;j<v[i].size();j++){
+            outFile << "[";
+            for(size_t k=0;k<v[i][j].size();k++){
+                outFile << v[i][j][k];
 
                 if(v[i][j].size()-1>k)
-                    fileOut <<" ";
+                    outFile <<",";
             }
-            fileOut << "]";
+            outFile << "]";
         }
-        fileOut << "]";
+        outFile << "]";
     }
-    fileOut << "]";
+    outFile << "]";
     
-    fileOut.close();
+    outFile.close();
 
 }
 
-NSave::Data NSave::read() const {
+NSave::Data NSave::read() const{
     Data x;
-    std::vector<std::vector<double>> y;
+    std::vector<  std::vector<double> > y;
     std::vector<double> z;
     std::string s;
-    std::ifstream fileEntrada;
-    char letra;
-    
-    fileEntrada.open (fileName);
-    fileEntrada >> letra;
+    s="";
 
-    while (! fileEntrada.eof() ) {
-        fileEntrada >> letra;
+    std::ifstream fileIn;
+    char letra;
+
+    fileIn.open (fileName);
+    fileIn >> letra;
+    while (! fileIn.eof() ) {
+        fileIn >> letra;
         while(letra!=']'){
             while(letra!=']'){
-                fileEntrada >> letra;
-                if(letra!=' ' && letra!=']' && letra!='['){
-                    s=letra;
-                    z.push_back(atof(s.c_str()));
+                fileIn >> letra;
+                if(letra=='['){
+                    fileIn >> letra;
                 }
+                if(letra==']' || letra==','){
+                    std::cout << s << std::endl;
+                    z.push_back(atof(s.c_str()));
+                    s="";
+                }else{
+                    s+=letra;
+                }
+                
             }
             y.push_back(z);
             z.clear();
-            fileEntrada >> letra;
+            fileIn >> letra;
         }
         if(y.size()>0){
             x.push_back(y);
             y.clear();
         }
     }
-    fileEntrada.close();
+    fileIn.close();
 
     return x;
 }

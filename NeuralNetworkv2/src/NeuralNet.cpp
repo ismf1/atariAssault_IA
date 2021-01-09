@@ -1,5 +1,6 @@
 #include <NeuralNet.hpp>
 #include <list>
+#include <tuple>
 
 NNet::VecFordward NNet::forwardPass(const Mat2d &X) const
 {
@@ -24,12 +25,10 @@ Mat2d NNet::ttrain(const Mat2d &X, const Mat2d &y, const CostFunc &costf, double
     // Forward pass
     VecFordward out = forwardPass(X);
 
-    // Backward pass
+    // Backpropagation
     std::list<Mat2d> deltas;
     auto [cost, costD] = costf;
-    Mat2d _W;
-
-    using namespace std;
+    Mat2d lastW;
 
     for (int l = nn.size() - 1; l >= 0; l--)
     {
@@ -40,9 +39,9 @@ Mat2d NNet::ttrain(const Mat2d &X, const Mat2d &y, const CostFunc &costf, double
         if (static_cast<size_t>(l) == nn.size() - 1)
             deltas.push_front(costD(a, y) ^ a.apply(actfD));
         else
-            deltas.push_front(deltas.front() * _W.transpose() ^ a.apply(actfD));
+            deltas.push_front(deltas.front() * lastW.transpose() ^ a.apply(actfD));
 
-        _W      = nn[l].w;
+        lastW   = nn[l].w;
         nn[l].b = nn[l].b - deltas.front().mean(1) * lr;
         nn[l].w = nn[l].w - (al.transpose() * deltas.front()).mult(lr);
     }
@@ -52,10 +51,9 @@ Mat2d NNet::ttrain(const Mat2d &X, const Mat2d &y, const CostFunc &costf, double
 
 NNet::NNet(const std::vector<int16_t> &topology, const VecActFunc &vecAct)
 {
-    for (size_t i = 0; i < topology.size() - 1; i++) {
-        std::cout << i << std::endl;
+    assert(topology.size() - 1 == vecAct.size());
+    for (size_t i = 0; i < topology.size() - 1; i++)
         nn.push_back(NeuralLayer(topology[i], topology[i + 1], vecAct[i]));
-    }
 }
 
 NNet::NNet(const std::vector<int16_t> &topology, const ActFunc &actf)
@@ -78,7 +76,7 @@ void NNet::train(const Mat2d &X, const Mat2d &y, const CostFunc &costf, size_t e
         {
             auto [cost, costD] = costf;
             auto loss = cost(pY, y);
-            std::cout << "MSE: " << loss << std::endl;
+            std::cout << "Loss: " << loss << std::endl;
         }
     }
 }

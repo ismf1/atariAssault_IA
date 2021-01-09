@@ -216,14 +216,14 @@ Data readCsv(std::string fileName) {
         tempX.push_back(std::get<56>(row));
         tempX.push_back(std::get<57>(row));
         tempX.push_back(std::get<58>(row));
-        tempX.push_back(std::get<59>(row));        
         Vec2d tempY;
+        tempY.push_back(std::get<59>(row));        
         tempY.push_back(std::get<60>(row));
         tempY.push_back(std::get<61>(row));
         tempY.push_back(std::get<62>(row));
         tempY.push_back(std::get<63>(row));
         
-        if (i < 22000) {
+        if (i < 20000) {
             X.push_back(tempX);
             y.push_back(tempY);
         } else {
@@ -233,13 +233,13 @@ Data readCsv(std::string fileName) {
         i++;
     }
 
-    X.ncol = 60;
+    X.ncol = X[0].size();
     X.nrow = X.size();
-    y.ncol = 4;
+    y.ncol = y[0].size();
     y.nrow = y.size();
-    X_test.ncol = 60;
+    X_test.ncol = X.ncol;
     X_test.nrow = X_test.size();
-    y_test.ncol = 4;
+    y_test.ncol = y.ncol;
     y_test.nrow = y_test.size();
 
     return { X, y, X_test, y_test};
@@ -888,22 +888,22 @@ int main(int argc, char *argv[]) {
     if (opt == "-t") {
 
         std::string fileModel = argv[3];
-        int16_t p = 60; 
-        std::vector<int16_t> topology = { p, 128, 64, 32, 16, 4};
+        auto [ X, y, X_test, y_test] = readCsv(file);
+        std::vector<int16_t> topology = { (int16_t)X.ncol, 128, 128, 128, (int16_t)y.ncol };
         CostFunc costf     { Functions::mse, Functions::mseD };
         ActFunc  actfRelu  { Functions::relu, Functions::reluD };
         ActFunc  actfSigm  { Functions::sigm, Functions::sigmD };
         VecActFunc  actf  {
-            actfSigm,
             actfRelu,
             actfRelu,
             actfRelu,
             actfSigm
         };
         
-        auto [ X, y, X_test, y_test] = readCsv(file);
         NNet nn(topology, actf);
-        nn.train(X, y, costf, 10, 5e-6f);
+        NSave saver(fileModel);
+        nn.train(X, y, costf, atof(argv[4]), atof(argv[5]));
+        saver.write(nn.getWeights());
     } 
     else if (opt == "-l") {
         NNet nn;
