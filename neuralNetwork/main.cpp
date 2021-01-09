@@ -583,14 +583,14 @@ void run(){
     //Generamos la red neuronal
     initializer_list<uint16_t> layerStruct={data.tamXi,64,32,data.tamYi};
     //initializer_list<uint16_t> layerStruct={X[0].size(),4,8,Y[0].size()};
-    float learningRate=0.1;
+    float learningRate=0.03;
 
     NeuralNetwork_t net(layerStruct,learningRate);
     
     //Entrenamos la red neuronal
     net.train(vectorOfVectorsToMatDouble(data.X),
               vectorOfVectorsToMatDouble(data.Y),
-              250);
+              50);
     //net.train(X,Y,250);
 
 
