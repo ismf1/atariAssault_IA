@@ -581,7 +581,8 @@ void run(){
     data.init("dataBuena.txt",59,5);
 
     //Generamos la red neuronal
-    initializer_list<uint16_t> layerStruct={data.tamXi,4,8,data.tamYi};
+    initializer_list<uint16_t> layerStruct={data.tamXi,64,32,data.tamYi};
+    //initializer_list<uint16_t> layerStruct={X[0].size(),4,8,Y[0].size()};
     float learningRate=0.1;
 
     NeuralNetwork_t net(layerStruct,learningRate);
@@ -590,6 +591,7 @@ void run(){
     net.train(vectorOfVectorsToMatDouble(data.X),
               vectorOfVectorsToMatDouble(data.Y),
               250);
+    //net.train(X,Y,250);
 
 
     //Predecimos los valores

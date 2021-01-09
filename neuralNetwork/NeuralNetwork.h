@@ -38,11 +38,11 @@ struct NeuralNetwork_t{
 
     constexpr auto signal(VecDouble_t const& x,auto layer,auto neuron);
 
-    constexpr auto deltaOutputLayer(VecDouble_t const& x,VecDouble_t const y,auto layer,auto neuron);
+    constexpr auto deltaOutputLayer(VecDouble_t const& x,VecDouble_t const& y,auto layer,auto neuron);
 
     constexpr auto deltaHiddenLayers(VecDouble_t const& x,auto layer,auto neuron);
 
-    auto delta(VecDouble_t const& x,VecDouble_t const y,auto layer,auto neuron);
+    auto delta(VecDouble_t const& x,VecDouble_t const& y,auto layer,auto neuron);
 
     //Cambiar para y multidimensional
     constexpr auto errorDerivateFunction(auto hx, auto y,auto size_y) const;
@@ -56,15 +56,15 @@ struct NeuralNetwork_t{
     double errorFunctionVector(MatDouble_t const& X, MatDouble_t const& Y);
 
     //Derivada parcial para el peso m_layers[layer][neuron][beforeNeuron]
-    double errorDerivateParcialFunction(VecDouble_t const& x,VecDouble_t const y,auto layer,auto neuron,auto beforeNeuron);
+    double errorDerivateParcialFunction(VecDouble_t const& x,VecDouble_t const& y,auto layer,auto neuron,auto beforeNeuron);
     //Devuelve vector de las derivadas parciales de la funcion de error de 1 neurona
-    VecDouble_t errorDerivateParcialFunctions(VecDouble_t const& x,VecDouble_t const y,auto layer,auto neuron);
+    VecDouble_t errorDerivateParcialFunctions(VecDouble_t const& x,VecDouble_t const& y,auto layer,auto neuron);
 
     //Actualiza los pesos de una capa
-    MatDouble_t updateLayer(VecDouble_t const& x,VecDouble_t const y,auto layer);
+    MatDouble_t updateLayer(VecDouble_t const& x,VecDouble_t const& y,auto layer);
 
     //Actualiza los pesos de la red
-    void updateWeights(VecDouble_t const& x,VecDouble_t const y);
+    void updateWeights(VecDouble_t const& x,VecDouble_t const& y);
 
     void calculateFeedForwardMat(VecDouble_t const& x);
 

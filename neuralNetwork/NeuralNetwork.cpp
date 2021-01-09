@@ -142,8 +142,8 @@ constexpr auto NeuralNetwork_t::reluDeriv(auto x) const{
     else return 1;
 }
 
-//Meter en matriz l hacer forwardPropagation para evitar calculos innecesarios: OPTIMIZACION
-constexpr auto NeuralNetwork_t::signal(VecDouble_t const& x,auto layer,auto neuron){
+//Meter en matriz al hacer forwardPropagation para evitar calculos innecesarios: OPTIMIZACION
+/*constexpr auto NeuralNetwork_t::signal(VecDouble_t const& x,auto layer,auto neuron){
     double res=m_layers[layer][neuron][0];
     if(layer>0){
         for(size_t i=0;i<m_layers[layer-1].size();i++){
@@ -155,9 +155,9 @@ constexpr auto NeuralNetwork_t::signal(VecDouble_t const& x,auto layer,auto neur
         }
     }
     return res;
-}
+}*/
 
-constexpr auto NeuralNetwork_t::deltaOutputLayer(VecDouble_t const& x,VecDouble_t const y,auto layer,auto neuron){  //Funciona
+constexpr auto NeuralNetwork_t::deltaOutputLayer(VecDouble_t const& x,VecDouble_t const& y,auto layer,auto neuron){  //Funciona
     return errorDerivateFunction(feedforwardMat[layer][neuron],y[neuron],y.size())*activeFunctionDeriv(signalMat[layer][neuron],layer);
 }
 
@@ -172,7 +172,7 @@ constexpr auto NeuralNetwork_t::deltaHiddenLayers(VecDouble_t const& x,auto laye
     return m1*m2;
 }
 
-auto NeuralNetwork_t::delta(VecDouble_t const& x,VecDouble_t const y,auto layer,auto neuron){    //Funciona
+auto NeuralNetwork_t::delta(VecDouble_t const& x,VecDouble_t const& y,auto layer,auto neuron){    //Funciona
     double delta;
     if(layer==m_layers.size()-1){
         delta=deltaOutputLayer(x,y,layer,neuron);
@@ -218,7 +218,7 @@ double NeuralNetwork_t::errorFunctionVector(MatDouble_t const& X, MatDouble_t co
 }
 
 //Derivada parcial para el peso m_layers[layer][neuron][beforeNeuron]
-double NeuralNetwork_t::errorDerivateParcialFunction(VecDouble_t const& x,VecDouble_t const y,auto layer,auto neuron,auto beforeNeuron){    //Funciona
+double NeuralNetwork_t::errorDerivateParcialFunction(VecDouble_t const& x,VecDouble_t const& y,auto layer,auto neuron,auto beforeNeuron){    //Funciona
     double deltaV;
     if(beforeNeuron==0){
         return delta(x,y,layer,neuron);
@@ -235,7 +235,7 @@ double NeuralNetwork_t::errorDerivateParcialFunction(VecDouble_t const& x,VecDou
 
 //Devuelve vector de las derivadas parciales de la funcion de error de 1 neurona
 //Devolver por referencia: OPTIMIZACION
-VecDouble_t NeuralNetwork_t::errorDerivateParcialFunctions(VecDouble_t const& x,VecDouble_t const y,auto layer,auto neuron){    //Funciona
+VecDouble_t NeuralNetwork_t::errorDerivateParcialFunctions(VecDouble_t const& x,VecDouble_t const& y,auto layer,auto neuron){    //Funciona
     VecDouble_t res(m_layers[layer][neuron].size());
 
     for(size_t i=0;i<res.size();i++){
@@ -247,7 +247,7 @@ VecDouble_t NeuralNetwork_t::errorDerivateParcialFunctions(VecDouble_t const& x,
 
 //Actualiza los pesos de una capa
 //Devolver por referencia: OPTIMIZACION
-MatDouble_t NeuralNetwork_t::updateLayer(VecDouble_t const& x,VecDouble_t const y,auto layer){
+MatDouble_t NeuralNetwork_t::updateLayer(VecDouble_t const& x,VecDouble_t const& y,auto layer){
     MatDouble_t layerVector;
 
     //Eliminamos el delta desfasado
@@ -268,7 +268,7 @@ MatDouble_t NeuralNetwork_t::updateLayer(VecDouble_t const& x,VecDouble_t const 
 }
 
 //Actualiza los pesos de la red
-void NeuralNetwork_t::updateWeights(VecDouble_t const& x,VecDouble_t const y){
+void NeuralNetwork_t::updateWeights(VecDouble_t const& x,VecDouble_t const& y){
     vector<MatDouble_t> layersVector(m_layers.size());
 
     calculateFeedForwardMat(x);
