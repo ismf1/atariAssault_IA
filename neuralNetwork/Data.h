@@ -2,12 +2,13 @@
 #define DATA_H
 #include <stdio.h>
 #include <vector>
+#include <stdint.h>
 using namespace std;
 
 class Data{
     public:
-        int tamXi = 7;
-        int tamYi = 2;
+        uint16_t tamXi = 7;
+        uint16_t tamYi = 2;
         static const int MAXCHAR = 1000;
         const char* filename;
         int size;

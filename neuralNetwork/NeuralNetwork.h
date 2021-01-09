@@ -96,6 +96,9 @@ private:
     vector<MatDouble_t> m_layers;
     queue<VecDouble_t> deltaQueue;
     float learningRate=0.2;
+    //Para error sesgado
+    vector<int> Yneg;
+    vector<int> Ypos;
 };
 
 #endif

@@ -47,7 +47,7 @@ void Data::init(const char* filename,const int tamXi,const int tamYi){
     fp = fopen(filename, "r");
     if (fp == NULL){
         printf("Could not open file %s",filename);
-        exit;
+        //FALTA: Poner throw exception
     }
     int line=0;
     while (fgets(str, MAXCHAR, fp) != NULL){
