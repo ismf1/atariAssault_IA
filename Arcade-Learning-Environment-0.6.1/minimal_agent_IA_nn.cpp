@@ -131,11 +131,11 @@ float agentStep() {
 
    VecDouble_t res=net.feedforward(state);
 
-   if(res[0]>0) reward+=alei.act(PLAYER_A_RIGHTFIRE);
-   if(res[1]>0) reward+=alei.act(PLAYER_A_LEFTFIRE);
-   if(res[2]>0) reward+=alei.act(PLAYER_A_UPFIRE);
-   if(res[3]>0) reward += alei.act(PLAYER_A_LEFT);
-   if(res[4]>0) reward += alei.act(PLAYER_A_RIGHT);
+   if(res[0]>0.5) reward+=alei.act(PLAYER_A_RIGHTFIRE);
+   if(res[1]>0.5) reward+=alei.act(PLAYER_A_LEFTFIRE);
+   if(res[2]>0.5) reward+=alei.act(PLAYER_A_UPFIRE);
+   if(res[3]>0.5) reward += alei.act(PLAYER_A_LEFT);
+   if(res[4]>0.5) reward += alei.act(PLAYER_A_RIGHT);
    
    return (reward + alei.act(PLAYER_A_NOOP));
 }

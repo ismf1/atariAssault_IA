@@ -601,23 +601,31 @@ void splitDataTrainTest(double percent,MatDouble_t const& X,MatDouble_t const& Y
 
 void run(){
     //Leemos los datos
-    Data data;
-    data.init("dataBuena.txt",59,5);
+    Data dataTrain;
+    dataTrain.init("dataBuena.txt",59,5);
+    Data dataVal;
+    dataVal.init("data.txt",59,5);
+
 
     //Generamos la red neuronal
-    initializer_list<uint16_t> layerStruct={data.tamXi,64,32,data.tamYi};
+    initializer_list<uint16_t> layerStruct={dataTrain.tamXi,64,32,dataTrain.tamYi};
     //initializer_list<uint16_t> layerStruct={X[0].size(),4,8,Y[0].size()};
     float learningRate=0.1;
 
     NeuralNetwork_t net(layerStruct,learningRate);
     net.setActiveFunctions({ActF::SIGMOID,ActF::SIGMOID,ActF::SIGMOID});
 
-    MatDouble_t Xtrain,Ytrain,Xval,Yval;
-    splitDataTrainTest(0.9,vectorOfVectorsToMatDouble(data.X),vectorOfVectorsToMatDouble(data.Y),
-                        Xtrain,Ytrain,Xval,Yval);
+    //MatDouble_t Xtrain,Ytrain,Xval,Yval;
+    //splitDataTrainTest(0.9,vectorOfVectorsToMatDouble(data.X),vectorOfVectorsToMatDouble(data.Y),
+    //                    Xtrain,Ytrain,Xval,Yval);
 
     //Entrenamos la red neuronal
-    net.train(Xtrain,Ytrain,Xval,Yval,10);
+    //net.train(Xtrain,Ytrain,Xval,Yval,10);
+    net.train(vectorOfVectorsToMatDouble(dataTrain.X),
+              vectorOfVectorsToMatDouble(dataTrain.Y),
+              vectorOfVectorsToMatDouble(dataVal.X),
+              vectorOfVectorsToMatDouble(dataVal.Y),
+              10);
     //net.train(X,Y,250);
 
     net.save("NeuralNetwork.txt");
