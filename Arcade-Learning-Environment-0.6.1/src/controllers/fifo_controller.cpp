@@ -18,6 +18,7 @@
 
 #include <stdio.h>
 #include <cassert>
+#include <unistd.h>
 #include "../common/Log.hpp"
 
 #define MAX_RUN_LENGTH (0xFF)
@@ -63,6 +64,7 @@ void FIFOController::run() {
 
     // Update display if needed
     display();
+    usleep(400);
   }
 
   // Send a termination signal to the agent, if they're still around
