@@ -98,6 +98,8 @@ struct NeuralNetwork_t{
 
     void save(const string s) const;
 
+    MatDouble_t test(MatDouble_t const& X, MatDouble_t const& Y);
+
 private:
     vector<ActF> functionsAct;
     MatDouble_t feedforwardMat;

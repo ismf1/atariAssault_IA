@@ -552,4 +552,27 @@ void NeuralNetwork_t::load(const std::string fichero){
     }
 }
 
+//Solo vale para clasificadores (0-1)
+MatDouble_t NeuralNetwork_t::test(MatDouble_t const& X, MatDouble_t const& Y){
+    MatDouble_t res;
+    for(size_t i=0;i<Y[0].size();i++){
+        VecDouble_t v;
+        for(size_t j=0;j<2;j++){
+            v.push_back(0);
+        }
+        res.push_back(v);
+    }
+
+    for(size_t i=0;i<X.size();i++){
+        VecDouble_t v=feedforward(X[i]);
+        for(size_t j=0;j<Y[i].size();j++){
+            if((int)(v[j]+0.5)!=Y[i][j]){
+                if(Y[i][j]==0) res[j][0]++;
+                else res[j][1]++;
+            }
+        }
+    }
+    return res;
+}
+
 #endif
