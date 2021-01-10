@@ -24,6 +24,7 @@ using MatDouble_t = vector<VecDouble_t>;    //Capa
 enum class ActF{SIGMOID,RELU};
 
 struct NeuralNetwork_t{
+    explicit NeuralNetwork_t() ;
     explicit NeuralNetwork_t(initializer_list<uint16_t> const& layers,float learningR) ;
 
     void setActiveFunctions(vector<ActF> v);
@@ -93,7 +94,7 @@ struct NeuralNetwork_t{
 
     double evaluateNet(MatDouble_t const& X, VecDouble_t const& Y);
 
-    vector<MatDouble_t> load(const string fichero) const;
+    void load(const string fichero);
 
     void save(const string s) const;
 

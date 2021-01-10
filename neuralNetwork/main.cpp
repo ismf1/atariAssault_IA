@@ -594,6 +594,9 @@ void run(){
     //net.train(X,Y,250);
 
     net.save("NeuralNetwork.txt");
+    /*net.load("NeuralNetwork2.txt");
+
+    net.feedforward(vectorOfVectorsToMatDouble(data.X)[0]);*/
 
 
     //Predecimos los valores

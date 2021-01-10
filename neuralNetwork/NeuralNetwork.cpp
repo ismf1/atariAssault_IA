@@ -58,6 +58,10 @@ void fillVectorRandom(auto& vec, double min, double max){
     }
 }
 
+NeuralNetwork_t::NeuralNetwork_t(){
+    
+}
+
 NeuralNetwork_t::NeuralNetwork_t(initializer_list<uint16_t> const& layers,float learningR) {
     for(size_t i=0;i<layers.size();i++){
         functionsAct.push_back(ActF::SIGMOID);
@@ -92,7 +96,10 @@ void NeuralNetwork_t::setActiveFunctions(vector<ActF> v){
 
 //OPTIMIZACION: Devolver por referencia
 VecDouble_t NeuralNetwork_t::multiplyT(VecDouble_t const& input,MatDouble_t const& W) const{
-    if(input.size()!=W[0].size()) throw length_error("Input and weight vector must have the same size.");
+    if(input.size()!=W[0].size()){
+        string msg="Input and weight vector must have the same size.\nInput size: " + to_string(input.size()) + "\nWeight size: " + to_string(W[0].size()) + "\n";
+        throw length_error(msg);
+    }
 
     VecDouble_t result(W.size(),0.0);
     for(size_t i=0; i<W.size() ; i++){
@@ -493,8 +500,8 @@ void NeuralNetwork_t::save(const std::string s) const{
 
 }
 
-vector<MatDouble_t> NeuralNetwork_t::load(const std::string fichero) const{
-    vector<MatDouble_t> x;
+void NeuralNetwork_t::load(const std::string fichero){
+    m_layers.resize(0);
     MatDouble_t y;
     VecDouble_t z;
     string s;
@@ -514,7 +521,6 @@ vector<MatDouble_t> NeuralNetwork_t::load(const std::string fichero) const{
                     ficheroEntrada >> letra;
                 }
                 if(letra==']' || letra==','){
-                    cout << s << endl;
                     z.push_back(atof(s.c_str()));
                     s="";
                 }else{
@@ -527,14 +533,16 @@ vector<MatDouble_t> NeuralNetwork_t::load(const std::string fichero) const{
             ficheroEntrada >> letra;
         }
         if(y.size()>0){
-            x.push_back(y);
+            m_layers.push_back(y);
             y.clear();
         }
     }
     ficheroEntrada.close();
     //escribir(x,"leida");
 
-    return x;
+    for(size_t i=0;i<m_layers.size();i++){
+        functionsAct.push_back(ActF::SIGMOID);
+    }
 }
 
 #endif
