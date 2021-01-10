@@ -169,10 +169,10 @@ constexpr auto NeuralNetwork_t::reluDeriv(auto x) const{
 
 constexpr auto NeuralNetwork_t::deltaOutputLayer(VecDouble_t const& x,VecDouble_t const& y,auto layer,auto neuron){  //Funciona
     //Sesgado
-    /*if(y[neuron]==1) return (Yneg[neuron]/(Yneg[neuron]+Ypos[neuron]))*errorDerivateFunction(feedforwardMat[layer][neuron],y[neuron],y.size())*activeFunctionDeriv(signalMat[layer][neuron],layer);
-    else return (Ypos[neuron]/(Yneg[neuron]+Ypos[neuron]))*errorDerivateFunction(feedforwardMat[layer][neuron],y[neuron],y.size())*activeFunctionDeriv(signalMat[layer][neuron],layer);
-    *///Sin sesgar
-    return errorDerivateFunction(feedforwardMat[layer][neuron],y[neuron],y.size())*activeFunctionDeriv(signalMat[layer][neuron],layer);
+    if(y[neuron]==1) return ((double)Yneg[neuron]/(Yneg[neuron]+Ypos[neuron]))*errorDerivateFunction(feedforwardMat[layer][neuron],y[neuron],y.size())*activeFunctionDeriv(signalMat[layer][neuron],layer);
+    else return ((double)Ypos[neuron]/(Yneg[neuron]+Ypos[neuron]))*errorDerivateFunction(feedforwardMat[layer][neuron],y[neuron],y.size())*activeFunctionDeriv(signalMat[layer][neuron],layer);
+    //Sin sesgar
+    //return errorDerivateFunction(feedforwardMat[layer][neuron],y[neuron],y.size())*activeFunctionDeriv(signalMat[layer][neuron],layer);
 }
 
 constexpr auto NeuralNetwork_t::deltaHiddenLayers(VecDouble_t const& x,auto layer,auto neuron){    //Funciona
@@ -213,10 +213,10 @@ auto NeuralNetwork_t::errorFunction(const VecDouble_t hx,const VecDouble_t y) co
     double error=0;
     for(size_t i=0;i<y.size();i++){
         //Sesgado
-        /*if(y[i]==1) error+=(Yneg[i]/(Yneg[i]+Ypos[i]))*errorFunctionInNeuron(hx[i],y[i]);
-        else error+=(Ypos[i]/(Yneg[i]+Ypos[i]))*errorFunctionInNeuron(hx[i],y[i]);*/
+        if(y[i]==1) error+=((double)Yneg[i]/(Yneg[i]+Ypos[i]))*errorFunctionInNeuron(hx[i],y[i]);
+        else error+=((double)Ypos[i]/(Yneg[i]+Ypos[i]))*errorFunctionInNeuron(hx[i],y[i]);
         //Sin sesgar
-        error+=errorFunctionInNeuron(hx[i],y[i]);
+        //error+=errorFunctionInNeuron(hx[i],y[i]);
     }
     error=error/y.size();
     return error;
@@ -364,18 +364,21 @@ double NeuralNetwork_t::feedforwardinneuron(VecDouble_t const& x,auto layer,auto
     return feedforwardinlayer(x,layer)[neuron];
 }
 
-void NeuralNetwork_t::train(MatDouble_t const& X,MatDouble_t const& Y,uint16_t epochs){
+void NeuralNetwork_t::train(MatDouble_t const& X,MatDouble_t const& Y,MatDouble_t const& Xval,MatDouble_t const& Yval,uint16_t epochs){
 
     if(X.size()!=Y.size()){
         throw length_error("Input and output vector must have the same size.");
     }
     //Sin comprobar---------------------------
-    for(size_t i=0;i<Y.size();i++){
+    for(size_t i=0;i<Y[0].size();i++){
         Yneg.push_back(0);
         Ypos.push_back(0);
+    }
+    for(size_t i=0;i<Y.size();i++){
+        
         for(size_t j=0;j<Y[i].size();j++){
-            if(Y[i][j]==1) Ypos[i]++;
-            else Yneg[i]++;
+            if(Y[i][j]==1) Ypos[j]++;
+            else Yneg[j]++;
         }
     }
     //-----------------------------------------
@@ -388,13 +391,15 @@ void NeuralNetwork_t::train(MatDouble_t const& X,MatDouble_t const& Y,uint16_t e
         cout << "Epoca " << i << endl;
         errorF=errorFunctionVector(X,Y);
         cout << "Error cuadratico medio: " << errorF << endl;
+        errorF=errorFunctionVector(Xval,Yval);
+        cout << "Error cuadratico medio validation: " << errorF << endl;
         //¿Borrar?:
         /*if(errorF<0.1){
             cout << "Epocas necesarias: " << i << endl;
             break;   
         }*/
     }
-    errorF=errorFunctionVector(X,Y);
+    errorF=errorFunctionVector(Xval,Yval);
     cout << "Error cuadratico medio: " << errorF << endl;
 }
 
