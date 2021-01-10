@@ -120,22 +120,22 @@ void showRAM(){
 /// Do Next Agent Step
 ///////////////////////////////////////////////////////////////////////////////
 //Prediccion del perceptron iPerceptron con la entrada X
-int hw(VecDouble_t X, int neuron){
-   //FALLA
-   net.feedforward(X);
+/*int hw(VecDouble_t X, int neuron){
    return net.feedforward(X)[neuron];
-}
+}*/
 
 float agentStep() {
    
    static int wide = 9;
    float reward = 0;
 
-   if(hw(state,0)>0) reward+=alei.act(PLAYER_A_RIGHTFIRE);
-   if(hw(state,1)>0) reward+=alei.act(PLAYER_A_LEFTFIRE);
-   if(hw(state,2)>0) reward+=alei.act(PLAYER_A_UPFIRE);
-   if(hw(state,3)>0) reward += alei.act(PLAYER_A_LEFT);
-   if(hw(state,4)>0) reward += alei.act(PLAYER_A_RIGHT);
+   VecDouble_t res=net.feedforward(state);
+
+   if(res[0]>0) reward+=alei.act(PLAYER_A_RIGHTFIRE);
+   if(res[1]>0) reward+=alei.act(PLAYER_A_LEFTFIRE);
+   if(res[2]>0) reward+=alei.act(PLAYER_A_UPFIRE);
+   if(res[3]>0) reward += alei.act(PLAYER_A_LEFT);
+   if(res[4]>0) reward += alei.act(PLAYER_A_RIGHT);
    
    return (reward + alei.act(PLAYER_A_NOOP));
 }

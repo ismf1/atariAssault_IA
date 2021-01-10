@@ -204,7 +204,6 @@ constexpr auto NeuralNetwork_t::errorDerivateFunction(auto hx, auto y,auto size_
     return 2*(hx-y)/size_y;
 }
 
-//FALTA: Sesgar error
 constexpr auto NeuralNetwork_t::errorFunctionInNeuron(double hx, double y) const{
     //(m-n)/m
     return pow(hx-y,2);
