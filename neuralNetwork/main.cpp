@@ -608,7 +608,7 @@ void run(){
 
 
     //Generamos la red neuronal
-    initializer_list<uint16_t> layerStruct={dataTrain.tamXi,64,32,dataTrain.tamYi};
+    initializer_list<uint16_t> layerStruct={dataTrain.tamXi,62,32,16,dataTrain.tamYi};
     //initializer_list<uint16_t> layerStruct={X[0].size(),4,8,Y[0].size()};
     float learningRate=0.1;
 

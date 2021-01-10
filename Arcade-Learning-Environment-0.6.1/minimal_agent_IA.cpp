@@ -133,7 +133,8 @@ float agentStep() {
    
    static int wide = 9;
    float reward = 0;
-
+   
+   //Probar con >0.5 -> CAMBIAR
    if(hw(state,0)>0) reward+=alei.act(PLAYER_A_RIGHTFIRE);
    if(hw(state,1)>0) reward+=alei.act(PLAYER_A_LEFTFIRE);
    if(hw(state,2)>0) reward+=alei.act(PLAYER_A_UPFIRE);

@@ -608,7 +608,7 @@ void run(){
 
 
     //Generamos la red neuronal
-    initializer_list<uint16_t> layerStruct={dataTrain.tamXi,64,32,dataTrain.tamYi};
+    initializer_list<uint16_t> layerStruct={dataTrain.tamXi,62,32,16,dataTrain.tamYi};
     //initializer_list<uint16_t> layerStruct={X[0].size(),4,8,Y[0].size()};
     float learningRate=0.1;
 
@@ -627,6 +627,18 @@ void run(){
               vectorOfVectorsToMatDouble(dataVal.Y),
               10);
     //net.train(X,Y,250);
+    cout << "Fallos:" << endl;
+    MatDouble_t fallos=net.test(vectorOfVectorsToMatDouble(dataVal.X),vectorOfVectorsToMatDouble(dataVal.Y));
+
+    for(size_t i=0;i<fallos.size();i++){
+        cout << "Por moverse cuando no debia: ";
+        cout << (double)fallos[i][0]/dataVal.Yneg[i]*100 << "%" << endl;
+        cout << "Por no moverse cuando debia: ";
+        cout << (double)fallos[i][1]/dataVal.Ypos[i]*100 << "%" << endl;
+        cout << "Totales: ";
+        cout << (double)(fallos[i][1]+fallos[i][0])/dataVal.Y.size()*100 << "%" << endl;
+        cout << endl;
+    }
 
     net.save("NeuralNetwork.txt");
     /*net.load("NeuralNetwork2.txt");
