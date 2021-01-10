@@ -468,4 +468,73 @@ double NeuralNetwork_t::evaluateNet(MatDouble_t const& X, VecDouble_t const& Y){
     return fails;
 }
 
+void NeuralNetwork_t::save(const std::string s) const{
+
+    std::ofstream ficheroSalida;
+    ficheroSalida.open (s);
+    ficheroSalida << "[";
+    for(size_t i=0;i<m_layers.size();i++){
+        ficheroSalida << "[";
+        for(size_t j=0;j<m_layers[i].size();j++){
+            ficheroSalida << "[";
+            for(size_t k=0;k<m_layers[i][j].size();k++){
+                ficheroSalida << m_layers[i][j][k];
+
+                if(m_layers[i][j].size()-1>k)
+                    ficheroSalida <<",";
+            }
+            ficheroSalida << "]";
+        }
+        ficheroSalida << "]";
+    }
+    ficheroSalida << "]";
+    
+    ficheroSalida.close();
+
+}
+
+vector<MatDouble_t> NeuralNetwork_t::load(const std::string fichero) const{
+    vector<MatDouble_t> x;
+    MatDouble_t y;
+    VecDouble_t z;
+    string s;
+    s="";
+
+    ifstream ficheroEntrada;
+    char letra;
+
+    ficheroEntrada.open (fichero);
+    ficheroEntrada >> letra;
+    while (! ficheroEntrada.eof() ) {
+        ficheroEntrada >> letra;
+        while(letra!=']'){
+            while(letra!=']'){
+                ficheroEntrada >> letra;
+                if(letra=='['){
+                    ficheroEntrada >> letra;
+                }
+                if(letra==']' || letra==','){
+                    cout << s << endl;
+                    z.push_back(atof(s.c_str()));
+                    s="";
+                }else{
+                    s+=letra;
+                }
+                
+            }
+            y.push_back(z);
+            z.clear();
+            ficheroEntrada >> letra;
+        }
+        if(y.size()>0){
+            x.push_back(y);
+            y.clear();
+        }
+    }
+    ficheroEntrada.close();
+    //escribir(x,"leida");
+
+    return x;
+}
+
 #endif

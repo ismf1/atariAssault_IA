@@ -590,8 +590,10 @@ void run(){
     //Entrenamos la red neuronal
     net.train(vectorOfVectorsToMatDouble(data.X),
               vectorOfVectorsToMatDouble(data.Y),
-              50);
+              5);
     //net.train(X,Y,250);
+
+    net.save("NeuralNetwork.txt");
 
 
     //Predecimos los valores

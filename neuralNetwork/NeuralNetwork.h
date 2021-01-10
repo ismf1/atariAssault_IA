@@ -9,6 +9,10 @@
 #include <random>
 #include <queue>
 #include <iostream>
+#include <string>
+#include <cstring>
+#include <iostream>
+#include <fstream>
 using namespace std;
 
 using VecDouble_t = vector<double>; //Neurona
@@ -88,6 +92,10 @@ struct NeuralNetwork_t{
     vector<MatDouble_t> getm_layers();
 
     double evaluateNet(MatDouble_t const& X, VecDouble_t const& Y);
+
+    vector<MatDouble_t> load(const string fichero) const;
+
+    void save(const string s) const;
 
 private:
     vector<ActF> functionsAct;
