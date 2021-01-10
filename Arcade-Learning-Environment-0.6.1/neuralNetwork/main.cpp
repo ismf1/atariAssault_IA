@@ -586,6 +586,7 @@ void run(){
     float learningRate=0.1;
 
     NeuralNetwork_t net(layerStruct,learningRate);
+    net.setActiveFunctions({ActF::SIGMOID,ActF::SIGMOID,ActF::SIGMOID});
     
     //Entrenamos la red neuronal
     net.train(vectorOfVectorsToMatDouble(data.X),

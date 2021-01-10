@@ -63,9 +63,6 @@ NeuralNetwork_t::NeuralNetwork_t(){
 }
 
 NeuralNetwork_t::NeuralNetwork_t(initializer_list<uint16_t> const& layers,float learningR) {
-    for(size_t i=0;i<layers.size();i++){
-        functionsAct.push_back(ActF::SIGMOID);
-    }
     learningRate=learningR;
     //Al menos deben haber 2 capas
     if(layers.size()<2) throw out_of_range("Number of layers can not be less than 2");
@@ -86,11 +83,17 @@ NeuralNetwork_t::NeuralNetwork_t(initializer_list<uint16_t> const& layers,float 
         m_layers.push_back(matrix_w);
         input_size=*it;
     }
+
+    for(size_t i=0;i<m_layers.size();i++){
+        functionsAct.push_back(ActF::SIGMOID);
+    }
 }
 
-void NeuralNetwork_t::setActiveFunctions(vector<ActF> v){
-    for(size_t i=0;i<v.size();i++){
-        functionsAct[i]=v[i];
+void NeuralNetwork_t::setActiveFunctions(initializer_list<ActF> v){
+    size_t i=0;
+    for(auto it=v.begin()+1; it!=v.end() ; it++){
+        functionsAct[i]=*it;
+        i++;
     }
 }
 
@@ -345,7 +348,9 @@ VecDouble_t NeuralNetwork_t::feedforwardinlayer(VecDouble_t const& x,auto layer)
         result.resize(result.size()+1); //Aumentamos size
         copy(result.rbegin()+1, result.rend(), result.rbegin()); //Desplazamos los elementos 1 pos a la derecha
         result[0]=1.0;
+
         result = activeFunction(multiplyT(result,Wi),i);
+        
 
         if(i==layer){
             return result;
@@ -537,7 +542,7 @@ void NeuralNetwork_t::load(const std::string fichero){
     }
     ficheroEntrada.close();
     //escribir(x,"leida");
-
+    functionsAct.resize(0);
     for(size_t i=0;i<m_layers.size();i++){
         functionsAct.push_back(ActF::SIGMOID);
     }
