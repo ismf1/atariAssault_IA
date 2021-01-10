@@ -77,7 +77,7 @@ struct NeuralNetwork_t{
 
     double feedforwardinneuron(VecDouble_t const& x,auto layer,auto neuron);
 
-    void train(MatDouble_t const& X,MatDouble_t const& Y,uint16_t epochs);
+    void train(MatDouble_t const& X,MatDouble_t const& Y,MatDouble_t const& Xval,MatDouble_t const& Yval,uint16_t epochs);
 
     VecDouble_t activeFunction (VecDouble_t const& vec, auto layer);
 

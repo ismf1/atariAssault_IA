@@ -575,6 +575,30 @@ MatDouble_t vectorOfVectorsToMatDouble(const auto &vv){
     return m;
 }
 
+void splitDataTrainTest(double percent,MatDouble_t const& X,MatDouble_t const& Y,
+                        MatDouble_t& Xtrain,MatDouble_t& Ytrain,
+                        MatDouble_t& Xval,MatDouble_t& Yval){
+    size_t i=0;
+
+    Xtrain.resize(0);
+    Ytrain.resize(0);
+    Xval.resize(0);
+    Yval.resize(0);
+    cout << "Separando train data..." << endl;
+    while(i<(percent*X.size())){
+        Xtrain.push_back(X[i]);
+        Ytrain.push_back(Y[i]);
+        i++;
+    }
+    cout << "Separando validation data..." << endl;
+    while(i<X.size()){
+        Xval.push_back(X[i]);
+        Yval.push_back(Y[i]);
+        i++;
+    }
+    cout << "Datos separados" << endl;
+}
+
 void run(){
     //Leemos los datos
     Data data;
@@ -587,11 +611,13 @@ void run(){
 
     NeuralNetwork_t net(layerStruct,learningRate);
     net.setActiveFunctions({ActF::SIGMOID,ActF::SIGMOID,ActF::SIGMOID});
-    
+
+    MatDouble_t Xtrain,Ytrain,Xval,Yval;
+    splitDataTrainTest(0.9,vectorOfVectorsToMatDouble(data.X),vectorOfVectorsToMatDouble(data.Y),
+                        Xtrain,Ytrain,Xval,Yval);
+
     //Entrenamos la red neuronal
-    net.train(vectorOfVectorsToMatDouble(data.X),
-              vectorOfVectorsToMatDouble(data.Y),
-              10);
+    net.train(Xtrain,Ytrain,Xval,Yval,10);
     //net.train(X,Y,250);
 
     net.save("NeuralNetwork.txt");
