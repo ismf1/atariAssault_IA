@@ -41,7 +41,7 @@ struct NeuralNetwork_t{
     constexpr auto sigmoidDeriv(auto x) const;
     constexpr auto reluDeriv(auto x) const;
 
-    constexpr auto signal(VecDouble_t const& x,auto layer,auto neuron);
+    //constexpr auto signal(VecDouble_t const& x,auto layer,auto neuron);
 
     constexpr auto deltaOutputLayer(VecDouble_t const& x,VecDouble_t const& y,auto layer,auto neuron);
 

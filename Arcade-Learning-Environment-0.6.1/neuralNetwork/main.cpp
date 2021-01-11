@@ -602,12 +602,14 @@ void splitDataTrainTest(double percent,MatDouble_t const& X,MatDouble_t const& Y
 void run(){
     //Leemos los datos
     Data dataTrain;
-    dataTrain.init("dataBuena.txt",59,5);
+    //dataTrain.init("dataBuena.txt",59,5);
+    dataTrain.init("dataTrain.txt",59,5);
     Data dataVal;
-    dataVal.init("data.txt",59,5);
+    dataVal.init("dataVal.txt",59,5);
 
     cout << "Numero de datos:" << endl;
     for(size_t i=0;i<dataTrain.Yneg.size();i++){
+        cout << "Neurona de salida " << i << endl;
         cout << "Negativos: " << dataTrain.Yneg[i] << endl;
         cout << "Positivos: " << dataTrain.Ypos[i] << endl;
         cout << "Totales: " << dataTrain.Y.size() << endl << endl;
@@ -617,10 +619,12 @@ void run(){
     //Generamos la red neuronal
     initializer_list<uint16_t> layerStruct={dataTrain.tamXi,62,32,16,dataTrain.tamYi};
     //initializer_list<uint16_t> layerStruct={X[0].size(),4,8,Y[0].size()};
-    float learningRate=0.03;
+    float learningRate=0.01;
+    uint16_t epochs=50;
+    uint16_t patience=5;
 
     NeuralNetwork_t net(layerStruct,learningRate);
-    net.setActiveFunctions({ActF::SIGMOID,ActF::SIGMOID,ActF::SIGMOID});
+    //net.setActiveFunctions({ActF::RELU,ActF::RELU,ActF::RELU,ActF::SIGMOID});
 
     //MatDouble_t Xtrain,Ytrain,Xval,Yval;
     //splitDataTrainTest(0.9,vectorOfVectorsToMatDouble(data.X),vectorOfVectorsToMatDouble(data.Y),
@@ -632,23 +636,39 @@ void run(){
               vectorOfVectorsToMatDouble(dataTrain.Y),
               vectorOfVectorsToMatDouble(dataVal.X),
               vectorOfVectorsToMatDouble(dataVal.Y),
-              10);
+              epochs,
+              patience);
     //net.train(X,Y,250);
     cout << "Fallos:" << endl;
     MatDouble_t fallos=net.test(vectorOfVectorsToMatDouble(dataVal.X),vectorOfVectorsToMatDouble(dataVal.Y));
+    double fallosSesgados=0;
+    double fallosNoSesgados=0;
 
     for(size_t i=0;i<fallos.size();i++){
-        cout << "Por moverse cuando no debia: " << endl;
+        /*cout << "Por moverse cuando no debia: " << endl;
         cout << fallos[i][0] << "/" << dataVal.Yneg[i] << "->";
-        cout << (double)fallos[i][0]/dataVal.Yneg[i]*100 << "%" << endl;
+        cout << (double)fallos[i][0]/dataVal.Yneg[i]*100 << "%" << " -> ";
+        cout << "Sesgado: " << (double)fallos[i][0]/dataVal.Yneg[i]*100 * dataVal.Ypos[i] / dataVal.Y.size() << endl;
+
         cout << "Por no moverse cuando debia: "<< endl;
         cout << fallos[i][1] << "/" << dataVal.Ypos[i] << "->";
-        cout << (double)fallos[i][1]/dataVal.Ypos[i]*100 << "%" << endl;
+        cout << (double)fallos[i][1]/dataVal.Ypos[i]*100 << "%" << " -> ";
+        cout << "Sesgado: " << (double)fallos[i][1]/dataVal.Ypos[i]*100 * dataVal.Yneg[i] / dataVal.Y.size() << endl;
+
         cout << "Totales: "<< endl;
         cout << (fallos[i][1]+fallos[i][0]) << "/" << dataVal.Y.size() << "->";
-        cout << (double)(fallos[i][1]+fallos[i][0])/dataVal.Y.size()*100 << "%" << endl;
-        cout << endl;
+        cout << (double)(fallos[i][1]+fallos[i][0])/dataVal.Y.size()*100 << "%" << " -> ";
+        cout << "Sesgado: " << (double)fallos[i][0]/dataVal.Yneg[i]*100 * dataVal.Ypos[i] / dataVal.Y.size()+(double)fallos[i][1]/dataVal.Ypos[i]*100 * dataVal.Yneg[i] / dataVal.Y.size()/2 << endl;
+        cout << endl;*/
+        fallosSesgados+=(double)fallos[i][0]/dataVal.Yneg[i]*100 * dataVal.Ypos[i] / dataVal.Y.size()+(double)fallos[i][1]/dataVal.Ypos[i]*100 * dataVal.Yneg[i] / dataVal.Y.size()/2;
+        fallosNoSesgados+=(double)(fallos[i][1]+fallos[i][0])/dataVal.Y.size()*100;
     }
+
+    fallosSesgados/=fallos.size();
+    fallosNoSesgados/=fallos.size();
+
+    cout << "Porcentaje total no sesgado de fallos: " << fallosSesgados << endl;
+    cout << "Porcentaje total sesgado de fallos: " << fallosNoSesgados << endl;
 
     net.save("NeuralNetwork.txt");
     /*net.load("NeuralNetwork2.txt");
