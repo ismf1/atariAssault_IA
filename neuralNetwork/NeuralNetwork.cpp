@@ -384,7 +384,6 @@ void NeuralNetwork_t::train(MatDouble_t const& X,MatDouble_t const& Y,MatDouble_
     }
 
     double errorF;
-    double beforeErrorVal=9999;
     uint16_t patienceRest=patience;
     double bestError=9999;
 
