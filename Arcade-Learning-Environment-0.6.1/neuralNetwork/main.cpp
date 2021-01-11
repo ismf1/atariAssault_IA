@@ -606,11 +606,18 @@ void run(){
     Data dataVal;
     dataVal.init("data.txt",59,5);
 
+    cout << "Numero de datos:" << endl;
+    for(size_t i=0;i<dataTrain.Yneg.size();i++){
+        cout << "Negativos: " << dataTrain.Yneg[i] << endl;
+        cout << "Positivos: " << dataTrain.Ypos[i] << endl;
+        cout << "Totales: " << dataTrain.Y.size() << endl << endl;
+    }
+
 
     //Generamos la red neuronal
     initializer_list<uint16_t> layerStruct={dataTrain.tamXi,62,32,16,dataTrain.tamYi};
     //initializer_list<uint16_t> layerStruct={X[0].size(),4,8,Y[0].size()};
-    float learningRate=0.1;
+    float learningRate=0.03;
 
     NeuralNetwork_t net(layerStruct,learningRate);
     net.setActiveFunctions({ActF::SIGMOID,ActF::SIGMOID,ActF::SIGMOID});
@@ -631,11 +638,14 @@ void run(){
     MatDouble_t fallos=net.test(vectorOfVectorsToMatDouble(dataVal.X),vectorOfVectorsToMatDouble(dataVal.Y));
 
     for(size_t i=0;i<fallos.size();i++){
-        cout << "Por moverse cuando no debia: ";
+        cout << "Por moverse cuando no debia: " << endl;
+        cout << fallos[i][0] << "/" << dataVal.Yneg[i] << "->";
         cout << (double)fallos[i][0]/dataVal.Yneg[i]*100 << "%" << endl;
-        cout << "Por no moverse cuando debia: ";
+        cout << "Por no moverse cuando debia: "<< endl;
+        cout << fallos[i][1] << "/" << dataVal.Ypos[i] << "->";
         cout << (double)fallos[i][1]/dataVal.Ypos[i]*100 << "%" << endl;
-        cout << "Totales: ";
+        cout << "Totales: "<< endl;
+        cout << (fallos[i][1]+fallos[i][0]) << "/" << dataVal.Y.size() << "->";
         cout << (double)(fallos[i][1]+fallos[i][0])/dataVal.Y.size()*100 << "%" << endl;
         cout << endl;
     }
