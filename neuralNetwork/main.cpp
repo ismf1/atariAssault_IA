@@ -620,7 +620,8 @@ void run(){
     initializer_list<uint16_t> layerStruct={dataTrain.tamXi,62,32,16,dataTrain.tamYi};
     //initializer_list<uint16_t> layerStruct={X[0].size(),4,8,Y[0].size()};
     float learningRate=0.01;
-    uint16_t epochs=10;
+    uint16_t epochs=50;
+    uint16_t patience=5;
 
     NeuralNetwork_t net(layerStruct,learningRate);
     //net.setActiveFunctions({ActF::RELU,ActF::RELU,ActF::RELU,ActF::SIGMOID});
@@ -635,7 +636,8 @@ void run(){
               vectorOfVectorsToMatDouble(dataTrain.Y),
               vectorOfVectorsToMatDouble(dataVal.X),
               vectorOfVectorsToMatDouble(dataVal.Y),
-              epochs);
+              epochs,
+              patience);
     //net.train(X,Y,250);
     cout << "Fallos:" << endl;
     MatDouble_t fallos=net.test(vectorOfVectorsToMatDouble(dataVal.X),vectorOfVectorsToMatDouble(dataVal.Y));

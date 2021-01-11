@@ -364,12 +364,13 @@ double NeuralNetwork_t::feedforwardinneuron(VecDouble_t const& x,auto layer,auto
     return feedforwardinlayer(x,layer)[neuron];
 }
 
-void NeuralNetwork_t::train(MatDouble_t const& X,MatDouble_t const& Y,MatDouble_t const& Xval,MatDouble_t const& Yval,uint16_t epochs){
+void NeuralNetwork_t::train(MatDouble_t const& X,MatDouble_t const& Y,MatDouble_t const& Xval,MatDouble_t const& Yval,uint16_t epochs, uint16_t const patience){
 
     if(X.size()!=Y.size()){
         throw length_error("Input and output vector must have the same size.");
     }
-    //Sin comprobar---------------------------
+
+    //Contamos valores negativos y positivos
     for(size_t i=0;i<Y[0].size();i++){
         Yneg.push_back(0);
         Ypos.push_back(0);
@@ -381,24 +382,33 @@ void NeuralNetwork_t::train(MatDouble_t const& X,MatDouble_t const& Y,MatDouble_
             else Yneg[j]++;
         }
     }
-    //-----------------------------------------
+
     double errorF;
+    double beforeErrorVal=9999;
+    uint16_t patienceRest=patience;
+    double bestError=9999;
 
     for(size_t i=0;i<epochs;i++){
+        //Actualizamos pesos
         for(size_t j=0;j<X.size();j++){
             updateWeights(X[j],Y[j]);
         }
+
+        //Calculamos error cuadratico
         cout << "Epoca " << i << endl;
         errorF=errorFunctionVector(X,Y);
         cout << "Error cuadratico medio: " << errorF << endl;
         errorF=errorFunctionVector(Xval,Yval);
         cout << "Error cuadratico medio validation: " << errorF << endl;
 
-        //¿Borrar?:
-        /*if(errorF<0.1){
-            cout << "Epocas necesarias: " << i << endl;
-            break;   
-        }*/
+        //Comprobamos early stopping
+        if(errorF > bestError){
+            patienceRest--;
+            if(patienceRest==0) break;
+        }else{
+            patienceRest=patience;
+            bestError=errorF;
+        }
     }
     errorF=errorFunctionVector(Xval,Yval);
     cout << "Error cuadratico medio: " << errorF << endl;
