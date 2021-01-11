@@ -620,7 +620,7 @@ void run(){
     initializer_list<uint16_t> layerStruct={dataTrain.tamXi,62,32,16,dataTrain.tamYi};
     //initializer_list<uint16_t> layerStruct={X[0].size(),4,8,Y[0].size()};
     float learningRate=0.01;
-    uint16_t epochs=50;
+    uint16_t epochs=500;
     uint16_t patience=5;
 
     NeuralNetwork_t net(layerStruct,learningRate);
