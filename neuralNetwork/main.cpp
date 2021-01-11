@@ -619,7 +619,8 @@ void run(){
     //Generamos la red neuronal
     initializer_list<uint16_t> layerStruct={dataTrain.tamXi,62,32,16,dataTrain.tamYi};
     //initializer_list<uint16_t> layerStruct={X[0].size(),4,8,Y[0].size()};
-    float learningRate=0.03;
+    float learningRate=0.01;
+    uint16_t epochs=10;
 
     NeuralNetwork_t net(layerStruct,learningRate);
     //net.setActiveFunctions({ActF::RELU,ActF::RELU,ActF::RELU,ActF::SIGMOID});
@@ -634,7 +635,7 @@ void run(){
               vectorOfVectorsToMatDouble(dataTrain.Y),
               vectorOfVectorsToMatDouble(dataVal.X),
               vectorOfVectorsToMatDouble(dataVal.Y),
-              1);
+              epochs);
     //net.train(X,Y,250);
     cout << "Fallos:" << endl;
     MatDouble_t fallos=net.test(vectorOfVectorsToMatDouble(dataVal.X),vectorOfVectorsToMatDouble(dataVal.Y));
@@ -642,7 +643,7 @@ void run(){
     double fallosNoSesgados=0;
 
     for(size_t i=0;i<fallos.size();i++){
-        cout << "Por moverse cuando no debia: " << endl;
+        /*cout << "Por moverse cuando no debia: " << endl;
         cout << fallos[i][0] << "/" << dataVal.Yneg[i] << "->";
         cout << (double)fallos[i][0]/dataVal.Yneg[i]*100 << "%" << " -> ";
         cout << "Sesgado: " << (double)fallos[i][0]/dataVal.Yneg[i]*100 * dataVal.Ypos[i] / dataVal.Y.size() << endl;
@@ -656,7 +657,7 @@ void run(){
         cout << (fallos[i][1]+fallos[i][0]) << "/" << dataVal.Y.size() << "->";
         cout << (double)(fallos[i][1]+fallos[i][0])/dataVal.Y.size()*100 << "%" << " -> ";
         cout << "Sesgado: " << (double)fallos[i][0]/dataVal.Yneg[i]*100 * dataVal.Ypos[i] / dataVal.Y.size()+(double)fallos[i][1]/dataVal.Ypos[i]*100 * dataVal.Yneg[i] / dataVal.Y.size()/2 << endl;
-        cout << endl;
+        cout << endl;*/
         fallosSesgados+=(double)fallos[i][0]/dataVal.Yneg[i]*100 * dataVal.Ypos[i] / dataVal.Y.size()+(double)fallos[i][1]/dataVal.Ypos[i]*100 * dataVal.Yneg[i] / dataVal.Y.size()/2;
         fallosNoSesgados+=(double)(fallos[i][1]+fallos[i][0])/dataVal.Y.size()*100;
     }

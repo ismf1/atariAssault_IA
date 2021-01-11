@@ -393,6 +393,7 @@ void NeuralNetwork_t::train(MatDouble_t const& X,MatDouble_t const& Y,MatDouble_
         cout << "Error cuadratico medio: " << errorF << endl;
         errorF=errorFunctionVector(Xval,Yval);
         cout << "Error cuadratico medio validation: " << errorF << endl;
+
         //¿Borrar?:
         /*if(errorF<0.1){
             cout << "Epocas necesarias: " << i << endl;
