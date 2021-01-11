@@ -603,12 +603,13 @@ void run(){
     //Leemos los datos
     Data dataTrain;
     //dataTrain.init("dataBuena.txt",59,5);
-    dataTrain.init("data_noscaled.csv",59,5);
+    dataTrain.init("dataCarlos/data.csv",59,5);
     Data dataVal;
-    dataVal.init("data.txt",59,5);
+    dataVal.init("dataVal.txt",59,5);
 
     cout << "Numero de datos:" << endl;
     for(size_t i=0;i<dataTrain.Yneg.size();i++){
+        cout << "Neurona de salida " << i << endl;
         cout << "Negativos: " << dataTrain.Yneg[i] << endl;
         cout << "Positivos: " << dataTrain.Ypos[i] << endl;
         cout << "Totales: " << dataTrain.Y.size() << endl << endl;
