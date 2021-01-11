@@ -602,7 +602,8 @@ void splitDataTrainTest(double percent,MatDouble_t const& X,MatDouble_t const& Y
 void run(){
     //Leemos los datos
     Data dataTrain;
-    dataTrain.init("dataBuena.txt",59,5);
+    //dataTrain.init("dataBuena.txt",59,5);
+    dataTrain.init("data_noscaled.csv",59,5);
     Data dataVal;
     dataVal.init("data.txt",59,5);
 
