@@ -33,7 +33,6 @@ public:
         std::vector<std::vector<double>> a; 
         a.push_back(X);
         Mat2d temp(a);
-        std::cout << temp << std::endl;
         Mat2d r = forwardPass(temp).back();
         return r.toSTLVector()[0];
     };
