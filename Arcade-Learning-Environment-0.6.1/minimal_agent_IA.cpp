@@ -133,12 +133,12 @@ float agentStep() {
    
    static int wide = 9;
    float reward = 0;
-
-   if(hw(state,0)>0) reward+=alei.act(PLAYER_A_RIGHTFIRE);
-   if(hw(state,1)>0) reward+=alei.act(PLAYER_A_LEFTFIRE);
-   if(hw(state,2)>0) reward+=alei.act(PLAYER_A_UPFIRE);
-   if(hw(state,3)>0) reward += alei.act(PLAYER_A_LEFT);
-   if(hw(state,4)>0) reward += alei.act(PLAYER_A_RIGHT);
+   
+   if(hw(state,0)>0.5) reward+=alei.act(PLAYER_A_RIGHTFIRE);
+   if(hw(state,1)>0.5) reward+=alei.act(PLAYER_A_LEFTFIRE);
+   if(hw(state,2)>0.5) reward+=alei.act(PLAYER_A_UPFIRE);
+   if(hw(state,3)>0.5) reward += alei.act(PLAYER_A_LEFT);
+   if(hw(state,4)>0.5) reward += alei.act(PLAYER_A_RIGHT);
    
    return (reward + alei.act(PLAYER_A_NOOP));
 }
