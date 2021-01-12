@@ -32,7 +32,7 @@ public:
     std::vector<double> predict(const std::vector<double> &X) {
         Mat2d temp;
         temp.push_back(X);
-        std::cout << X << std::endl;
+        std::cout << temp << std::endl;
         Mat2d r = forwardPass(temp).back();
         return r.toSTLVector()[0];
     };
