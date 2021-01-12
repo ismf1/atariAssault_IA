@@ -170,6 +170,8 @@ int main(int argc, char **argv) {
 
    net->load(argv[2]);
 
+   std::cout << net << std::endl;
+
    // Create alei object.
    alei.setInt("random_seed", 0);
    alei.setFloat("repeat_action_probability", 0);
