@@ -114,6 +114,8 @@ float agentStep(Network *net) {
    
    float reward = 0;
    
+   std::cout << state.size() << std::endl;
+
    std::vector<double> res = net->predict(state);
 
    /*if(res[0]>0.5) reward+=alei.act(PLAYER_A_RIGHTFIRE);
