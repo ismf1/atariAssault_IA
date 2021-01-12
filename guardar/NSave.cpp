@@ -52,7 +52,6 @@ NSave::Data NSave::read() const{
                     fileIn >> letra;
                 }
                 if(letra==']' || letra==','){
-                    std::cout << s << std::endl;
                     z.push_back(atof(s.c_str()));
                     s="";
                 }else{
