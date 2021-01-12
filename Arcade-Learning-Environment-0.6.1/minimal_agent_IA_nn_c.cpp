@@ -157,18 +157,18 @@ void updateState(){
 ///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char **argv) {
 
-   if (argc != 3)
+   if (argc != 4)
       usage(argv[0]);
 
    Network *net;
-   std::string type = argv[2];
+   std::string type = argv[3];
 
    if (type == "ivan")
       net = new NeuralNetwork_t;
    else
       net = new NNet();
 
-   net->load(argv[1]);
+   net->load(argv[2]);
 
    // Create alei object.
    alei.setInt("random_seed", 0);

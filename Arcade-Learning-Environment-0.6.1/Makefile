@@ -3,7 +3,7 @@ CXXFLAGS := -pedantic-errors -Wall -Wextra -std=c++2a -fconcepts -O3 -funroll-lo
 LDFLAGS  := -L/usr/lib -L. -lale -lSDL -lstdc++ -lm
 BUILD    := ./build
 OBJ_DIR  := $(BUILD)/obj
-APP_DIR  := minimal_agent_IA_nn_c
+APP_DIR  := .
 TARGET   := nn
 SRC_FILES_NN := $(wildcard ../NeuralNetworkv2/src/*.cpp)
 INCLUDE  := -I../NeuralNetworkv2/include/ -I../include -I../neuralNetwork -I../ -I../guardar
