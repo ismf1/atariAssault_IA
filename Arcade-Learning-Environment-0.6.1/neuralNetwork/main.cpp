@@ -617,14 +617,24 @@ void run(){
 
 
     //Generamos la red neuronal
-    initializer_list<uint16_t> layerStruct={dataTrain.tamXi,62,32,16,dataTrain.tamYi};
+    //Antes: initializer_list<uint16_t> layerStruct={dataTrain.tamXi,64,32,16,dataTrain.tamYi};
+    initializer_list<uint16_t> layerStruct={dataTrain.tamXi,64,16,dataTrain.tamYi};  //Mejor resultado
     //initializer_list<uint16_t> layerStruct={X[0].size(),4,8,Y[0].size()};
     float learningRate=0.01;
     uint16_t epochs=500;
     uint16_t patience=5;
 
     NeuralNetwork_t net(layerStruct,learningRate);
+
     //net.setActiveFunctions({ActF::RELU,ActF::RELU,ActF::RELU,ActF::SIGMOID});
+
+    cout << "Datos mínimos necesarios: ";
+    uint16_t minData=0;
+    for(size_t i=0;i<net.getm_layers().size();i++){
+        minData+=net.getm_layers()[i].size()*net.getm_layers()[i][0].size();
+    }
+    minData=minData*10;
+    cout << minData << endl << endl;
 
     //MatDouble_t Xtrain,Ytrain,Xval,Yval;
     //splitDataTrainTest(0.9,vectorOfVectorsToMatDouble(data.X),vectorOfVectorsToMatDouble(data.Y),
