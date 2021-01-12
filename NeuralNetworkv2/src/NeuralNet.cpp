@@ -1,4 +1,6 @@
 #include <NeuralNet.hpp>
+#include <NSave.hpp>
+#include <Functions.hpp>
 #include <list>
 #include <tuple>
 
@@ -19,7 +21,10 @@ NNet::VecFordward NNet::forwardPass(const Mat2d &X) const
     return vecA;
 }
 
-Mat2d NNet::ttrain(const Mat2d &X, const Mat2d &y, const CostFunc &costf, double lr)
+Mat2d NNet::ttrain(
+    const Mat2d &X, const Mat2d &y, 
+    const CostFunc &costf, double lr
+)
 {
 
     // Forward pass
@@ -64,8 +69,14 @@ NNet::NNet(const std::vector<int16_t> &topology, const ActFunc &actf)
 
 NNet::NNet() {}
 
-void NNet::train(const Mat2d &X, const Mat2d &y, const CostFunc &costf, size_t epochs, double lr)
+void NNet::train(
+    const Mat2d &X, const Mat2d &y, 
+    const CostFunc &costf, size_t epochs, double lr, 
+    const Vec2d& initialBias
+)
 {
+    if (!initialBias.empty())
+        nn.back().b = initialBias;
 
     for (size_t i = 0; i < epochs; i++)
     {
@@ -107,8 +118,26 @@ NNet::VecWeights NNet::getWeights() const {
 void NNet::load(const NNet::VecWeights &vecW) {
     nn.clear();
 
-    for (auto &layer : vecW)
-        nn.push_back(NeuralLayer(layer));
+    ActFunc  actfRelu  { Functions::relu, Functions::reluD };
+    ActFunc  actfSigm  { Functions::sigm, Functions::sigmD };
+    VecActFunc  actf  {
+            actfRelu,
+            actfRelu,
+            actfRelu,
+            actfSigm
+    };
+
+    size_t i = 0;
+    for (auto &layer : vecW) {
+        nn.push_back(NeuralLayer(layer, actf[i]));
+    }
+}
+
+void NNet::load(const std::string &fileName) {
+    nn.clear();
+
+    NSave loader(fileName);
+    load(loader.read());
 }
 
 auto NNet::begin() const

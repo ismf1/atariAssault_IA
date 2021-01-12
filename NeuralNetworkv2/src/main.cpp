@@ -223,7 +223,7 @@ Data readCsv(std::string fileName) {
         tempY.push_back(std::get<62>(row));
         tempY.push_back(std::get<63>(row));
         
-        if (i < 20000) {
+        if (i < 240000) {
             X.push_back(tempX);
             y.push_back(tempY);
         } else {
@@ -889,7 +889,7 @@ int main(int argc, char *argv[]) {
 
         std::string fileModel = argv[3];
         auto [ X, y, X_test, y_test] = readCsv(file);
-        std::vector<int16_t> topology = { (int16_t)X.ncol, 128, 128, 128, (int16_t)y.ncol };
+        std::vector<int16_t> topology = { (int16_t)X.ncol, 128, 64, 32, (int16_t)y.ncol };
         CostFunc costf     { Functions::mse, Functions::mseD };
         ActFunc  actfRelu  { Functions::relu, Functions::reluD };
         ActFunc  actfSigm  { Functions::sigm, Functions::sigmD };
@@ -900,9 +900,22 @@ int main(int argc, char *argv[]) {
             actfSigm
         };
         
+        Vec2d initialBias(y.ncol);
+
+        for (size_t i = 0; i < y.ncol; i++) {
+            double pos = y.countIf(i, [](double e) { return e == 1; }); 
+            double neg = y.countIf(i, [](double e) { return e == 0; });
+            std::cout << "Positive: " << pos << ", Negative: " << neg << std::endl;
+            initialBias[i] = std::log(pos / neg);
+        }
+
+        std::cout << initialBias << std::endl;
+
         NNet nn(topology, actf);
         NSave saver(fileModel);
-        nn.train(X, y, costf, atof(argv[4]), atof(argv[5]));
+        // std::cout << nn << std::endl;
+        nn.train(X, y, costf, atof(argv[4]), atof(argv[5]), initialBias);
+        // nn.train(X, y, costf, atof(argv[4]), atof(argv[5]));
         saver.write(nn.getWeights());
     } 
     else if (opt == "-l") {

@@ -5,7 +5,7 @@ BUILD    := ./build
 OBJ_DIR  := $(BUILD)/obj
 APP_DIR  := .
 TARGET   := nn
-INCLUDE  := -Iinclude/ -I../guardar
+INCLUDE  := -Iinclude/ -I../guardar -I../include
 SRC      :=                      \
    $(wildcard src/*.cpp)         \
    $(wildcard ../guardar/*.cpp) 

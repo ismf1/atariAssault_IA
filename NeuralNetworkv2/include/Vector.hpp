@@ -198,7 +198,7 @@ class Vector {
         return v.push_back(e);
     }
 
-    Vector apply(const std::function<W (W)> &func) const {
+    Vector apply(const auto &func) const {
         Vector temp(*this);
 
         for (size_t i = 0; i < size(); i++)
@@ -246,6 +246,14 @@ class Vector {
             mat[i] = Vector({ v[i] });
 
         return mat;
+    }
+
+    size_t countIf(auto x) const {
+        return std::count_if(v.begin(), v.end(), x);
+    }
+
+    bool empty() const {
+        return v.empty();
     }
 
     friend std::ostream& operator<<(std::ostream &os, const Vector &v) {

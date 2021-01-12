@@ -13,8 +13,8 @@ struct NeuralLayer {
     Mat2d w;
     Vec2d b;
 
-    explicit NeuralLayer(int16_t nconn, int16_t nneur, ActFunc actf);
-    explicit NeuralLayer(Weights w);
+    explicit NeuralLayer(int16_t nconn, int16_t nneur, const ActFunc &actf);
+    explicit NeuralLayer(Weights w, const ActFunc &actf);
     Weights getWeights() const;
 
     friend std::ostream& operator<<(std::ostream &os, const NeuralLayer &nl);
