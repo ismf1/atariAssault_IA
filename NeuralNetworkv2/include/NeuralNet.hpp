@@ -30,8 +30,9 @@ public:
     void test(const Mat2d &X, const Mat2d &y) const;
 
     std::vector<double> predict(const std::vector<double> &X) {
-        Mat2d temp;
-        temp.push_back(X);
+        std::vector<std::vector<double>> a; 
+        a.push_back(X);
+        Mat2d temp(a);
         std::cout << temp << std::endl;
         Mat2d r = forwardPass(temp).back();
         return r.toSTLVector()[0];
