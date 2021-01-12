@@ -170,7 +170,7 @@ int main(int argc, char **argv) {
 
    net->load(argv[2]);
 
-   std::cout << *net << std::endl;
+   std::cout << *(NNet*)(net) << std::endl;
 
    // Create alei object.
    alei.setInt("random_seed", 0);
