@@ -624,7 +624,16 @@ void run(){
     uint16_t patience=5;
 
     NeuralNetwork_t net(layerStruct,learningRate);
+
     //net.setActiveFunctions({ActF::RELU,ActF::RELU,ActF::RELU,ActF::SIGMOID});
+
+    cout << "Datos mínimos necesarios: ";
+    uint16_t minData=0;
+    for(size_t i=0;i<net.getm_layers().size();i++){
+        minData+=net.getm_layers()[i].size()*net.getm_layers()[i][0].size();
+    }
+    minData=minData*10;
+    cout << minData << endl << endl;
 
     //MatDouble_t Xtrain,Ytrain,Xval,Yval;
     //splitDataTrainTest(0.9,vectorOfVectorsToMatDouble(data.X),vectorOfVectorsToMatDouble(data.Y),
