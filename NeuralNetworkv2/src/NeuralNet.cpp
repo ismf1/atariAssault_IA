@@ -12,8 +12,11 @@ NNet::VecFordward NNet::forwardPass(const Mat2d &X) const
     {
         auto [actf, actfD] = layer.actf;
         auto lastA = vecA.back();
+        std::cout << "Aqui2" << std::endl;
         auto z = lastA * layer.w + layer.b;
+        std::cout << "Aqui3" << std::endl;
         auto a = z.apply(actf);
+        std::cout << "Aqui4" << std::endl;
 
         vecA.push_back(a);
     }
