@@ -3,11 +3,15 @@ CXXFLAGS := -pedantic-errors -Wall -Wextra -std=c++2a -fconcepts -O3 -funroll-lo
 LDFLAGS  := -L/usr/lib -L. -lale -lSDL -lstdc++ -lm
 BUILD    := ./build
 OBJ_DIR  := $(BUILD)/obj
-APP_DIR  := .
+APP_DIR  := minimal_agent_IA_nn_c
 TARGET   := nn
-INCLUDE  := -Iinclude/
+SRC_FILES_NN := $(wildcard ../NeuralNetworkv2/src/*.cpp)
+INCLUDE  := -I../NeuralNetworkv2/include/ -I../include -I../neuralNetwork -I../ -I../guardar
 SRC      :=                      \
-   $(wildcard source/*.cpp)         
+	$(filter-out ../NeuralNetworkv2/src/main.cpp, $(SRC_FILES_NN)) \
+	$(filter-out ../neuralNetwork/main.cpp, $(wildcard ../neuralNetwork/*.cpp)) \
+	$(wildcard ../guardar/*.cpp) \
+	$(wildcard ./minimal_agent_IA_nn_c.cpp)
 
 OBJECTS  := $(SRC:%.cpp=$(OBJ_DIR)/%.o)
 DEPENDENCIES := $(OBJECTS:.o=.d)
@@ -41,8 +45,7 @@ clean:
 	-@rm -rvf $(APP_DIR)/*
 
 info:
-   @echo "[*] Application dir: ${APP_DIR}     "
-   @echo "[*] Object dir:      ${OBJ_DIR}     "
-   @echo "[*] Sources:         ${SRC}         "
-   @echo "[*] Objects:         ${OBJECTS}     "
-   @echo "[*] Dependencies:    ${DEPENDENCIES}"
+	@echo "[*] Object dir:      ${OBJ_DIR}     "
+	@echo "[*] Sources:         ${SRC}         "
+	@echo "[*] Objects:         ${OBJECTS}     "
+	@echo "[*] Dependencies:    ${DEPENDENCIES}"
