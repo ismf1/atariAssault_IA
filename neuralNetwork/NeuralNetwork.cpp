@@ -3,7 +3,6 @@
 
 #include "NeuralNetwork.h"
 
-
 void multiplyIntVectors(auto n, auto &v){
     for(size_t i=0;i<v.size();i++){
         v[i]=v[i]*n;
@@ -170,7 +169,7 @@ constexpr auto NeuralNetwork_t::reluDeriv(auto x) const{
     return res;
 }*/
 
-constexpr auto NeuralNetwork_t::deltaOutputLayer(VecDouble_t const& x,VecDouble_t const& y,auto layer,auto neuron){  //Funciona
+constexpr auto NeuralNetwork_t::deltaOutputLayer(VecDouble_t const& y,auto layer,auto neuron){  //Funciona
     //Sesgado
     /*if(y[neuron]==1) return ((double)Yneg[neuron]/(Yneg[neuron]+Ypos[neuron]))*errorDerivateFunction(feedforwardMat[layer][neuron],y[neuron],y.size())*activeFunctionDeriv(signalMat[layer][neuron],layer);
     else return ((double)Ypos[neuron]/(Yneg[neuron]+Ypos[neuron]))*errorDerivateFunction(feedforwardMat[layer][neuron],y[neuron],y.size())*activeFunctionDeriv(signalMat[layer][neuron],layer);
@@ -178,7 +177,7 @@ constexpr auto NeuralNetwork_t::deltaOutputLayer(VecDouble_t const& x,VecDouble_
     return errorDerivateFunction(feedforwardMat[layer][neuron],y[neuron],y.size())*activeFunctionDeriv(signalMat[layer][neuron],layer);
 }
 
-constexpr auto NeuralNetwork_t::deltaHiddenLayers(VecDouble_t const& x,auto layer,auto neuron){    //Funciona
+constexpr auto NeuralNetwork_t::deltaHiddenLayers(auto layer,auto neuron){    //Funciona
     double m1=signalMat[layer][neuron];   //No se si es esta o la linea comentada de arriba
     m1=activeFunctionDeriv(m1,layer);
     double m2=0;
@@ -189,12 +188,12 @@ constexpr auto NeuralNetwork_t::deltaHiddenLayers(VecDouble_t const& x,auto laye
     return m1*m2;
 }
 
-auto NeuralNetwork_t::delta(VecDouble_t const& x,VecDouble_t const& y,auto layer,auto neuron){    //Funciona
+auto NeuralNetwork_t::delta(VecDouble_t const& y,auto layer,auto neuron){    //Funciona
     double delta;
     if(layer==m_layers.size()-1){
-        delta=deltaOutputLayer(x,y,layer,neuron);
+        delta=deltaOutputLayer(y,layer,neuron);
     }else{
-        delta=deltaHiddenLayers(x,layer,neuron);
+        delta=deltaHiddenLayers(layer,neuron);
     }
 
     deltaQueue.back()[neuron]=delta;
@@ -240,13 +239,13 @@ double NeuralNetwork_t::errorFunctionVector(MatDouble_t const& X, MatDouble_t co
 double NeuralNetwork_t::errorDerivateParcialFunction(VecDouble_t const& x,VecDouble_t const& y,auto layer,auto neuron,auto beforeNeuron){    //Funciona
     double deltaV;
     if(beforeNeuron==0){
-        return delta(x,y,layer,neuron);
+        return delta(y,layer,neuron);
     }else{
         beforeNeuron--;
         if(layer>0){
-            deltaV=delta(x,y,layer,neuron)*feedforwardMat[layer-1][beforeNeuron];
+            deltaV=delta(y,layer,neuron)*feedforwardMat[layer-1][beforeNeuron];
         }else{
-            deltaV=delta(x,y,layer,neuron)*x[beforeNeuron];
+            deltaV=delta(y,layer,neuron)*x[beforeNeuron];
         }
         return deltaV;
     }

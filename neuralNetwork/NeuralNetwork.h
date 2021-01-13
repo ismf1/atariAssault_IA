@@ -44,11 +44,11 @@ struct NeuralNetwork_t : public Network {
 
     //constexpr auto signal(VecDouble_t const& x,auto layer,auto neuron);
 
-    constexpr auto deltaOutputLayer(VecDouble_t const& x,VecDouble_t const& y,auto layer,auto neuron);
+    constexpr auto deltaOutputLayer(VecDouble_t const& y,auto layer,auto neuron);
 
-    constexpr auto deltaHiddenLayers(VecDouble_t const& x,auto layer,auto neuron);
+    constexpr auto deltaHiddenLayers(auto layer,auto neuron);
 
-    auto delta(VecDouble_t const& x,VecDouble_t const& y,auto layer,auto neuron);
+    auto delta(VecDouble_t const& y,auto layer,auto neuron);
 
     //Cambiar para y multidimensional
     constexpr auto errorDerivateFunction(auto hx, auto y,auto size_y) const;
