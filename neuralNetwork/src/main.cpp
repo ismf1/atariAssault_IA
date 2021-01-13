@@ -626,7 +626,7 @@ void run(){
 
     NeuralNetwork_t net(layerStruct,learningRate);
 
-    net.setActiveFunctions({ActF::RELU,ActF::RELU,ActF::RELU,ActF::SIGMOID});
+    //net.setActiveFunctions({ActF::RELU,ActF::RELU,ActF::RELU,ActF::SIGMOID});
 
     cout << "Datos mínimos necesarios: ";
     uint16_t minData=0;
@@ -670,7 +670,16 @@ void run(){
         cout << (double)(fallos[i][1]+fallos[i][0])/dataVal.Y.size()*100 << "%" << " -> ";
         cout << "Sesgado: " << (double)fallos[i][0]/dataVal.Yneg[i]*100 * dataVal.Ypos[i] / dataVal.Y.size()+(double)fallos[i][1]/dataVal.Ypos[i]*100 * dataVal.Yneg[i] / dataVal.Y.size()/2 << endl;
         cout << endl;*/
-        fallosSesgados+=(double)fallos[i][0]/dataVal.Yneg[i]*100 * dataVal.Ypos[i] / dataVal.Y.size()+(double)fallos[i][1]/dataVal.Ypos[i]*100 * dataVal.Yneg[i] / dataVal.Y.size()/2;
+        double fallosSesgadosAux=0;
+        double porcentajeFallosAux =(double)fallos[i][0]/dataVal.Yneg[i]*100; //Porcentaje de fallos negativos
+        fallosSesgadosAux += porcentajeFallosAux * dataVal.Ypos[i] / dataVal.Y.size();   //Sesgo
+
+        porcentajeFallosAux = (double)fallos[i][1]/dataVal.Ypos[i]*100; //Porcentaje de fallos positivos
+        fallosSesgadosAux += porcentajeFallosAux * dataVal.Yneg[i] / dataVal.Y.size();   //Sesgo
+
+        fallosSesgadosAux/=2;   //Media
+
+        fallosSesgados+=fallosSesgadosAux;
         fallosNoSesgados+=(double)(fallos[i][1]+fallos[i][0])/dataVal.Y.size()*100;
     }
 

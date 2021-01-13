@@ -390,6 +390,13 @@ void NeuralNetwork_t::train(MatDouble_t const& X,MatDouble_t const& Y,MatDouble_
     double bestError=9999;
 
     for(size_t i=0;i<epochs;i++){
+        //Calculamos error cuadratico
+        cout << "Epoca " << i << endl;
+        errorF=errorFunctionVector(X,Y);
+        cout << "Error cuadratico medio: " << errorF << endl;
+        errorF=errorFunctionVector(Xval,Yval);
+        cout << "Error cuadratico medio validation: " << errorF << endl;
+
         //Actualizamos pesos
         for(size_t j=0;j<X.size();j++){
             //Ponemos en el bias de la ultima capa el valor deseado(a prueba)
@@ -399,13 +406,6 @@ void NeuralNetwork_t::train(MatDouble_t const& X,MatDouble_t const& Y,MatDouble_
 
             updateWeights(X[j],Y[j]);
         }
-
-        //Calculamos error cuadratico
-        cout << "Epoca " << i << endl;
-        errorF=errorFunctionVector(X,Y);
-        cout << "Error cuadratico medio: " << errorF << endl;
-        errorF=errorFunctionVector(Xval,Yval);
-        cout << "Error cuadratico medio validation: " << errorF << endl;
 
         //Comprobamos early stopping
         if(errorF > bestError){
@@ -417,7 +417,7 @@ void NeuralNetwork_t::train(MatDouble_t const& X,MatDouble_t const& Y,MatDouble_
         }
     }
     errorF=errorFunctionVector(Xval,Yval);
-    cout << "Error cuadratico medio: " << errorF << endl;
+    cout << "Error cuadratico medio validation: " << errorF << endl;
 }
 
 //Devolver por referencia: OPTIMIZACION
