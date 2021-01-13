@@ -90,11 +90,16 @@ NeuralNetwork_t::NeuralNetwork_t(initializer_list<uint16_t> const& layers,float 
 
 void NeuralNetwork_t::setActiveFunctions(initializer_list<ActF> v){
     size_t i=0;
-    cout << "Active functions: {";
+
     for(auto it=v.begin(); it!=v.end() ; it++){
         functionsAct[i]=*it;
-        cout << (uint16_t)functionsAct[i] << ",";
         i++;
+    }
+
+    cout << "Active functions: {";
+    for(size_t j=0;j<m_layers.size();j++){
+        cout << (uint16_t)functionsAct[j] << ",";
+
     }
     cout << "}" << endl;
 }
@@ -150,8 +155,11 @@ constexpr auto NeuralNetwork_t::sigmoidDeriv(auto x) const{
     return sigmoid(x)*(1-sigmoid(x));
 }
 constexpr auto NeuralNetwork_t::reluDeriv(auto x) const{
-    if(x<0) return 0;
-    else return 1;
+    if(x<0){
+        return 0;
+    }else{
+        return 1;
+    }
 }
 
 //Meter en matriz al hacer forwardPropagation para evitar calculos innecesarios: OPTIMIZACION
