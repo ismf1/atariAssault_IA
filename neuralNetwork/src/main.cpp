@@ -603,9 +603,9 @@ void run(){
     //Leemos los datos
     Data dataTrain;
     //dataTrain.init("dataBuena.txt",59,5);
-    dataTrain.init("dataTrain.txt",59,5);
+    dataTrain.init("data/dataTrain.txt",59,5);
     Data dataVal;
-    dataVal.init("dataVal.txt",59,5);
+    dataVal.init("data/dataVal.txt",59,5);
 
     cout << "Numero de datos:" << endl;
     for(size_t i=0;i<dataTrain.Yneg.size();i++){
@@ -621,7 +621,7 @@ void run(){
     initializer_list<uint16_t> layerStruct={dataTrain.tamXi,64,32,16,dataTrain.tamYi};  
     //initializer_list<uint16_t> layerStruct={X[0].size(),4,8,Y[0].size()};
     float learningRate=0.01;
-    uint16_t epochs=500;
+    uint16_t epochs=1;
     uint16_t patience=5;
 
     NeuralNetwork_t net(layerStruct,learningRate);
@@ -680,7 +680,7 @@ void run(){
     cout << "Porcentaje total no sesgado de fallos: " << fallosSesgados << endl;
     cout << "Porcentaje total sesgado de fallos: " << fallosNoSesgados << endl;
 
-    net.save("NeuralNetwork.txt");
+    net.save("models/NeuralNetwork.txt");
     /*net.load("NeuralNetwork2.txt");
 
     net.feedforward(vectorOfVectorsToMatDouble(data.X)[0]);*/

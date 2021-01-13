@@ -7,7 +7,7 @@ APP_DIR  := .
 TARGET   := main
 INCLUDE  := -Iinclude/ -I../include
 SRC      :=                      \
-   $(wildcard *.cpp)         
+   $(wildcard src/*.cpp)         
 
 OBJECTS  := $(SRC:%.cpp=$(OBJ_DIR)/%.o)
 DEPENDENCIES := $(OBJECTS:.o=.d)
