@@ -15,15 +15,7 @@ void NSave::write(const Data &v, const Func &t) const{
     outFile << "(";
 
     for(size_t i=0;i<t.size();i++){
-        switch(t[i]){
-            case 0:
-                outFile << "0";
-                break;
-            case 1:
-                outFile << "1";
-                break;
-        }
-
+        t[i];
         if(t.size()-1>i)
             outFile <<",";
     }
