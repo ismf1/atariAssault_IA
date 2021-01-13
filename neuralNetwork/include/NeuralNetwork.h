@@ -64,10 +64,10 @@ struct NeuralNetwork_t : public Network {
     //Derivada parcial para el peso m_layers[layer][neuron][beforeNeuron]
     double errorDerivateParcialFunction(VecDouble_t const& x,VecDouble_t const& y,auto layer,auto neuron,auto beforeNeuron);
     //Devuelve vector de las derivadas parciales de la funcion de error de 1 neurona
-    VecDouble_t errorDerivateParcialFunctions(VecDouble_t const& x,VecDouble_t const& y,auto layer,auto neuron);
+    void errorDerivateParcialFunctions(VecDouble_t& res,VecDouble_t const& x,VecDouble_t const& y,auto layer,auto neuron);
 
     //Actualiza los pesos de una capa
-    MatDouble_t updateLayer(VecDouble_t const& x,VecDouble_t const& y,auto layer);
+    void updateLayer(MatDouble_t& layerVector, VecDouble_t const& x,VecDouble_t const& y,auto layer);
 
     //Actualiza los pesos de la red
     void updateWeights(VecDouble_t const& x,VecDouble_t const& y);

@@ -190,7 +190,10 @@ constexpr auto NeuralNetwork_t::deltaHiddenLayers(auto layer,auto neuron){    //
 
 auto NeuralNetwork_t::delta(VecDouble_t const& y,auto layer,auto neuron){    //Funciona
     double delta;
-    if(layer==m_layers.size()-1){
+
+    if(deltaQueue.back()[neuron]!=99999){
+        delta=deltaQueue.back()[neuron];
+    }else if(layer==m_layers.size()-1){
         delta=deltaOutputLayer(y,layer,neuron);
     }else{
         delta=deltaHiddenLayers(layer,neuron);
@@ -253,20 +256,15 @@ double NeuralNetwork_t::errorDerivateParcialFunction(VecDouble_t const& x,VecDou
 
 //Devuelve vector de las derivadas parciales de la funcion de error de 1 neurona
 //Devolver por referencia: OPTIMIZACION
-VecDouble_t NeuralNetwork_t::errorDerivateParcialFunctions(VecDouble_t const& x,VecDouble_t const& y,auto layer,auto neuron){    //Funciona
-    VecDouble_t res(m_layers[layer][neuron].size());
-
+void NeuralNetwork_t::errorDerivateParcialFunctions(VecDouble_t& res,VecDouble_t const& x,VecDouble_t const& y,auto layer,auto neuron){    //Funciona
     for(size_t i=0;i<res.size();i++){
         res[i]=errorDerivateParcialFunction(x,y,layer,neuron,i);
     }
-
-    return res;
 }
 
 //Actualiza los pesos de una capa
 //Devolver por referencia: OPTIMIZACION
-MatDouble_t NeuralNetwork_t::updateLayer(VecDouble_t const& x,VecDouble_t const& y,auto layer){
-    MatDouble_t layerVector;
+void NeuralNetwork_t::updateLayer(MatDouble_t& layerVector,VecDouble_t const& x,VecDouble_t const& y,auto layer){
 
     //Eliminamos el delta desfasado
     if(deltaQueue.size()>=2){
@@ -274,14 +272,14 @@ MatDouble_t NeuralNetwork_t::updateLayer(VecDouble_t const& x,VecDouble_t const&
     }
 
     //Añadimos el delta de la capa actual
-    VecDouble_t newDeltas(m_layers[layer].size());
+    VecDouble_t newDeltas(m_layers[layer].size(),99999);
     deltaQueue.push(newDeltas);
 
     for(size_t i=0;i<m_layers[layer].size();i++){
-        layerVector.push_back(errorDerivateParcialFunctions(x,y,layer,i));
+        VecDouble_t res(m_layers[layer][i].size());
+        errorDerivateParcialFunctions(res,x,y,layer,i);
+        layerVector.push_back(res);
     }
-
-    return layerVector;
 
 }
 
@@ -295,7 +293,7 @@ void NeuralNetwork_t::updateWeights(VecDouble_t const& x,VecDouble_t const& y){
 
     //De la ultima capa a la primera para backpropagation
     for(size_t i=m_layers.size()-1;(i+1)>0;i--){    //(i+1)>0 porque size_t no puede ser negativo // Es identico a i>=0
-        layersVector[i]=updateLayer(x,y,i);
+        updateLayer(layersVector[i],x,y,i);
     }
 
     multiplyIntMatrix(learningRate,layersVector);
