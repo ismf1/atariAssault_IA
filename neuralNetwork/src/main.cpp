@@ -626,7 +626,7 @@ void run(){
 
     NeuralNetwork_t net(layerStruct,learningRate);
 
-    //net.setActiveFunctions({ActF::RELU,ActF::RELU,ActF::RELU,ActF::SIGMOID});
+    net.setActiveFunctions({ActF::RELU,ActF::RELU,ActF::RELU,ActF::SIGMOID});
 
     cout << "Datos mínimos necesarios: ";
     uint16_t minData=0;

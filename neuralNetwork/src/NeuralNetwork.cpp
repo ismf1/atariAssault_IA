@@ -91,7 +91,7 @@ NeuralNetwork_t::NeuralNetwork_t(initializer_list<uint16_t> const& layers,float 
 void NeuralNetwork_t::setActiveFunctions(initializer_list<ActF> v){
     size_t i=0;
     cout << "Active functions: {";
-    for(auto it=v.begin()+1; it!=v.end() ; it++){
+    for(auto it=v.begin(); it!=v.end() ; it++){
         functionsAct[i]=*it;
         cout << (uint16_t)functionsAct[i] << ",";
         i++;
