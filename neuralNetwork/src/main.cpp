@@ -677,8 +677,8 @@ void run(){
     fallosSesgados/=fallos.size();
     fallosNoSesgados/=fallos.size();
 
-    cout << "Porcentaje total no sesgado de fallos: " << fallosSesgados << endl;
-    cout << "Porcentaje total sesgado de fallos: " << fallosNoSesgados << endl;
+    cout << "Porcentaje total no sesgado de fallos: " << fallosNoSesgados << endl;
+    cout << "Porcentaje total sesgado de fallos: " << fallosSesgados<< endl;
 
     net.save("models/NeuralNetwork.txt");
     /*net.load("NeuralNetwork2.txt");
