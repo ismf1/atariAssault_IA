@@ -15,7 +15,7 @@ void NSave::write(const Data &v, const Func &t) const{
     outFile << "(";
 
     for(size_t i=0;i<t.size();i++){
-        t[i];
+        outFile << t[i];
         if(t.size()-1>i)
             outFile <<",";
     }
