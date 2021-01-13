@@ -13,6 +13,7 @@
 #include <cstring>
 #include <iostream>
 #include <fstream>
+#include <Network.hpp>
 using namespace std;
 
 using VecDouble_t = vector<double>; //Neurona
@@ -23,7 +24,7 @@ using VecDouble_t = vector<double>; //Neurona
 using MatDouble_t = vector<VecDouble_t>;    //Capa
 enum class ActF{SIGMOID,RELU};
 
-struct NeuralNetwork_t{
+struct NeuralNetwork_t : public Network {
     explicit NeuralNetwork_t() ;
     explicit NeuralNetwork_t(initializer_list<uint16_t> const& layers,float learningR) ;
 
@@ -87,6 +88,7 @@ struct NeuralNetwork_t{
 
     VecDouble_t feedforward(VecDouble_t const& x);
 
+    VecDouble_t predict(VecDouble_t const& x);
 
     MatDouble_t createCopyLayer(MatDouble_t const& layer);
 
@@ -94,7 +96,7 @@ struct NeuralNetwork_t{
 
     double evaluateNet(MatDouble_t const& X, VecDouble_t const& Y);
 
-    void load(const string fichero);
+    void load(const string &fichero);
 
     void save(const string s) const;
 

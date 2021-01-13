@@ -5,13 +5,14 @@
 
 class NSave
 {
+    using Data = std::vector<std::vector<std::vector<double>>>;
 
     private:
+        std::string fileName;
 
     public:
 
-    void escribir(const  std::vector<  std::vector<  std::vector<double> > > v, const std::string) const;
-
-    std::vector< std::vector< std::vector<double> > > leer(const std::string) const;
-
+    explicit NSave(const std::string &s) : fileName(s) {}
+    void write(const Data &v) const;
+    Data read() const;
 };

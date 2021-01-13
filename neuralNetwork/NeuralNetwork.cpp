@@ -465,6 +465,9 @@ VecDouble_t NeuralNetwork_t::feedforward(VecDouble_t const& x){
     
 }
 
+VecDouble_t NeuralNetwork_t::predict(VecDouble_t const& x) {
+    return feedforward(x);
+}
 
 MatDouble_t NeuralNetwork_t::createCopyLayer(MatDouble_t const& layer){
     MatDouble_t matrixCopy;
@@ -525,7 +528,7 @@ void NeuralNetwork_t::save(const std::string s) const{
 
 }
 
-void NeuralNetwork_t::load(const std::string fichero){
+void NeuralNetwork_t::load(const std::string &fichero){
     m_layers.resize(0);
     MatDouble_t y;
     VecDouble_t z;

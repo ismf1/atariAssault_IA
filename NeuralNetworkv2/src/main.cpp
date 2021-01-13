@@ -7,11 +7,6 @@
 #include <tuple>
 #include <NSave.hpp>
 
-#define get_elem_i_ct(i, t)                                                                \
-    std::get<i>(t);                                                                        \
-    static_assert(std::is_integral<decltype(i)>::value, #i " must be an integral type");   \
-    static_assert(std::is_same<decltype(t), std::tuple<char, char>>::value, #t " must be a tuple");
-
 void print(std::vector<std::vector<std::vector<double>>> v) {
     for (auto &i : v) {
         for (auto &j : i) {
@@ -149,13 +144,7 @@ typename csv<fields...>::iterator csv<fields...>::end() {
 }
 
 using Data = std::tuple<Mat2d, Mat2d, Mat2d, Mat2d>;
-using CSVFile = csv<float, float, float, float, float, float, float, float, float, float, 
-                    float, float, float, float, float, float, float, float, float, float, 
-                    float, float, float, float, float, float, float, float, float, float,
-                    float, float, float, float, float, float, float, float, float, float, 
-                    float, float, float, float, float, float, float, float, float, float, 
-                    float, float, float, float, float, float, float, float, float, float, 
-                    float, float, float, float>;
+using CSVFile = csv<float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float,float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float>;
 
 using namespace csvtools;
 
@@ -227,14 +216,14 @@ Data readCsv(std::string fileName) {
         tempX.push_back(std::get<56>(row));
         tempX.push_back(std::get<57>(row));
         tempX.push_back(std::get<58>(row));
-        tempX.push_back(std::get<59>(row));        
         Vec2d tempY;
+        tempY.push_back(std::get<59>(row));        
         tempY.push_back(std::get<60>(row));
         tempY.push_back(std::get<61>(row));
         tempY.push_back(std::get<62>(row));
         tempY.push_back(std::get<63>(row));
         
-        if (i < 22000) {
+        if (i < 240000) {
             X.push_back(tempX);
             y.push_back(tempY);
         } else {
@@ -244,20 +233,20 @@ Data readCsv(std::string fileName) {
         i++;
     }
 
-    X.ncol = 60;
+    X.ncol = X[0].size();
     X.nrow = X.size();
-    y.ncol = 4;
+    y.ncol = y[0].size();
     y.nrow = y.size();
-    X_test.ncol = 60;
+    X_test.ncol = X.ncol;
     X_test.nrow = X_test.size();
-    y_test.ncol = 4;
+    y_test.ncol = y.ncol;
     y_test.nrow = y_test.size();
 
     return { X, y, X_test, y_test};
 }
 
 
-int main() {
+int main(int argc, char *argv[]) {
 
     // Mat2d X(
     // {{ 0.91319236,  0.43039519},
@@ -887,47 +876,57 @@ int main() {
     //     {1},{1},{1},{1},{0},{1},{1},{0},{1},{1},{0},{0},{1},{0},{0},{0},{0},{1},{0},{0},{0},{1},{0},{0},{0},{1}
     // });
 
-    int16_t p = 60; 
-    std::vector<int16_t> topology = { p, 128, 64, 32, 16, 4};
-    CostFunc costf { Functions::mse, Functions::mseD };
-    ActFunc  actfRelu  { Functions::relu, Functions::reluD };
-    ActFunc  actfSigm  { Functions::sigm, Functions::sigmD };
-    VecActFunc  actf  {
-        actfSigm,
-        actfRelu,
-        actfRelu,
-        actfRelu,
-        actfSigm
-    };
-    auto [ X, y, X_test, y_test] = readCsv("dataBuena.txt");
+    if (argc < 3) {
+        std::cerr << "ERROR: Params" << std::endl
+                  << "<program> -t dataFile outModelFile" << std::endl
+                  << "<program> -l modelFile" << std::endl;
+    }
 
-    // std::cout << X << std::endl;
-    // std::cout << y << std::endl;
+    std::string opt  = argv[1];
+    std::string file = argv[2];
 
-    // NNet nn(topology, actf);
-    NSave saver("prueba.model");
-    NNet nn;
-    std::vector<std::vector<std::vector<double>>> xxxx = {{{0}}};
+    if (opt == "-t") {
 
-    using namespace std;
+        std::string fileModel = argv[3];
+        auto [ X, y, X_test, y_test] = readCsv(file);
+        std::vector<int16_t> topology = { (int16_t)X.ncol, 128, 64, 32, (int16_t)y.ncol };
+        CostFunc costf     { Functions::mse, Functions::mseD };
+        ActFunc  actfRelu  { Functions::relu, Functions::reluD };
+        ActFunc  actfSigm  { Functions::sigm, Functions::sigmD };
+        VecActFunc  actf  {
+            actfRelu,
+            actfRelu,
+            actfRelu,
+            actfSigm
+        };
+        
+        Vec2d initialBias(y.ncol);
 
-    // cout << saver.read()[0][0][0] << endl;
-    nn.load(saver.read());
-    // std::cout << nn << std::endl;
-    // nn.load(saver.read());
-    // nn.train(X, y, costf, 10, 5e-6f);
-    // nn.test(X_test, y_test);
-    // saver.write(nn.getWeights());
+        for (size_t i = 0; i < y.ncol; i++) {
+            double pos = y.countIf(i, [](double e) { return e == 1; }); 
+            double neg = y.countIf(i, [](double e) { return e == 0; });
+            std::cout << "Positive: " << pos << ", Negative: " << neg << std::endl;
+            initialBias[i] = std::log(pos / neg);
+        }
 
-    // std::cout << nn << std::endl;
+        std::cout << initialBias << std::endl;
 
-    // print(nn.getWeights());
-
-    // std::cout << "----------" << std::endl; 
-    // auto a = nn.getWeights();
-    // nn.load(a);
-    // auto b = nn.getWeights();
-    // print(b);
+        NNet nn(topology, actf);
+        NSave saver(fileModel);
+        // std::cout << nn << std::endl;
+        nn.train(X, y, costf, atof(argv[4]), atof(argv[5]), initialBias);
+        // nn.train(X, y, costf, atof(argv[4]), atof(argv[5]));
+        saver.write(nn.getWeights());
+    } 
+    else if (opt == "-l") {
+        NNet nn;
+        NSave saver(file);
+        nn.load(saver.read());
+    } else {
+        std::cerr << "ERROR: Params" << std::endl
+            << "<program> -t dataFile outModelFile" << std::endl
+            << "<program> -l modelFile" << std::endl;
+    }
 
     return 0;
 }

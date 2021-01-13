@@ -1,5 +1,8 @@
 #include <NeuralNet.hpp>
+#include <NSave.hpp>
+#include <Functions.hpp>
 #include <list>
+#include <tuple>
 
 NNet::VecFordward NNet::forwardPass(const Mat2d &X) const
 {
@@ -18,18 +21,19 @@ NNet::VecFordward NNet::forwardPass(const Mat2d &X) const
     return vecA;
 }
 
-Mat2d NNet::ttrain(const Mat2d &X, const Mat2d &y, const CostFunc &costf, double lr)
+Mat2d NNet::ttrain(
+    const Mat2d &X, const Mat2d &y, 
+    const CostFunc &costf, double lr
+)
 {
 
     // Forward pass
     VecFordward out = forwardPass(X);
 
-    // Backward pass
+    // Backpropagation
     std::list<Mat2d> deltas;
     auto [cost, costD] = costf;
-    Mat2d _W;
-
-    using namespace std;
+    Mat2d lastW;
 
     for (int l = nn.size() - 1; l >= 0; l--)
     {
@@ -40,9 +44,9 @@ Mat2d NNet::ttrain(const Mat2d &X, const Mat2d &y, const CostFunc &costf, double
         if (static_cast<size_t>(l) == nn.size() - 1)
             deltas.push_front(costD(a, y) ^ a.apply(actfD));
         else
-            deltas.push_front(deltas.front() * _W.transpose() ^ a.apply(actfD));
+            deltas.push_front(deltas.front() * lastW.transpose() ^ a.apply(actfD));
 
-        _W      = nn[l].w;
+        lastW   = nn[l].w;
         nn[l].b = nn[l].b - deltas.front().mean(1) * lr;
         nn[l].w = nn[l].w - (al.transpose() * deltas.front()).mult(lr);
     }
@@ -52,10 +56,9 @@ Mat2d NNet::ttrain(const Mat2d &X, const Mat2d &y, const CostFunc &costf, double
 
 NNet::NNet(const std::vector<int16_t> &topology, const VecActFunc &vecAct)
 {
-    for (size_t i = 0; i < topology.size() - 1; i++) {
-        std::cout << i << std::endl;
+    assert(topology.size() - 1 == vecAct.size());
+    for (size_t i = 0; i < topology.size() - 1; i++)
         nn.push_back(NeuralLayer(topology[i], topology[i + 1], vecAct[i]));
-    }
 }
 
 NNet::NNet(const std::vector<int16_t> &topology, const ActFunc &actf)
@@ -66,8 +69,14 @@ NNet::NNet(const std::vector<int16_t> &topology, const ActFunc &actf)
 
 NNet::NNet() {}
 
-void NNet::train(const Mat2d &X, const Mat2d &y, const CostFunc &costf, size_t epochs, double lr)
+void NNet::train(
+    const Mat2d &X, const Mat2d &y, 
+    const CostFunc &costf, size_t epochs, double lr, 
+    const Vec2d& initialBias
+)
 {
+    if (!initialBias.empty())
+        nn.back().b = initialBias;
 
     for (size_t i = 0; i < epochs; i++)
     {
@@ -78,7 +87,7 @@ void NNet::train(const Mat2d &X, const Mat2d &y, const CostFunc &costf, size_t e
         {
             auto [cost, costD] = costf;
             auto loss = cost(pY, y);
-            std::cout << "MSE: " << loss << std::endl;
+            std::cout << "Loss: " << loss << std::endl;
         }
     }
 }
@@ -109,8 +118,26 @@ NNet::VecWeights NNet::getWeights() const {
 void NNet::load(const NNet::VecWeights &vecW) {
     nn.clear();
 
-    for (auto &layer : vecW)
-        nn.push_back(NeuralLayer(layer));
+    ActFunc  actfRelu  { Functions::relu, Functions::reluD };
+    ActFunc  actfSigm  { Functions::sigm, Functions::sigmD };
+    VecActFunc  actf  {
+            actfRelu,
+            actfRelu,
+            actfRelu,
+            actfSigm
+    };
+
+    size_t i = 0;
+    for (auto &layer : vecW) {
+        nn.push_back(NeuralLayer(layer, actf[i]));
+    }
+}
+
+void NNet::load(const std::string &fileName) {
+    nn.clear();
+
+    NSave loader(fileName);
+    load(loader.read());
 }
 
 auto NNet::begin() const

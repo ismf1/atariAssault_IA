@@ -1,8 +1,7 @@
 #include <NeuralLayer.hpp>
 #include <Functions.hpp>
 
-using namespace std;
-NeuralLayer::NeuralLayer(int16_t nconn, int16_t nneur, ActFunc actf) {
+NeuralLayer::NeuralLayer(int16_t nconn, int16_t nneur, const ActFunc &actf) {
     auto raD    = []() { return Functions::rand(-1, 1); };
     this->actf  = actf;
     this->b     = Vec2d(nneur, raD);
@@ -11,14 +10,14 @@ NeuralLayer::NeuralLayer(int16_t nconn, int16_t nneur, ActFunc actf) {
     this->nneur = nneur;
 } 
 
-NeuralLayer::NeuralLayer(Weights ws) {
+NeuralLayer::NeuralLayer(Weights ws, const ActFunc &act) {
     b = *ws.begin();  
     ws.erase(ws.begin());   
     w     = Mat2d(ws);
     nneur = b.size();
     nconn = w.size();
+    actf  = act;
 }
-
 
 NeuralLayer::Weights NeuralLayer::getWeights() const {
     Mat2d copy(w);

@@ -258,7 +258,7 @@ public:
         return temp;
     }
 
-    Matrix apply(const std::function<W(W)> &func) const
+    Matrix apply(const auto &func) const
     {
         Matrix temp(*this);
 
@@ -299,6 +299,24 @@ public:
         }
 
         return v;
+    }
+
+    size_t countIf(auto x) const {
+        size_t c = 0;
+
+        for (auto const &row : mat)
+            c += row.countIf(x);
+
+        return c;
+    }
+
+    size_t countIf(size_t num, auto x) const {
+        size_t c = 0;
+
+        for (auto const &row : mat)
+            c += x(row[num]);
+
+        return c;
     }
 
     auto insert(size_t index, const Vector<W> &e) {

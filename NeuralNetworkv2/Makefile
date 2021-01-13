@@ -1,11 +1,11 @@
 CXX      := -c++
-CXXFLAGS := -pedantic-errors -Wall -Wextra -std=c++2a -fconcepts -O3 -funroll-loops
-LDFLAGS  := -L/usr/lib -lstdc++ -lm
+CXXFLAGS := -pedantic-errors -Wall -Wextra -std=c++2a -fconcepts -funroll-loops -fopenmp
+LDFLAGS  := -L/usr/lib -lstdc++ -lm 
 BUILD    := ./build
 OBJ_DIR  := $(BUILD)/obj
 APP_DIR  := .
 TARGET   := nn
-INCLUDE  := -Iinclude/ -I../guardar
+INCLUDE  := -Iinclude/ -I../guardar -I../include
 SRC      :=                      \
    $(wildcard src/*.cpp)         \
    $(wildcard ../guardar/*.cpp) 
@@ -34,15 +34,15 @@ build:
 debug: CXXFLAGS += -DDEBUG -g
 debug: all
 
-release: CXXFLAGS += -O2
+release: CXXFLAGS += -O3
 release: all
 
 clean:
 	-@rm -rvf $(OBJ_DIR)/*
 
 info:
-   @echo "[*] Application dir: ${APP_DIR}     "
-   @echo "[*] Object dir:      ${OBJ_DIR}     "
-   @echo "[*] Sources:         ${SRC}         "
-   @echo "[*] Objects:         ${OBJECTS}     "
-   @echo "[*] Dependencies:    ${DEPENDENCIES}"
+	@echo "[*] Application dir: ${APP_DIR}     "
+	@echo "[*] Object dir:      ${OBJ_DIR}     "
+	@echo "[*] Sources:         ${SRC}         "
+	@echo "[*] Objects:         ${OBJECTS}     "
+	@echo "[*] Dependencies:    ${DEPENDENCIES}"

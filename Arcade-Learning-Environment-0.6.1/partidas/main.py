@@ -1,36 +1,51 @@
 import pandas as pd
 import numpy as np
 from sklearn.utils import resample
+from sklearn import preprocessing
 
-df = pd.read_csv('./ic.csv', delimiter=';')
+df = pd.read_csv('./dataTrain.txt', delimiter=';')
+df = df.sample(frac=1).reset_index(drop=True)
 
-target_count = df.iloc[:, 59:]
+# target_count = df.iloc[:, 59:]
 
-print(target_count.iloc[:, 0].value_counts())
-print(target_count.iloc[:, 1].value_counts())
-print(target_count.iloc[:, 2].value_counts())
-print(target_count.iloc[:, 3].value_counts())
-print(target_count.iloc[:, 4].value_counts())
-
-
-df.sample(frac=1).reset_index(drop=True).to_csv('data2.csv', index=False)
+# print(target_count.iloc[:, 0].value_counts())
+# print(target_count.iloc[:, 1].value_counts())
+# print(target_count.iloc[:, 2].value_counts())
+# print(target_count.iloc[:, 3].value_counts())
+# print(target_count.iloc[:, 4].value_counts())
 
 # a = []
 # for i in range(0, 64):
 #     a.append(str(i))
 
 # df.columns = a
+# df_max = df[(df['59'] == 0) & 
+#          (df['60'] == 0) & 
+#          (df['61'] == 0) & 
+#          (df['62'] == 0) & 
+#          (df['63'] == 0)][20000:]
+# df_min59 = df[(df['59'] == 0)]
+
+# df = pd.concat([df_max, df_min59])
+
+X_train = df.iloc[:, :59]
+y_train = df.iloc[:, 59:]
+
+scaler = preprocessing.StandardScaler().fit(X_train)
+x_scaled = scaler.transform(X_train)
+
+df = np.concatenate([x_scaled, y_train], axis=1)
+
+np.savetxt("data.csv", df, delimiter=";", fmt='%.8f')
+
+
+
 
 # df_max = df[(df['59'] == 0) & 
 #          (df['60'] == 0) & 
 #          (df['61'] == 0) & 
 #          (df['62'] == 0) & 
 #          (df['63'] == 0)]
-# df_min = df[(df['59'] == 1) | 
-#          (df['60'] == 1) | 
-#          (df['61'] == 1) | 
-#          (df['62'] == 1) | 
-#          (df['63'] == 1)]
 
 # print(len(df_max))
 
