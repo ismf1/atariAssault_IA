@@ -43,4 +43,4 @@ build/obj/./minimal_agent_IA_nn_c.o: minimal_agent_IA_nn_c.cpp \
  ../NeuralNetworkv2/include/Types.hpp \
  ../NeuralNetworkv2/include/Matrix.hpp \
  ../NeuralNetworkv2/include/Vector.hpp ../include/Network.hpp \
- ../neuralNetwork/NeuralNetwork.h
+ ../neuralNetwork/include/NeuralNetwork.h
