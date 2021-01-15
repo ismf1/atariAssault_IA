@@ -602,10 +602,9 @@ void splitDataTrainTest(double percent,MatDouble_t const& X,MatDouble_t const& Y
 void run(){
     //Leemos los datos
     Data dataTrain;
-    //dataTrain.init("dataBuena.txt",59,5);
-    dataTrain.init("data/dataTrain.txt",59,5);
+    dataTrain.init("data/dataTrainScaled255.csv",59,5);
     Data dataVal;
-    dataVal.init("data/dataVal.txt",59,5);
+    dataVal.init("data/dataValScaled255.csv",59,5);
 
     cout << "Numero de datos:" << endl;
     for(size_t i=0;i<dataTrain.Yneg.size();i++){
@@ -620,13 +619,13 @@ void run(){
     //Antes: initializer_list<uint16_t> layerStruct={dataTrain.tamXi,64,32,16,dataTrain.tamYi}; //Mejor resultado
     initializer_list<uint16_t> layerStruct={dataTrain.tamXi,64,32,16,dataTrain.tamYi};  
     //initializer_list<uint16_t> layerStruct={X[0].size(),4,8,Y[0].size()};
-    float learningRate=0.01;
-    uint16_t epochs=20;
+    float learningRate=0.06;
+    uint16_t epochs=500;
     uint16_t patience=5;
 
     NeuralNetwork_t net(layerStruct,learningRate);
 
-    net.setActiveFunctions({ActF::RELU,ActF::RELU,ActF::RELU,ActF::SIGMOID});
+    //net.setActiveFunctions({ActF::RELU,ActF::RELU,ActF::RELU,ActF::SIGMOID});
 
     cout << "Datos mínimos necesarios: ";
     uint16_t minData=0;
