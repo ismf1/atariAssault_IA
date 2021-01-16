@@ -889,12 +889,11 @@ int main(int argc, char *argv[]) {
 
         std::string fileModel = argv[3];
         auto [ X, y, X_test, y_test] = readCsv(file);
-        std::vector<int16_t> topology = { (int16_t)X.ncol, 128, 64, 32, (int16_t)y.ncol };
-        CostFunc costf     { Functions::mse, Functions::mseD };
+        std::vector<int16_t> topology = { (int16_t)X.ncol, 128, 128, (int16_t)y.ncol };
+        CostFunc costf     { Functions::mse, Functions::mseD   };
         ActFunc  actfRelu  { Functions::relu, Functions::reluD };
         ActFunc  actfSigm  { Functions::sigm, Functions::sigmD };
         VecActFunc  actf  {
-            actfRelu,
             actfRelu,
             actfRelu,
             actfSigm
