@@ -289,6 +289,26 @@ public:
         return temp;
     }
 
+    Vector<W> min() const {
+        Vector<W> r(ncol);
+        for (size_t i = 0; i < ncol; i++) {
+            r[i] = mat[0][i];
+            for (size_t j = 0; j < size(); j++)
+                r[i] = std::min(mat[j][i], r[i]);
+        }
+        return r;
+    }
+
+    Vector<W> max() const {
+        Vector<W> r(ncol);
+        for (size_t i = 0; i < ncol; i++) {
+            r[i] = mat[0][i];
+            for (size_t j = 0; j < size(); j++)
+                r[i] = std::max(mat[j][i], r[i]);
+        }
+        return r;
+    }
+
     std::vector<std::vector<W>> toSTLVector() {
         std::vector<std::vector<W>> v(size());
 

@@ -3,6 +3,9 @@
         "myDefaultIncludePath": [
             "${workspaceFolder}",
             "${workspaceFolder}/include", 
+            "${workspaceFolder}/include/NeuralNetwork", 
+            "${workspaceFolder}/include/NeuralNetworkv2", 
+            "${workspaceFolder}/include/Utils", 
             "${workspaceFolder}/lib/ale/src" 
         ]
     },

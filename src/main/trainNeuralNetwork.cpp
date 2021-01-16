@@ -7,7 +7,7 @@
 #include <queue>
 #include <iostream>
 #include <NeuralNetwork/NeuralNetwork.h>
-#include <NeuralNetwork/Data.h>
+#include <Utils/Data.hpp>
 using namespace std;
 
 /*MatDouble_t X {

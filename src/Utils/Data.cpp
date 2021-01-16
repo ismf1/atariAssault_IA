@@ -1,4 +1,4 @@
-#include <NeuralNetwork/Data.h>
+#include <Utils/Data.hpp>
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -75,7 +75,8 @@ void Data:: splitData(char str[],int line){
             strAux[nAux]=str[i];
             nAux++;
             i++;
-        }i++;
+        }
+        i++;
         strAux[nAux]='\0';
 
         n=atof(strAux);
