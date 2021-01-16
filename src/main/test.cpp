@@ -21,8 +21,11 @@ int main(int argc, char *argv[]) {
     Normalize<double> scaler;
     Mat2d m({
         { 1, 2, 3, 40},
-        { 3, 10, 30, 4},
-        { 5, 2, 3, 4},
+        { 4, 10, 30, 4},
+        { 5, 10, 30, 4},
+        { 2, 10, 30, 4},
+        { 6, 2, 3, 4},
+        { 6, 2, 3, 4},
     });
     cout << "Transformación: " << endl;
     cout << scaler.fitTransform(m) << endl;
@@ -45,6 +48,9 @@ int main(int argc, char *argv[]) {
     }
     cout << "Ejemplo pasar una matrix a una matrix normal" << endl;
     m.toSTLVector();
+    cout << "Ejemplo pasar un vector a un vector normal" << endl;
+    Vec2d vec(m[0]);
+    vec.toSTLVector();
 
     return 0;
 }

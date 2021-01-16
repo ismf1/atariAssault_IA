@@ -31,7 +31,7 @@ class Normalize
 
             for (size_t i = 0; i < v.size(); i++) {
                 auto [ min, max ] = minmaxv[i];
-                v[i] = (v[i] - min) / (min + max);
+                v[i] = (v[i] - min) / (max - min);
             }
 
             return v;

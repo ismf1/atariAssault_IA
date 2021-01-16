@@ -248,6 +248,10 @@ class Vector {
         return mat;
     }
 
+    std::vector<W> toSTLVector() {
+        return v;
+    }
+
     size_t countIf(auto x) const {
         return std::count_if(v.begin(), v.end(), x);
     }
