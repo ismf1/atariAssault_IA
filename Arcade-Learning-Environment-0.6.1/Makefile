@@ -6,10 +6,10 @@ OBJ_DIR  := $(BUILD)/obj
 APP_DIR  := .
 TARGET   := nn
 SRC_FILES_NN := $(wildcard ../NeuralNetworkv2/src/*.cpp)
-INCLUDE  := -I../NeuralNetworkv2/include/ -I../include -I../neuralNetwork -I../ -I../guardar
+INCLUDE  := -I../NeuralNetworkv2/include/ -I../include -I../neuralNetwork/include -I../ -I../guardar
 SRC      :=                      \
 	$(filter-out ../NeuralNetworkv2/src/main.cpp, $(SRC_FILES_NN)) \
-	$(filter-out ../neuralNetwork/main.cpp, $(wildcard ../neuralNetwork/*.cpp)) \
+	$(filter-out ../neuralNetwork/src/main.cpp, $(wildcard ../neuralNetwork/src/*.cpp)) \
 	$(wildcard ../guardar/*.cpp) \
 	$(wildcard ./minimal_agent_IA_nn_c.cpp)
 

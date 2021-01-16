@@ -150,6 +150,7 @@ void updateState(){
    for(size_t i=0;i<nImp.size();i++){
       ramValue=(int)RAM.get(nImp[i]+1);
       state.push_back((float)ramValue);
+      // state.push_back((float)ramValue/255); //Scaled
    }
    
 }
@@ -171,8 +172,6 @@ int main(int argc, char **argv) {
       net = new NNet();
 
    net->load(argv[2]);
-
-   std::cout << *(NNet*)(net) << std::endl;
 
    // Create alei object.
    alei.setInt("random_seed", 0);
