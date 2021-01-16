@@ -2,7 +2,8 @@
     "env": {
         "myDefaultIncludePath": [
             "${workspaceFolder}",
-            "${workspaceFolder}/include"
+            "${workspaceFolder}/include", 
+            "${workspaceFolder}/lib/ale/src" 
         ]
     },
     "configurations": [
