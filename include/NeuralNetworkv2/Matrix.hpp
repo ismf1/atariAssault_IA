@@ -249,11 +249,16 @@ public:
 
         assert(ncol == other.nrow);
         Matrix temp(nrow, other.ncol);
-
-        for (size_t i = 0; i < nrow; i++)
-            for (size_t k = 0; k < ncol; k++)
-                for (size_t j = 0; j < other.ncol; j++)
-                    temp[i][j] += mat[i][k] * other[k][j];
+        
+        size_t i, k, j;
+        // # pragma omp parallel shared ( temp, mat, other, n, pi, s )
+        // {
+        //     # pragma omp for
+            for (i = 0; i < nrow; i++)
+                for (k = 0; k < ncol; k++)
+                    for (j = 0; j < other.ncol; j++)
+                        temp[i][j] += mat[i][k] * other[k][j];
+        // }
 
         return temp;
     }

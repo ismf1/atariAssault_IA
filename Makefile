@@ -1,5 +1,5 @@
 CXX      := -c++
-CXXFLAGS := -pedantic-errors -Wall -Wextra -std=c++2a -fconcepts -O3 -funroll-loops
+CXXFLAGS := -pedantic-errors -Wall -Wextra -std=c++2a -fconcepts -O3 -funroll-loops -fopenmp
 LDFLAGS  := -L/usr/lib -L./lib/ale -lale -lSDL -lstdc++ -lm
 BUILD    := ./build
 OBJ_DIR  := $(BUILD)/obj

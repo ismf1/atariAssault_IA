@@ -17,7 +17,7 @@ const char splitSymbol = ';';
 int lastLives;
 float totalReward;
 ALEInterface alei;
-
+Scaler2d scaler;
 std::vector<double> state;
 
 vector<int> nImp = {//Muy importantes
@@ -113,14 +113,11 @@ void showRAM(){
 float agentStep(Network *net) {
    
    float reward = 0;
-   
-   std::cout << state.size() << std::endl;
-
    std::vector<double> res = net->predict(state);
 
-   /*if(res[0]>0.5) reward+=alei.act(PLAYER_A_RIGHTFIRE);
-   if(res[1]>0.5) reward+=alei.act(PLAYER_A_LEFTFIRE);*/
-   if(res[2]>0.5) reward+=alei.act(PLAYER_A_UPFIRE);
+   if(res[0]>0.5) reward += alei.act(PLAYER_A_RIGHTFIRE);
+   if(res[1]>0.5) reward += alei.act(PLAYER_A_LEFTFIRE);
+   if(res[2]>0.5) reward += alei.act(PLAYER_A_UPFIRE);
    if(res[3]>0.5) reward += alei.act(PLAYER_A_LEFT);
    if(res[4]>0.5) reward += alei.act(PLAYER_A_RIGHT);
    
@@ -142,17 +139,18 @@ void usage(char* pname) {
 ///////////////////////////////////////////////////////////////////////////////
 
 void updateState(){
-   state.resize(0);
    int ramValue;
 
    const auto& RAM = alei.getRAM();
+   Vec2d temp(nImp.size());
 
    for(size_t i=0;i<nImp.size();i++){
-      ramValue=(int)RAM.get(nImp[i]+1);
-      state.push_back((float)ramValue);
-      // state.push_back((float)ramValue/255); //Scaled
+      ramValue = (int)RAM.get(nImp[i]+1);
+      temp.push_back(ramValue); //Scaled
    }
    
+   // Transform scale
+   state = scaler.transform(temp).toSTLVector();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -160,7 +158,7 @@ void updateState(){
 ///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char **argv) {
 
-   if (argc != 4)
+   if (argc != 5)
       usage(argv[0]);
 
    Network *net;
@@ -172,6 +170,7 @@ int main(int argc, char **argv) {
       net = new NNet();
 
    net->load(argv[2]);
+   scaler.load(argv[4]);
 
    // Create alei object.
    alei.setInt("random_seed", 0);

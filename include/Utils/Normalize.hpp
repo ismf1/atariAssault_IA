@@ -38,7 +38,7 @@ class Normalize
         }
 
         Matrix<W> transform(const Matrix<W> &m) {
-            Matrix<W> mat(m.size());
+            Matrix<W> mat(m.size(), m.ncol);
 
             for (size_t i = 0; i < m.size(); i++) {
                 mat[i] = transform(m[i]);
@@ -59,10 +59,10 @@ class Normalize
         void save(const std::string &fileName) {
             std::ofstream file(fileName.c_str());
             assert(file.is_open());
-            file << minmaxv.size() << endl;
+            file << minmaxv.size() << std::endl;
             for (auto const &minmax : minmaxv) {
                 auto [ min, max ] = minmax;
-                file << min << "," << max << endl;
+                file << min << "," << max << std::endl;
             }
         }
 

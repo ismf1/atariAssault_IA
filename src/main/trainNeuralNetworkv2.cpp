@@ -222,6 +222,7 @@ Data readCsv(std::string fileName) {
         tempY.push_back(std::get<61>(row));
         tempY.push_back(std::get<62>(row));
         tempY.push_back(std::get<63>(row));
+        tempY.push_back(std::get<64>(row));
         
         if (i < 240000) {
             X.push_back(tempX);
@@ -900,21 +901,31 @@ int main(int argc, char *argv[]) {
         };
         
         Vec2d initialBias(y.ncol);
+        Vec2d classWeights(y.ncol);
 
         for (size_t i = 0; i < y.ncol; i++) {
             double pos = y.countIf(i, [](double e) { return e == 1; }); 
             double neg = y.countIf(i, [](double e) { return e == 0; });
             std::cout << "Positive: " << pos << ", Negative: " << neg << std::endl;
             initialBias[i] = std::log(pos / neg);
+            classWeights[i] = (1 / pos) * y.size() / 2;
         }
-
-        std::cout << initialBias << std::endl;
 
         NNet nn(topology, actf);
         NSave saver(fileModel);
+        Scaler2d scaler;
         // std::cout << nn << std::endl;
+        std::cout << "Bias inicial" << std::endl;
+        std::cout << initialBias << std::endl;
+        std::cout << "Escalando..." << std::endl;
+        X = scaler.fitTransform(X);
+        X.shape();
+        std::cout << "Pesos" << std::endl;
+        std::cout << classWeights << std::endl;
+
         nn.train(X, y, costf, atof(argv[4]), atof(argv[5]), initialBias);
         // nn.train(X, y, costf, atof(argv[4]), atof(argv[5]));
+        // nn.test(X_test, y_test);
         saver.write(nn.getWeights());
     } 
     else if (opt == "-l") {
