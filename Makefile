@@ -35,9 +35,9 @@ debug: all
 release: CXXFLAGS += -O2
 release: all
 
-trainv2: 
-	make main=./src/main/trainNeuralNetwork.cpp
 train: 
+	make main=./src/main/trainNeuralNetwork.cpp
+trainv2: 
 	make main=./src/main/trainNeuralNetworkv2.cpp
 
 run: 

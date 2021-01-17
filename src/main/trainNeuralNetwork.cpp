@@ -8,6 +8,9 @@
 #include <iostream>
 #include <NeuralNetwork/NeuralNetwork.h>
 #include <Utils/Data.hpp>
+#include <Utils/Normalize.hpp>
+
+
 using namespace std;
 
 /*MatDouble_t X {
@@ -602,9 +605,20 @@ void splitDataTrainTest(double percent,MatDouble_t const& X,MatDouble_t const& Y
 void run(){
     //Leemos los datos
     Data dataTrain;
-    dataTrain.init("data/dataTrainScaled255.csv",59,5);
+    dataTrain.init("data/dataIvan/dataTrain.csv",59,5);
     Data dataVal;
-    dataVal.init("data/dataValScaled255.csv",59,5);
+    dataVal.init("data/dataIvan/dataVal.csv",59,5);
+
+    //--------------------A prueba----------------------
+    /*cout << dataTrain.X[0][0] << endl;
+    while(true);*/
+    //Escalamos los datos
+    Normalize<double> scaler;
+    dataTrain.X=scaler.fitTransform(Matrix(dataTrain.X)).toSTLVector();
+    scaler.save("scaler.txt");
+    dataVal.X=scaler.transform(Matrix(dataVal.X)).toSTLVector();
+
+    //--------------------------------------------------
 
     cout << "Numero de datos:" << endl;
     for(size_t i=0;i<dataTrain.Yneg.size();i++){
