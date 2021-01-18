@@ -642,7 +642,7 @@ void run(){
     //Antes: initializer_list<uint16_t> layerStruct={dataTrain.tamXi,64,32,16,dataTrain.tamYi}; //Mejor resultado
     initializer_list<uint16_t> layerStruct={dataTrain.tamXi,64,32,16,dataTrain.tamYi};  
     //initializer_list<uint16_t> layerStruct={X[0].size(),4,8,Y[0].size()};
-    float learningRate=0.06;
+    float learningRate=0.03;
     uint16_t epochs=500;
     uint16_t patience=5;
 
