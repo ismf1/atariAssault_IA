@@ -225,6 +225,7 @@ constexpr auto NeuralNetwork_t::errorFunctionInNeuron(double hx, double y) const
 auto NeuralNetwork_t::errorFunction(const VecDouble_t hx,const VecDouble_t y) const{
     double error=0;
     for(size_t i=0;i<y.size();i++){
+        //cout << hx[i] << "-" << y[i] << " Error: " << errorFunctionInNeuron(hx[i],y[i]) << endl;
         //Sesgado
         if(y[i]==1) error+=((double)Yneg[i]/(Yneg[i]+Ypos[i]))*errorFunctionInNeuron(hx[i],y[i]);
         else error+=((double)Ypos[i]/(Yneg[i]+Ypos[i]))*errorFunctionInNeuron(hx[i],y[i]);

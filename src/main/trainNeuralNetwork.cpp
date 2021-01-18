@@ -618,6 +618,15 @@ void run(){
     scaler.save("scaler.txt");
     dataVal.X=scaler.transform(Matrix(dataVal.X)).toSTLVector();
 
+    /*for(size_t i=0;i<dataVal.X.size();i++){
+        for(size_t j=0;j<dataVal.X[i].size();j++){
+            if(dataVal.X[i][j]!=dataVal.X[i][j]){
+                cout << "Train: " << "i: " << i << " j: " << j << " " << dataTrain.X[i][j] << endl;
+                cout << "Val: " << "i: " << i << " j: " << j << " " << dataVal.X[i][j] << endl;
+            }
+        }
+    }*/
+
     //--------------------------------------------------
 
     cout << "Numero de datos:" << endl;
