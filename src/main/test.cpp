@@ -20,12 +20,12 @@ int main(int argc, char *argv[]) {
 
     Normalize<double> scaler;
     Mat2d m({
-        { 1, 2, 3, 40},
-        { 4, 10, 30, 4},
-        { 5, 10, 30, 4},
-        { 2, 10, 30, 4},
-        { 6, 2, 3, 4},
-        { 6, 2, 3, 4},
+        { 0, 2, 3, 40},
+        { 0, 10, 30, 4},
+        { 0, 10, 30, 4},
+        { 0, 10, 30, 4},
+        { 0, 2, 5, 4},
+        { 0, 2, 3, 4},
     });
     cout << "Transformación: " << endl;
     cout << scaler.fitTransform(m) << endl;

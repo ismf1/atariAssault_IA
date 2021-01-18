@@ -31,8 +31,8 @@ void Data::init(const char* filename,const int tamXi,const int tamYi){
     this->tamYi=tamYi;
 
     this->size=countLinesFile();
-    this->X.resize(this->size,vector<float>(tamXi));
-    this->Y.resize(this->size,vector<int>(tamYi));
+    this->X.resize(this->size,vector<double>(tamXi));
+    this->Y.resize(this->size,vector<double>(tamYi));
     this->Yneg.resize(tamYi);
     this->Ypos.resize(tamYi);
 
