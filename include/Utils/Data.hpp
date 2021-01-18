@@ -13,9 +13,9 @@ class Data{
         const char* filename;
         int size;
         vector<vector<double>> X;
-        vector<vector<int>> Y;
-        vector<int> Yneg;
-        vector<int> Ypos;
+        vector<vector<double>> Y;
+        vector<double> Yneg;
+        vector<double> Ypos;
 
         Data();
         int countLinesFile();

@@ -2,3 +2,4 @@ build/
 nn
 trainNeuralNetwork
 trainNeuralNetworkv2
+test
