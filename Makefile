@@ -42,7 +42,7 @@ trainv2:
 
 run: 
 	make main=./src/main/minimal_agent_IA_nn_c.cpp
-	LD_LIBRARY_PATH="./lib/ale" ./minimal_agent_IA_nn_c assets/supported/assault.bin $(file) $(type)
+	LD_LIBRARY_PATH="./lib/ale" ./minimal_agent_IA_nn_c assets/supported/assault.bin $(file) $(type) $(scaler)
 
 clean:
 	-@rm -rvf $(OBJ_DIR)/*

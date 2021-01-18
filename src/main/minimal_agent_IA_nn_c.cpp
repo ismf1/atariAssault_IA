@@ -167,6 +167,11 @@ int main(int argc, char **argv) {
 
       usage(argv[0]);
    }
+
+   cout << "Modelo: " << argv[2] << endl;
+   cout << "Tipo: " << argv[3] << endl;
+   cout << "Scaler: " << argv[4] << endl;
+
    Network *net;
    std::string type = argv[3];
 
