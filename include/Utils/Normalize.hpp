@@ -25,7 +25,6 @@ class Normalize
         } 
         
         Vector<W> transform(const Vector<W> &vec) {
-            std::cout << minmaxv.size() << " = " << vec.size() << std::endl;
             assert(vec.size() <= minmaxv.size());
 
             Vector v(vec);
