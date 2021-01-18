@@ -146,7 +146,7 @@ void updateState(){
 
    for(size_t i=0;i<nImp.size();i++){
       ramValue = (int)RAM.get(nImp[i]+1);
-      temp.push_back(ramValue); //Scaled
+      temp[i] = ramValue; //Scaled
    }
    
    // Transform scale
