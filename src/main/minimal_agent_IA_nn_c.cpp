@@ -130,7 +130,7 @@ float agentStep(Network *net) {
 void usage(char* pname) {
    std::cerr
       << "\nUSAGE:\n" 
-      << "   " << pname << " <romfile>\n";
+      << "   " << pname << " <romfile> <red_neuronal> <type> <scaler>\n";
    exit(-1);
 }
 
@@ -158,9 +158,15 @@ void updateState(){
 ///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char **argv) {
 
-   if (argc != 5)
-      usage(argv[0]);
+   if (argc != 5){
+      cout << "Introducido: ";
+      for(size_t i=0;i<argc;i++){
+         cout << argv[i] << " ";
+      }
+      cout << endl;
 
+      usage(argv[0]);
+   }
    Network *net;
    std::string type = argv[3];
 
