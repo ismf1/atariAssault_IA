@@ -711,7 +711,7 @@ void run(){
     cout << "Porcentaje total no sesgado de fallos: " << fallosNoSesgados << endl;
     cout << "Porcentaje total sesgado de fallos: " << fallosSesgados<< endl;
 
-    net.save("models/NeuralNetwork.txt");
+    net.save("models/NeuralNetwork/NeuralNetwork.txt");
     /*net.load("NeuralNetwork2.txt");
 
     net.feedforward(vectorOfVectorsToMatDouble(data.X)[0]);*/
