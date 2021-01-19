@@ -605,7 +605,7 @@ void splitDataTrainTest(double percent,MatDouble_t const& X,MatDouble_t const& Y
 void run(){
     //Leemos los datos
     Data dataTrain;
-    dataTrain.init("data/dataIvan/dataTrain.csv",59,5);
+    dataTrain.init("data/combined/dataTrain.csv",59,5);
     Data dataVal;
     dataVal.init("data/dataIvan/dataVal.csv",59,5);
 
@@ -614,11 +614,15 @@ void run(){
     while(true);*/
     //Escalamos los datos
     Normalize<double> scaler;
-    dataTrain.X=scaler.fitTransform(Matrix(dataTrain.X)).toSTLVector();
-    scaler.save("scaler.txt");
+    //dataTrain.X=scaler.fitTransform(Matrix(dataTrain.X)).toSTLVector();
+    //scaler.save("scaler.txt");
+    scaler.load("models/NeuralNetwork/scaler255.txt");
+    dataTrain.X=scaler.transform(Matrix(dataTrain.X)).toSTLVector();
     dataVal.X=scaler.transform(Matrix(dataVal.X)).toSTLVector();
 
-    /*for(size_t i=0;i<dataVal.X.size();i++){
+    /*cout << "Train size: " << dataTrain.X.size() << "x" << dataTrain.X[0].size() << endl;
+    cout << "Validation size: " << dataVal.X.size() << "x" << dataVal.X[0].size() << endl;
+    for(size_t i=0;i<dataVal.X.size();i++){
         for(size_t j=0;j<dataVal.X[i].size();j++){
             if(dataVal.X[i][j]!=dataVal.X[i][j]){
                 cout << "Train: " << "i: " << i << " j: " << j << " " << dataTrain.X[i][j] << endl;
@@ -642,7 +646,7 @@ void run(){
     //Antes: initializer_list<uint16_t> layerStruct={dataTrain.tamXi,64,32,16,dataTrain.tamYi}; //Mejor resultado
     initializer_list<uint16_t> layerStruct={dataTrain.tamXi,64,32,16,dataTrain.tamYi};  
     //initializer_list<uint16_t> layerStruct={X[0].size(),4,8,Y[0].size()};
-    float learningRate=0.01;
+    float learningRate=0.03;
     uint16_t epochs=500;
     uint16_t patience=5;
 
