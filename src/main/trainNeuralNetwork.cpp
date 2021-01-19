@@ -605,7 +605,7 @@ void splitDataTrainTest(double percent,MatDouble_t const& X,MatDouble_t const& Y
 void run(){
     //Leemos los datos
     Data dataTrain;
-    dataTrain.init("data/combined/dataTrain.csv",59,5);
+    dataTrain.init("data/dataIvan/dataTrain.csv",59,5);
     Data dataVal;
     dataVal.init("data/dataIvan/dataVal.csv",59,5);
 
@@ -614,10 +614,10 @@ void run(){
     while(true);*/
     //Escalamos los datos
     Normalize<double> scaler;
-    //dataTrain.X=scaler.fitTransform(Matrix(dataTrain.X)).toSTLVector();
-    //scaler.save("scaler.txt");
-    scaler.load("models/NeuralNetwork/scaler255.txt");
-    dataTrain.X=scaler.transform(Matrix(dataTrain.X)).toSTLVector();
+    dataTrain.X=scaler.fitTransform(Matrix(dataTrain.X)).toSTLVector();
+    scaler.save("scaler.txt");
+    //scaler.load("models/NeuralNetwork/scaler255.txt");
+    //dataTrain.X=scaler.transform(Matrix(dataTrain.X)).toSTLVector();
     dataVal.X=scaler.transform(Matrix(dataVal.X)).toSTLVector();
 
     /*cout << "Train size: " << dataTrain.X.size() << "x" << dataTrain.X[0].size() << endl;
