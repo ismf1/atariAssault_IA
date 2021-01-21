@@ -172,12 +172,11 @@ int main(int argc, char *argv[]) {
         scaler.save("escaladorSuperBonito.txt");
         std::cout << "Ya puedo entrenar mi super red" << std::endl;
 
-        std::vector<int16_t> topology = { (int16_t)X.ncol, 128, 128, 64, (int16_t)y.ncol };
+        std::vector<int16_t> topology = { (int16_t)X.ncol, 128, 64, (int16_t)y.ncol };
         CostFunc costf     { Functions::mse, Functions::mseD   };
         ActFunc  actfRelu  { Functions::relu, Functions::reluD };
         ActFunc  actfSigm  { Functions::sigm, Functions::sigmD };
         VecActFunc  actf  {
-            actfRelu,
             actfRelu,
             actfRelu,
             actfSigm
