@@ -605,7 +605,7 @@ void splitDataTrainTest(double percent,MatDouble_t const& X,MatDouble_t const& Y
 void run(){
     //Leemos los datos
     Data dataTrain;
-    dataTrain.init("data/dataIvan/dataTrain.csv",59,5);
+    dataTrain.init("data/combined/carlosFriendsIvan/dataTrain.csv",59,5);
     Data dataVal;
     dataVal.init("data/dataIvan/dataVal.csv",59,5);
 
