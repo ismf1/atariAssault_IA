@@ -1,5 +1,5 @@
-#include <NeuralNetworkV2/NeuralNet.hpp>
-#include <NeuralNetworkV2/Functions.hpp>
+#include <NeuralNetworkv2/NeuralNet.hpp>
+#include <NeuralNetworkv2/Functions.hpp>
 #include <iterator>
 #include <sstream>
 #include <string>
@@ -161,7 +161,7 @@ int main(int argc, char *argv[]) {
         std::string fileModel = argv[3];
         Data data;
 
-        data.init(file.c_str(), 129, 6);
+        data.init(file.c_str(), 59, 5);
 
         auto X = Mat2d(data.X);
         auto y = Mat2d(data.Y);

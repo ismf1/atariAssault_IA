@@ -1,6 +1,13 @@
 #include <Utils/Data.hpp>
+#include <NeuralNetworkv2/Types.hpp>
 #include <stdlib.h>
 #include <stdio.h>
+#include <iostream>
+#include <fstream>
+#include <cassert>
+#include <sstream>
+
+using BufferIt = std::istreambuf_iterator<char>;
 
 Data::Data(){
 
@@ -57,7 +64,7 @@ void Data::init(const char* filename,const int tamXi,const int tamYi){
     fclose(fp);
 }
 
-void Data:: splitData(char str[],int line){
+void Data::splitData(char str[],int line){
 
     int i=0;
     float n=-1;
@@ -111,4 +118,28 @@ void Data:: splitData(char str[],int line){
 
     }
     
+}
+
+auto read(const std::string &fileName, const std::string &delimiter, int sx) {
+    std::ifstream file(fileName);
+    assert(file.is_open());
+
+    std::size_t count = std::count(BufferIt(file), BufferIt(), '\n');
+    std::string line;
+    Mat2d X, y;
+    Vec2d row;
+    char comma;
+    double num;
+
+    while (std::getline(file, line)) {
+        istringstream ss(line);
+        row.clear();
+        while (row.size() < sx && ss >> num >> comma)
+            row.push_back(num);
+        X.push_back(row);
+        row.clear();
+        while (row.size() < sx && ss >> num >> comma)
+            row.push_back(num);
+        y.push_back(row);
+    }
 }

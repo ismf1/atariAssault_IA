@@ -260,6 +260,10 @@ class Vector {
         return v.empty();
     }
 
+    auto clear() {
+        return v.clear();
+    }
+
     friend std::ostream& operator<<(std::ostream &os, const Vector &v) {
         os << std::fixed << std::setprecision(10) << "[";
 

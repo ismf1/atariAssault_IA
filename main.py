@@ -1,42 +1,46 @@
 import pandas as pd
 import numpy as np
+from imblearn.over_sampling import SMOTE, ADASYN, RandomOverSampler
 from imblearn.under_sampling import RandomUnderSampler
 from collections import Counter
-from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import OneHotEncoder
 import sklearn.preprocessing
 
-df = pd.read_csv ('prueba.csv', delimiter=' ')
+df = pd.read_csv ('dataBuena.csv', delimiter=';')
 df = df.values
-X, y = df[:,:129], df[:,-1]
+X, y = df[:,:59], df[:,59:]
 
-# result = []
+print(sorted(Counter(y).items()))
 
-# for row in y:
-#     if np.array_equal(np.array(row), np.array([1, 0, 0, 0, 0])):
-#         result.append(1)            
-#     elif np.array_equal(np.array(row), np.array([0, 1, 0, 0, 0])):
-#         result.append(2)            
-#     elif np.array_equal(np.array(row), np.array([0, 0, 1, 0, 0])):
-#         result.append(3)            
-#     elif np.array_equal(np.array(row), np.array([0, 0, 0, 1, 0])):
-#         result.append(4)            
-#     elif np.array_equal(np.array(row), np.array([0, 0, 0, 0, 1])):
-#         result.append(5)            
-#     elif np.array_equal(np.array(row), np.array([0, 0, 0, 0, 0])):
-#         result.append(6)         
-#     else:
-#         result.append(7)         
+result    = []
+y_reverse = []
+i = 0
 
-# y = np.array(result)
-# print(y)
-oversample = RandomUnderSampler()
+for row in y:
+    a = False
+    index = 0
+    for idx, x in enumerate(result):
+        if np.array_equal(x, row):
+            a = True
+            index = idx
+    if a:
+        y_reverse.append(y_reverse[index])
+    else:
+        y_reverse.append(i)
+        result.append(row)
+        i += 1
+
+y = np.array(y_reverse)
+
+oversample = RandomOverSampler()
 X, y = oversample.fit_sample(X, y)
 
-y = y.astype('int')
-label_binarizer = sklearn.preprocessing.LabelBinarizer()
-label_binarizer.fit(range(max(y)+1))
-y = label_binarizer.transform(y)
+print(sorted(Counter(y).items()))
+
+# y = y.astype('int')
+# label_binarizer = sklearn.preprocessing.LabelBinarizer()
+# label_binarizer.fit(range(max(y)+1))
+# y = label_binarizer.transform(y)
 
 # r = []
 # for row in y:

@@ -7,9 +7,9 @@
 
 NNet::VecFordward NNet::forwardPass(const Mat2d &X) const
 {
-    VecFordward vecA({ X });
+    VecFordward vecA({X});
 
-    for (auto const& layer : nn)
+    for (auto const &layer : nn)
     {
         auto [actf, actfD] = layer.actf;
         auto lastA = vecA.back();
@@ -23,9 +23,8 @@ NNet::VecFordward NNet::forwardPass(const Mat2d &X) const
 }
 
 Mat2d NNet::ttrain(
-    const Mat2d &X, const Mat2d &y, 
-    const CostFunc &costf, double lr
-)
+    const Mat2d &X, const Mat2d &y,
+    const CostFunc &costf, double lr)
 {
 
     // Forward pass
@@ -39,7 +38,7 @@ Mat2d NNet::ttrain(
     for (int l = nn.size() - 1; l >= 0; l--)
     {
         auto [actf, actfD] = nn[l].actf;
-        auto a  = out[l + 1];
+        auto a = out[l + 1];
         auto al = out[l];
 
         if (static_cast<size_t>(l) == nn.size() - 1)
@@ -47,7 +46,7 @@ Mat2d NNet::ttrain(
         else
             deltas.push_front(deltas.front() * lastW.transpose() ^ a.apply(actfD));
 
-        lastW   = nn[l].w;
+        lastW = nn[l].w;
         nn[l].b = nn[l].b - deltas.front().mean(1) * lr;
         nn[l].w = nn[l].w - (al.transpose() * deltas.front()).mult(lr);
     }
@@ -70,11 +69,16 @@ NNet::NNet(const std::vector<int16_t> &topology, const ActFunc &actf)
 
 NNet::NNet() {}
 
+NNet::NNet(const std::vector<int16_t> &topology, const VecActFunc &vecAct, const VecWeights &weights)
+{
+    for (size_t i = 0; i < topology.size() - 1; i++)
+        nn.push_back(NeuralLayer(weights[i], vecAct[i]));
+}
+
 void NNet::train(
-    const Mat2d &X, const Mat2d &y, 
-    const CostFunc &costf, size_t epochs, double lr, 
-    const Vec2d& initialBias
-)
+    const Mat2d &X, const Mat2d &y,
+    const CostFunc &costf, size_t epochs, double lr,
+    const Vec2d &initialBias)
 {
     if (!initialBias.empty())
         nn.back().b = initialBias;
@@ -98,8 +102,9 @@ void NNet::test(const Mat2d &X, const Mat2d &y) const
     Mat2d r = forwardPass(X).back().apply([](double n) { return (int)(n + 0.5); });
     double acc = 0;
 
-    for (size_t i = 0; i < r.size(); i++) {
-        std::cout << y[i]  << "==" << r[i] << std::endl; 
+    for (size_t i = 0; i < r.size(); i++)
+    {
+        std::cout << y[i] << "==" << r[i] << std::endl;
         if (y[i] == r[i])
             acc++;
     }
@@ -107,7 +112,8 @@ void NNet::test(const Mat2d &X, const Mat2d &y) const
     std::cout << "Acc: " << (acc * 100.f / r.size()) << "%" << std::endl;
 }
 
-NNet::VecWeights NNet::getWeights() const {
+VecWeights NNet::getWeights() const
+{
     VecWeights vecW;
 
     for (size_t i = 0; i < size(); i++)
@@ -116,25 +122,26 @@ NNet::VecWeights NNet::getWeights() const {
     return vecW;
 }
 
-void NNet::load(const NNet::VecWeights &vecW) {
+void NNet::load(const VecWeights &vecW)
+{
     nn.clear();
 
-    ActFunc  actfRelu  { Functions::relu, Functions::reluD };
-    ActFunc  actfSigm  { Functions::sigm, Functions::sigmD };
-    VecActFunc  actf  {
-            actfRelu,
-            actfRelu,
-            actfRelu,
-            actfSigm
+    ActFunc actfRelu{Functions::relu, Functions::reluD};
+    ActFunc actfSigm{Functions::sigm, Functions::sigmD};
+    VecActFunc actf{
+        actfRelu,
+        actfRelu,
+        actfRelu,
+        actfSigm
     };
 
     size_t i = 0;
-    for (auto &layer : vecW) {
-        nn.push_back(NeuralLayer(layer, actf[i]));
-    }
+    for (auto &layer : vecW)
+        nn.push_back(NeuralLayer(layer, actf[i++]));
 }
 
-void NNet::load(const std::string &fileName) {
+void NNet::load(const std::string &fileName)
+{
     nn.clear();
 
     NSave loader(fileName);
