@@ -22,7 +22,9 @@ void GA::breed(const VecIndividual &parents) {
     while (children.size() < notElite) {
         auto father = Functions::randomChoice(parents);
         auto mother = Functions::randomChoice(parents);
+        std::cout << "Aqui1" << std::endl;
         auto child  = father.crossover(mother, mutateRate);
+        std::cout << "Aqui2" << std::endl;
         children.push_back(child);
     }
 
@@ -32,7 +34,7 @@ void GA::breed(const VecIndividual &parents) {
 
 Individual GA::evolve(uint16_t maxIterations) {
     for (size_t i = 0; i < maxIterations; i++) {
-        std::for_each(std::execution::par_unseq, population.begin(), population.end(), [](Individual &e) { e.fitness(); });
+        std::for_each(population.begin(), population.end(), [](Individual &e) { e.fitness(); });
         auto parents = selection();
         std::cout << "Best " << i << "fitness: " << parents.front().getFitness() << std::endl;
         breed(parents);

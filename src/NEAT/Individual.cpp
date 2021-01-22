@@ -22,7 +22,7 @@ Individual::Individual(const Individual &o) {
 }
 
 Individual::Individual() {
-    nn = NNet();
+    nn = NNet(TOPOLOGY, actf);
 }
 
 const std::vector<double> Individual::getState(ALEInterface &alei) {
@@ -86,12 +86,16 @@ Individual Individual::crossover(const Individual &other, double mutateRate) {
 
 double Individual::fitness()
 {
+    std::cerr.setstate(std::ios_base::failbit);
+
     ALEInterface alei;
 
     alei.setFloat("repeat_action_probability", 0);
     alei.setBool("display_screen", false);
     alei.setBool("sound", false);
     alei.loadROM("assets/supported/assault.bin");
+
+    std::cerr.clear();
 
     uint16_t step = 0;
     uint16_t totalReward = 0;
