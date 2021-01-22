@@ -10,3 +10,5 @@ using ActFunc    = std::tuple<std::function<double (double)>, std::function<doub
 using CostFunc   = std::tuple<std::function<double (Mat2d, Mat2d)>, std::function<Mat2d (Mat2d, Mat2d)>>;
 using VecActFunc = std::vector<ActFunc>;
 using VecWeights = std::vector<std::vector<std::vector<double>>>;
+using NMat2d     = std::vector<std::vector<double>>;
+using NVec2d     = std::vector<double>;

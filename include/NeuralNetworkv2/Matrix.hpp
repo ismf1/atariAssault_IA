@@ -239,26 +239,18 @@ public:
 
     Matrix operator*(const Matrix &other) const
     {
-        if (ncol == 1 && other.ncol == 1)
-        {
-            Vector a = toVector();
-            Vector b = other.toVector();
-
-            return (a * b).template toMatrix<Matrix<W>>();
-        }
-
         assert(ncol == other.nrow);
         Matrix temp(nrow, other.ncol);
         
         size_t i, k, j;
-        // # pragma omp parallel shared ( temp, mat, other, n, pi, s )
-        // {
-        //     # pragma omp for
+        # pragma omp parallel shared ( temp, mat, other) private(i, k, j)
+        {
+            # pragma omp for simd
             for (i = 0; i < nrow; i++)
                 for (k = 0; k < ncol; k++)
                     for (j = 0; j < other.ncol; j++)
                         temp[i][j] += mat[i][k] * other[k][j];
-        // }
+        }
 
         return temp;
     }
@@ -356,6 +348,14 @@ public:
     {
         std::cout << "(" << nrow << ", " << ncol << ")" << std::endl;
     }
+
+    bool operator==(const Matrix& other) const {
+        return mat == other.mat;
+    }
+
+    bool operator!=(const Matrix& other) const {
+        return mat != other.mat;
+    }   
 
     friend std::ostream &operator<<(std::ostream &os, const Matrix &m)
     {

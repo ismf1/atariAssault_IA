@@ -205,12 +205,12 @@ int main(int argc, char *argv[]) {
         nn.train(X, y, costf, atof(argv[4]), atof(argv[5]), initialBias);
         // nn.train(X, y, costf, atof(argv[4]), atof(argv[5]));
         // nn.test(X_test, y_test);
-        saver.write(nn.getWeights());
+        // saver.write(nn.getWeights());
     } 
     else if (opt == "-l") {
         NNet nn;
         NSave saver(file);
-        nn.load(saver.read());
+        // nn.load(saver.read());
     } else {
         std::cerr << "ERROR: Params" << std::endl
             << "<program> -t dataFile outModelFile" << std::endl

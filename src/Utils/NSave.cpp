@@ -4,12 +4,22 @@
 #include <vector>
 #include <string>
 #include <cstring>
+#include <tuple>
 
 
-void NSave::write(const Data &v) const{
+void NSave::write(const Data &v, const Func &t) const{
 
     std::ofstream outFile;
     outFile.open (fileName);
+
+    outFile << "(";
+
+    for(size_t i=0;i<t.size();i++){
+        outFile << t[i];
+        if(t.size()-1>i)
+            outFile <<",";
+    }
+    outFile << ")";
     outFile << "[";
     for(size_t i=0;i<v.size();i++){
         outFile << "[";
@@ -26,26 +36,49 @@ void NSave::write(const Data &v) const{
         outFile << "]";
     }
     outFile << "]";
+
     
+
     outFile.close();
 
 }
 
-NSave::Data NSave::read() const{
+std::tuple<NSave::Data,NSave::Func> NSave::read() const{
     Data x;
     std::vector<  std::vector<double> > y;
     std::vector<double> z;
     std::string s;
     s="";
+    NSave::Func t; 
 
     std::ifstream fileIn;
     char letra;
 
     fileIn.open (fileName);
     fileIn >> letra;
+    if(letra=='('){
+        std::string fun="";
+        while(letra!=')'){
+            fileIn >> letra;
+            if(letra==',' || letra==')'){
+                switch(stoi(fun)){
+                    case 0:
+                        t.push_back(SIGM);
+                        break;
+                    case 1:
+                        t.push_back(RELU);
+                        break;
+                }
+                fun="";
+            }else{
+                fun+=letra;
+            }
+        }
+    }
+    fileIn >> letra;
     while (! fileIn.eof() ) {
         fileIn >> letra;
-        while(letra!=']'){
+        while(letra!=']' && letra!='('){
             while(letra!=']'){
                 fileIn >> letra;
                 if(letra=='['){
@@ -68,7 +101,10 @@ NSave::Data NSave::read() const{
             y.clear();
         }
     }
+    
     fileIn.close();
 
-    return x;
+    std::tuple<NSave::Data,NSave::Func> tupla (std::make_tuple(x,t));
+    
+    return tupla;
 }

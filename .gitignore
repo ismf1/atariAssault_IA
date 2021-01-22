@@ -3,3 +3,4 @@ nn
 trainNeuralNetwork
 trainNeuralNetworkv2
 test
+trainGA

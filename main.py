@@ -10,8 +10,6 @@ df = pd.read_csv ('dataBuena.csv', delimiter=';')
 df = df.values
 X, y = df[:,:59], df[:,59:]
 
-print(sorted(Counter(y).items()))
-
 result    = []
 y_reverse = []
 i = 0

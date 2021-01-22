@@ -145,7 +145,7 @@ void NNet::load(const std::string &fileName)
     nn.clear();
 
     NSave loader(fileName);
-    load(loader.read());
+    // load(loader.read());
 }
 
 auto NNet::begin() const
