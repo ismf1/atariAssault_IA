@@ -1,6 +1,7 @@
 #include <Utils/Data.hpp>
 #include <stdlib.h>
 #include <stdio.h>
+#include <iostream>
 
 Data::Data(){
 
@@ -51,6 +52,7 @@ void Data::init(const char* filename,const int tamXi,const int tamYi){
     }
     int line=0;
     while (fgets(str, MAXCHAR, fp) != NULL){
+        std::cout << "Loading line " << line << "..." << std::endl;
         splitData(str,line);
         line++;
     }
