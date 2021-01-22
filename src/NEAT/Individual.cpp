@@ -70,7 +70,8 @@ Individual Individual::crossover(const Individual &other, double mutateRate) {
             std::vector<double> nw(lw1[j].size());
 
             for (size_t k = 0; k < lw1[j].size(); k++) {
-                nw[k] = Functions::rand(0, 1) < mutateRate?
+                auto x = ((double) rand() / (RAND_MAX));                
+                nw[k] =  x < mutateRate?
                         Functions::rand(-1, 1) :
                         Functions::randomChoice(lw1[i][j], lw2[i][j]);  
             }

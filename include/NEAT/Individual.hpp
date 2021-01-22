@@ -7,11 +7,11 @@
 class Individual {
 
     private:
-        NNet nn;
         double fit;
 
     public: 
 
+        NNet nn;
     explicit Individual();
     explicit Individual(const VecWeights &);
     Individual(const Individual &);
