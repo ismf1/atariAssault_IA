@@ -96,20 +96,20 @@ Individual Individual::crossover(const Individual &other, double mutateRate) {
 
 double Individual::fitness(bool display)
 {
+    reward = 0; 
+    fit = 0;
+
     for (size_t i = 0; i < 3; i++) {
         std::cerr.setstate(std::ios_base::failbit);
 
         ALEInterface alei;
 
         alei.setFloat("repeat_action_probability", 0);
-        alei.setBool("display_screen", display);
+        alei.setBool("display_screen", i == 0? display : false);
         alei.setBool("sound", false);
         alei.loadROM("assets/supported/assault.bin");
 
         std::cerr.clear();
-
-        reward = 0; 
-        fit = 0;
 
         double totalReward = 0;
         double step = 0;
@@ -120,8 +120,10 @@ double Individual::fitness(bool display)
             totalReward += agentStep(alei); //Movimiento
         }
         reward += totalReward;
-        fit += ((movesLeft + movesRight) * 0.1) + totalReward * 1.3;
+        //fit += std::abs() * 0.1 + std::pow(totalReward, 1.2);
         //fit = ;
+        fit += (totalReward) * (movesLeft + movesRight) / step;
+        //fit += totalReward;
     }
 
     reward /= 3;
