@@ -19,11 +19,7 @@
 #ifndef PROPERTIES_SET_HXX
 #define PROPERTIES_SET_HXX
 
-#include <fstream>
 
-#include "m6502/src/bspf/src/bspf.hxx"
-
-class OSystem;
 class Properties;
 
 /**
@@ -43,7 +39,7 @@ class PropertiesSet
       Create an empty properties set object using the md5 as the
       key to the BST.
     */
-    PropertiesSet(OSystem* osystem);
+    PropertiesSet();
 
     /**
       Destructor
@@ -61,26 +57,6 @@ class PropertiesSet
     */
     void getMD5(const std::string& md5, Properties& properties,
                 bool useDefaults = false) const;
-
-    /** 
-      Load properties from the specified file.  Use the given 
-      defaults properties as the defaults for any properties loaded.
-
-      @param filename  Full pathname of input file to use
-      @param save      Indicates whether to set the 'save' tag for
-                       these properties
-    */
-    void load(const std::string& filename, bool save);
-
-    /**
-      Save properties to the specified file.
-
-      @param filename  Full pathname of output file to use
-
-      @return  True on success, false on failure
-               Failure occurs if file couldn't be opened for writing
-    */
-    bool save(const std::string& filename) const;
 
     /**
       Insert the properties into the set.  If a duplicate is inserted
@@ -104,7 +80,7 @@ class PropertiesSet
 
       @return  The number of properties in the collection
     */
-    uInt32 size() const;
+    uint32_t size() const;
 
     /**
       Prints the contents of the PropertiesSet as a flat file.
@@ -138,14 +114,6 @@ class PropertiesSet
     void deleteNode(TreeNode *node);
 
     /**
-      Save current node properties to the specified output stream 
-
-      @param out   The output stream to use
-      @param node  The current subroot of the tree
-    */
-    void saveNode(std::ostream& out, TreeNode* node) const;
-
-    /**
       Prints the current node properties
 
       @param node  The current subroot of the tree
@@ -153,14 +121,11 @@ class PropertiesSet
     void printNode(TreeNode* node) const;
 
   private:
-    // The parent system for this object
-    OSystem* myOSystem;
-
     // The root of the BST
     TreeNode* myRoot;
 
     // The size of the properties bst (i.e. the number of properties in it)
-    uInt32 mySize;
+    uint32_t mySize;
 };
 
 #endif

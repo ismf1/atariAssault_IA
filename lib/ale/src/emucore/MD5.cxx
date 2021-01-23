@@ -19,8 +19,7 @@
 // $Id: MD5.cxx,v 1.7 2007/01/01 18:04:48 stephena Exp $
 //============================================================================
 
-#include "MD5.hxx"
-using namespace std;
+#include "emucore/MD5.hxx"
 
 /*
  Copyright (C) 1991-2, RSA Data Security, Inc. Created 1991. All 
@@ -47,8 +46,8 @@ using namespace std;
 
 // Setup the types used by the MD5 routines
 typedef unsigned char* POINTER;
-typedef uInt16 UINT2;
-typedef uInt32 UINT4;
+typedef uint16_t UINT2;
+typedef uint32_t UINT4;
 
 // MD5 context.
 typedef struct 
@@ -326,7 +325,7 @@ static void MD5_memset(POINTER output, int value, unsigned int len)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-string MD5(const uInt8* buffer, uInt32 length)
+std::string MD5(const uint8_t* buffer, uint32_t length)
 {
   char hex[] = "0123456789abcdef";
   MD5_CTX context;
@@ -336,7 +335,7 @@ string MD5(const uInt8* buffer, uInt32 length)
   MD5Update(&context, buffer, length);
   MD5Final(md5, &context);
 
-  string result;
+  std::string result;
   for(int t = 0; t < 16; ++t)
   {
     result += hex[(md5[t] >> 4) & 0x0f];

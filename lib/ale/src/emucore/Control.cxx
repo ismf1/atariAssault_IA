@@ -16,8 +16,8 @@
 // $Id: Control.cxx,v 1.6 2007/01/05 17:54:09 stephena Exp $
 //============================================================================
 
-#include <assert.h>
-#include "Control.hxx"
+#include <cassert>
+#include "emucore/Control.hxx"
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Controller::Controller(Jack jack, const Event& event, Type type)
@@ -39,10 +39,10 @@ Controller::Type Controller::type()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-const Int32 Controller::maximumResistance = 0x7FFFFFFF;
+const int Controller::maximumResistance = 0x7FFFFFFF;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-const Int32 Controller::minimumResistance = 0x00000000;
+const int Controller::minimumResistance = 0x00000000;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Controller::Controller(const Controller& c)

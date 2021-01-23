@@ -16,22 +16,17 @@
 // $Id: SoundNull.cxx,v 1.6 2007/01/01 18:04:40 stephena Exp $
 //============================================================================
 
-#include "Serializer.hxx"
-#include "Deserializer.hxx"
+#include "emucore/Serializer.hxx"
+#include "emucore/Deserializer.hxx"
 
-#include "bspf.hxx"
 
-#include "OSystem.hxx"
-#include "Settings.hxx"
-#include "SoundNull.hxx"
+#include "emucore/Settings.hxx"
+#include "common/SoundNull.hxx"
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-SoundNull::SoundNull(OSystem* osystem)
-    : Sound(osystem)
+SoundNull::SoundNull(Settings* settings)
+    : Sound(settings)
 {
-  // Show some info
-  if(myOSystem->settings().getBool("showinfo"))
-    std::cerr << "Sound disabled." << std::endl << std::endl;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -46,13 +41,13 @@ bool SoundNull::load(Deserializer& in)
   if(in.getString() != soundDevice)
     return false;
 
-  uInt8 reg;
-  reg = (uInt8) in.getInt();
-  reg = (uInt8) in.getInt();
-  reg = (uInt8) in.getInt();
-  reg = (uInt8) in.getInt();
-  reg = (uInt8) in.getInt();
-  reg = (uInt8) in.getInt();
+  uint8_t reg;
+  reg = (uint8_t) in.getInt();
+  reg = (uint8_t) in.getInt();
+  reg = (uint8_t) in.getInt();
+  reg = (uint8_t) in.getInt();
+  reg = (uint8_t) in.getInt();
+  reg = (uint8_t) in.getInt();
 
   // myLastRegisterSetCycle
   in.getInt();
@@ -65,7 +60,7 @@ bool SoundNull::save(Serializer& out)
 {
   out.putString("TIASound");
 
-  uInt8 reg = 0;
+  uint8_t reg = 0;
   out.putInt(reg);
   out.putInt(reg);
   out.putInt(reg);

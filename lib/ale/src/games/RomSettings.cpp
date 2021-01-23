@@ -1,8 +1,8 @@
 /* *****************************************************************************
  * A.L.E (Arcade Learning Environment)
- * Copyright (c) 2009-2013 by Yavar Naddaf, Joel Veness, Marc G. Bellemare and 
+ * Copyright (c) 2009-2013 by Yavar Naddaf, Joel Veness, Marc G. Bellemare and
  *   the Reinforcement Learning and Artificial Intelligence Laboratory
- * Released under the GNU General Public License; see License.txt for details. 
+ * Released under the GNU General Public License; see License.txt for details.
  *
  * Based on: Stella  --  "An Atari 2600 VCS Emulator"
  * Copyright (c) 1995-2007 by Bradford W. Mott and the Stella team
@@ -15,10 +15,14 @@
  *  reward information.
  * *****************************************************************************
  */
-#include "RomSettings.hpp"
+
+#include "games/RomSettings.hpp"
+
+#include <algorithm>
+
+namespace ale {
 
 RomSettings::RomSettings() {}
-
 
 bool RomSettings::isLegal(const Action& a) const {
   return true;
@@ -50,15 +54,32 @@ ActionVect RomSettings::getStartingActions() {
 
 ModeVect RomSettings::getAvailableModes() {
   return ModeVect(1, 0);
-};
+}
 
 void RomSettings::setMode(game_mode_t m, System&, std::unique_ptr<StellaEnvironmentWrapper>) {
-  //By default, 0 is the only available mode
-  if(m != 0) {
+  // By default, 0 is the only available mode
+  if (m != 0) {
     throw std::runtime_error("This mode is not currently available for this game");
+  }
+}
+
+game_mode_t RomSettings::getDefaultMode() {
+  // By default, return the first available mode, or 0 if none are listed
+  ModeVect available_modes = getAvailableModes();
+  if (available_modes.empty()) {
+    return 0;
+  } else {
+    return available_modes[0];
   }
 }
 
 DifficultyVect RomSettings::getAvailableDifficulties() {
   return DifficultyVect(1, 0);
-};
+}
+
+bool RomSettings::isModeSupported(game_mode_t m) {
+  auto modes = getAvailableModes();
+  return std::find(modes.begin(), modes.end(), m) != modes.end();
+}
+
+}  // namespace ale

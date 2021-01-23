@@ -19,11 +19,10 @@
 #ifndef SOUND_HXX
 #define SOUND_HXX
 
-class OSystem;
+class Settings;
 class Serializer;
 class Deserializer;
 
-#include "m6502/src/bspf/src/bspf.hxx"
 
 /**
   This class is an abstract base class for the various sound objects.
@@ -39,7 +38,7 @@ class Sound
       Create a new sound object.  The init method must be invoked before
       using the object.
     */
-    Sound(OSystem* osystem) { myOSystem = osystem; }
+    Sound(Settings* settings) { mySettings = settings; }
 
     /**
       Destructor
@@ -60,14 +59,14 @@ class Sound
 
       @param amount The amount the cycle counter is being adjusted by
     */
-    virtual void adjustCycleCounter(Int32 amount) = 0;
+    virtual void adjustCycleCounter(int amount) = 0;
 
     /**
       Sets the number of channels (mono or stereo sound).
 
       @param channels The number of channels
     */
-    virtual void setChannels(uInt32 channels) = 0;
+    virtual void setChannels(uint32_t channels) = 0;
 
     /**
       Sets the display framerate.  Sound generation for NTSC and PAL games
@@ -75,7 +74,7 @@ class Sound
 
       @param framerate The base framerate depending on NTSC or PAL ROM
     */
-    virtual void setFrameRate(uInt32 framerate) = 0;
+    virtual void setFrameRate(uint32_t framerate) = 0;
 
     /**
       Initializes the sound device.  This must be called before any
@@ -115,7 +114,7 @@ class Sound
       @param value The value to save into the register
       @param cycle The system cycle at which the register is being updated
     */
-    virtual void set(uInt16 addr, uInt8 value, Int32 cycle) = 0;
+    virtual void set(uint16_t addr, uint8_t value, int cycle) = 0;
 
     /**
       Sets the volume of the sound device to the specified level.  The
@@ -124,7 +123,7 @@ class Sound
 
       @param percent The new volume percentage level for the sound device
     */
-    virtual void setVolume(Int32 percent) = 0;
+    virtual void setVolume(int percent) = 0;
 
     /**
       Adjusts the volume of the sound device based on the given direction.
@@ -132,7 +131,7 @@ class Sound
       @param direction  Increase or decrease the current volume by a predefined
                         amount based on the direction (1 = increase, -1 =decrease)
     */
-    virtual void adjustVolume(Int8 direction) = 0;
+    virtual void adjustVolume(int8_t direction) = 0;
 
     /**
       * Tells the sound engine to record one frame's worth of sound.
@@ -157,8 +156,8 @@ public:
     virtual bool save(Serializer& out) = 0;
 
   protected:
-    // The OSystem for this sound object
-    OSystem* myOSystem;
+    // The emulator Settings
+    Settings* mySettings;
 };
 
 #endif

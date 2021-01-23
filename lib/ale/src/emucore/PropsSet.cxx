@@ -16,27 +16,20 @@
 // $Id: PropsSet.cxx,v 1.34 2007/07/31 15:46:20 stephena Exp $
 //============================================================================
 
+#include <string>
 #include <sstream>
-#include <string.h>
+#include <cstring>
+#include <iostream>
 
-#include "OSystem.hxx"
-#include "DefProps.hxx"
-#include "Props.hxx"
-#include "PropsSet.hxx"
-#include "bspf.hxx"
-using namespace std;
+#include "emucore/DefProps.hxx"
+#include "emucore/Props.hxx"
+#include "emucore/PropsSet.hxx"
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-PropertiesSet::PropertiesSet(OSystem* osystem)
-  : myOSystem(osystem),
-    myRoot(NULL),
+PropertiesSet::PropertiesSet()
+  : myRoot(NULL),
     mySize(0)
 {
-  const string& props = myOSystem->propertiesFile();
-  load(props, true);    // do save these properties
-
-  if(myOSystem->settings().getBool("showinfo"))
-    cerr << "User game properties: \'" << props << "\'\n";
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -46,7 +39,7 @@ PropertiesSet::~PropertiesSet()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void PropertiesSet::getMD5(const string& md5, Properties& properties,
+void PropertiesSet::getMD5(const std::string& md5, Properties& properties,
                            bool useDefaults) const
 {
   properties.setDefaults();
@@ -58,7 +51,7 @@ void PropertiesSet::getMD5(const string& md5, Properties& properties,
     TreeNode* current = myRoot;
     while(current)
     {
-      const string& currentMd5 = current->props->get(Cartridge_MD5);
+      const std::string& currentMd5 = current->props->get(Cartridge_MD5);
       if(currentMd5 == md5)
       {
         // We only report a node as found if it's been marked as valid.
@@ -84,7 +77,7 @@ void PropertiesSet::getMD5(const string& md5, Properties& properties,
     while(low <= high)
     {
       int i = (low + high) / 2;
-      int cmp = strncmp(md5.c_str(), DefProps[i][Cartridge_MD5], 32);
+      int cmp = std::strncmp(md5.c_str(), DefProps[i][Cartridge_MD5], 32);
 
       if(cmp == 0)  // found it
       {
@@ -110,7 +103,7 @@ void PropertiesSet::insert(const Properties& properties, bool save)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void PropertiesSet::removeMD5(const string& md5)
+void PropertiesSet::removeMD5(const std::string& md5)
 {
   // We only remove from the dynamic BST
   if(myRoot != 0)
@@ -118,7 +111,7 @@ void PropertiesSet::removeMD5(const string& md5)
     TreeNode* current = myRoot;
     while(current)
     {
-      const string& currentMd5 = current->props->get(Cartridge_MD5);
+      const std::string& currentMd5 = current->props->get(Cartridge_MD5);
       if(currentMd5 == md5)
       {
         current->valid = false;  // Essentially, this node doesn't exist
@@ -138,8 +131,8 @@ void PropertiesSet::insertNode(TreeNode* &t, const Properties& properties,
 {
   if(t)
   {
-    string md5 = properties.get(Cartridge_MD5);
-    string currentMd5 = t->props->get(Cartridge_MD5);
+    std::string md5 = properties.get(Cartridge_MD5);
+    std::string currentMd5 = t->props->get(Cartridge_MD5);
 
     if(md5 < currentMd5)
       insertNode(t->left, properties, save);
@@ -179,58 +172,10 @@ void PropertiesSet::deleteNode(TreeNode *node)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void PropertiesSet::load(const string& filename, bool save)
-{
-  ifstream in(filename.c_str(), ios::in);
-
-  // Loop reading properties
-  for(;;)
-  {
-    // Make sure the stream is still good or we're done 
-    if(!in)
-      break;
-
-    // Get the property list associated with this profile
-    Properties prop;
-    prop.load(in);
-
-    // If the stream is still good then insert the properties
-    if(in)
-      insert(prop, save);
-  }
-  if(in)
-    in.close();
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool PropertiesSet::save(const string& filename) const
-{
-  ofstream out(filename.c_str(), ios::out);
-  if(!out)
-    return false;
-
-  saveNode(out, myRoot);
-  out.close();
-  return true;
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void PropertiesSet::print() const
 {
-  cerr << size() << endl;
+  std::cerr << size() << std::endl;
   printNode(myRoot);  // FIXME - print out internal properties as well
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void PropertiesSet::saveNode(ostream& out, TreeNode *node) const
-{
-  if(node)
-  {
-    if(node->valid && node->save)
-      node->props->save(out);
-    saveNode(out, node->left);
-    saveNode(out, node->right);
-  }
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -246,7 +191,7 @@ void PropertiesSet::printNode(TreeNode *node) const
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt32 PropertiesSet::size() const
+uint32_t PropertiesSet::size() const
 {
   return mySize;
 }

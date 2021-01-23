@@ -23,8 +23,8 @@ class System;
 class Serializer;
 class Deserializer;
 
-#include "m6502/src/bspf/src/bspf.hxx"
-#include "Cart.hxx"
+#include "emucore/Cart.hxx"
+#include "emucore/Random.hxx"
 
 /**
   Cartridge class used for CBS' RAM Plus cartridges.  There are
@@ -40,8 +40,9 @@ class CartridgeFASC : public Cartridge
       Create a new cartridge using the specified image
 
       @param image Pointer to the ROM image
+      @param rng A random number generator used to populate the initial extra RAM
     */
-    CartridgeFASC(const uInt8* image);
+    CartridgeFASC(const uint8_t* image, Random& rng);
  
     /**
       Destructor
@@ -90,7 +91,7 @@ class CartridgeFASC : public Cartridge
 
       @param bank The bank that should be installed in the system
     */
-    virtual void bank(uInt16 bank);
+    virtual void bank(uint16_t bank);
 
     /**
       Get the current bank.
@@ -111,7 +112,7 @@ class CartridgeFASC : public Cartridge
       @param value    The value to place into the address
       @return    Success or failure of the patch operation
     */
-    virtual bool patch(uInt16 address, uInt8 value);
+    virtual bool patch(uint16_t address, uint8_t value);
 
     /**
       Access the internal ROM image for this cartridge.
@@ -119,7 +120,7 @@ class CartridgeFASC : public Cartridge
       @param size  Set to the size of the internal ROM image data
       @return  A pointer to the internal ROM image data
     */
-    virtual uInt8* getImage(int& size);
+    virtual uint8_t* getImage(int& size);
 
   public:
     /**
@@ -127,7 +128,7 @@ class CartridgeFASC : public Cartridge
 
       @return The byte at the specified address
     */
-    virtual uInt8 peek(uInt16 address);
+    virtual uint8_t peek(uint16_t address);
 
     /**
       Change the byte at the specified address to the given value
@@ -135,17 +136,17 @@ class CartridgeFASC : public Cartridge
       @param address The address where the value should be stored
       @param value The value to be stored at the address
     */
-    virtual void poke(uInt16 address, uInt8 value);
+    virtual void poke(uint16_t address, uint8_t value);
 
   private:
     // Indicates which bank is currently active
-    uInt16 myCurrentBank;
+    uint16_t myCurrentBank;
 
     // The 12K ROM image of the cartridge
-    uInt8 myImage[12288];
+    uint8_t myImage[12288];
 
     // The 256 bytes of RAM on the cartridge
-    uInt8 myRAM[256];
+    uint8_t myRAM[256];
 };
 
 #endif

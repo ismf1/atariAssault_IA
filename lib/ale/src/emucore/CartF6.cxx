@@ -18,17 +18,16 @@
 
 #include <cassert>
 
-#include "System.hxx"
-#include "Serializer.hxx"
-#include "Deserializer.hxx"
-#include "CartF6.hxx"
-using namespace std;
+#include "emucore/System.hxx"
+#include "emucore/Serializer.hxx"
+#include "emucore/Deserializer.hxx"
+#include "emucore/CartF6.hxx"
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-CartridgeF6::CartridgeF6(const uInt8* image)
+CartridgeF6::CartridgeF6(const uint8_t* image)
 {
   // Copy the ROM image into my buffer
-  for(uInt32 addr = 0; addr < 16384; ++addr)
+  for(uint32_t addr = 0; addr < 16384; ++addr)
   {
     myImage[addr] = image[addr];
   }
@@ -56,15 +55,15 @@ void CartridgeF6::reset()
 void CartridgeF6::install(System& system)
 {
   mySystem = &system;
-  uInt16 shift = mySystem->pageShift();
-  uInt16 mask = mySystem->pageMask();
+  uint16_t shift = mySystem->pageShift();
+  uint16_t mask = mySystem->pageMask();
 
   // Make sure the system we're being installed in has a page size that'll work
   assert((0x1000 & mask) == 0);
 
   // Set the page accessing methods for the hot spots
   System::PageAccess access;
-  for(uInt32 i = (0x1FF6 & ~mask); i < 0x2000; i += (1 << shift))
+  for(uint32_t i = (0x1FF6 & ~mask); i < 0x2000; i += (1 << shift))
   {
     access.directPeekBase = 0;
     access.directPokeBase = 0;
@@ -77,7 +76,7 @@ void CartridgeF6::install(System& system)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt8 CartridgeF6::peek(uInt16 address)
+uint8_t CartridgeF6::peek(uint16_t address)
 {
   address = address & 0x0FFF;
 
@@ -112,7 +111,7 @@ uInt8 CartridgeF6::peek(uInt16 address)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void CartridgeF6::poke(uInt16 address, uInt8)
+void CartridgeF6::poke(uint16_t address, uint8_t)
 {
   address = address & 0x0FFF;
 
@@ -147,7 +146,7 @@ void CartridgeF6::poke(uInt16 address, uInt8)
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool CartridgeF6::save(Serializer& out)
 {
-  string cart = name();
+  std::string cart = name();
 
   try
   {
@@ -157,12 +156,12 @@ bool CartridgeF6::save(Serializer& out)
   }
   catch(const char* msg)
   {
-    ale::Logger::Error << msg << endl;
+    ale::Logger::Error << msg << std::endl;
     return false;
   }
   catch(...)
   {
-    ale::Logger::Error << "Unknown error in save state for " << cart << endl;
+    ale::Logger::Error << "Unknown error in save state for " << cart << std::endl;
     return false;
   }
 
@@ -172,23 +171,23 @@ bool CartridgeF6::save(Serializer& out)
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool CartridgeF6::load(Deserializer& in)
 {
-  string cart = name();
+  std::string cart = name();
 
   try
   {
     if(in.getString() != cart)
       return false;
 
-    myCurrentBank = (uInt16) in.getInt();
+    myCurrentBank = (uint16_t) in.getInt();
   }
   catch(const char* msg)
   {
-    ale::Logger::Error << msg << endl;
+    ale::Logger::Error << msg << std::endl;
     return false;
   }
   catch(...)
   {
-    ale::Logger::Error << "Unknown error in load state for " << cart << endl;
+    ale::Logger::Error << "Unknown error in load state for " << cart << std::endl;
     return false;
   }
 
@@ -199,15 +198,15 @@ bool CartridgeF6::load(Deserializer& in)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void CartridgeF6::bank(uInt16 bank)
+void CartridgeF6::bank(uint16_t bank)
 { 
   if(bankLocked) return;
 
   // Remember what bank we're in
   myCurrentBank = bank;
-  uInt16 offset = myCurrentBank * 4096;
-  uInt16 shift = mySystem->pageShift();
-  uInt16 mask = mySystem->pageMask();
+  uint16_t offset = myCurrentBank * 4096;
+  uint16_t shift = mySystem->pageShift();
+  uint16_t mask = mySystem->pageMask();
 
   // Setup the page access methods for the current bank
   System::PageAccess access;
@@ -215,7 +214,7 @@ void CartridgeF6::bank(uInt16 bank)
   access.directPokeBase = 0;
 
   // Map ROM image into the system
-  for(uInt32 address = 0x1000; address < (0x1FF6U & ~mask);
+  for(uint32_t address = 0x1000; address < (0x1FF6U & ~mask);
       address += (1 << shift))
   {
     access.directPeekBase = &myImage[offset + (address & 0x0FFF)];
@@ -236,7 +235,7 @@ int CartridgeF6::bankCount()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartridgeF6::patch(uInt16 address, uInt8 value)
+bool CartridgeF6::patch(uint16_t address, uint8_t value)
 {
   address = address & 0x0FFF;
   myImage[myCurrentBank * 4096 + address] = value;
@@ -244,7 +243,7 @@ bool CartridgeF6::patch(uInt16 address, uInt8 value)
 } 
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt8* CartridgeF6::getImage(int& size)
+uint8_t* CartridgeF6::getImage(int& size)
 {
   size = 16384;
   return &myImage[0];

@@ -19,7 +19,6 @@
 #ifndef EVENT_HXX
 #define EVENT_HXX
 
-#include "m6502/src/bspf/src/bspf.hxx"
 
 class Event;
 
@@ -37,8 +36,7 @@ class Event
     */
     enum Type
     {
-      NoType,
-      ConsoleOn, ConsoleOff, ConsoleColor, ConsoleBlackWhite,
+      ConsoleColor, ConsoleBlackWhite,
       ConsoleLeftDifficultyA, ConsoleLeftDifficultyB,
       ConsoleRightDifficultyA, ConsoleRightDifficultyB,
       ConsoleSelect, ConsoleReset,
@@ -48,9 +46,6 @@ class Event
       JoystickOneUp, JoystickOneDown, JoystickOneLeft,
       JoystickOneRight, JoystickOneFire,
 
-      BoosterGripZeroTrigger, BoosterGripZeroBooster,
-      BoosterGripOneTrigger, BoosterGripOneBooster,
-
       PaddleZeroResistance, PaddleZeroFire,
         PaddleZeroDecrease, PaddleZeroIncrease, PaddleZeroAnalog,
       PaddleOneResistance, PaddleOneFire,
@@ -59,28 +54,6 @@ class Event
         PaddleTwoDecrease, PaddleTwoIncrease, PaddleTwoAnalog,
       PaddleThreeResistance, PaddleThreeFire,
         PaddleThreeDecrease, PaddleThreeIncrease, PaddleThreeAnalog,
-
-      KeyboardZero1, KeyboardZero2, KeyboardZero3,
-      KeyboardZero4, KeyboardZero5, KeyboardZero6,
-      KeyboardZero7, KeyboardZero8, KeyboardZero9,
-      KeyboardZeroStar, KeyboardZero0, KeyboardZeroPound,
-
-      KeyboardOne1, KeyboardOne2, KeyboardOne3,
-      KeyboardOne4, KeyboardOne5, KeyboardOne6,
-      KeyboardOne7, KeyboardOne8, KeyboardOne9,
-      KeyboardOneStar, KeyboardOne0, KeyboardOnePound,
-
-      DrivingZeroClockwise, DrivingZeroCounterClockwise, DrivingZeroValue, 
-      DrivingZeroFire,
-      DrivingOneClockwise, DrivingOneCounterClockwise, DrivingOneValue,
-      DrivingOneFire,
-      
-      ChangeState, LoadState, SaveState, TakeSnapshot, Quit,
-      PauseMode, MenuMode, CmdMenuMode, DebuggerMode, LauncherMode,
-      Fry, VolumeDecrease, VolumeIncrease,
-
-      UIUp, UIDown, UILeft, UIRight, UIHome, UIEnd, UIPgUp, UIPgDown,
-      UISelect, UINavPrev, UINavNext, UIOK, UICancel,
 
       LastType
     };
@@ -100,12 +73,12 @@ class Event
     /**
       Get the value associated with the event of the specified type
     */
-    virtual Int32 get(Type type) const;
+    virtual int get(Type type) const;
 
     /**
       Set the value associated with the event of the specified type
     */
-    virtual void set(Type type, Int32 value);
+    virtual void set(Type type, int value);
 
     /**
       Clears the event array (resets to initial state)
@@ -114,10 +87,10 @@ class Event
 
   protected:
     // Number of event types there are
-    const Int32 myNumberOfTypes;
+    const int myNumberOfTypes;
 
     // Array of values associated with each event type
-    Int32 myValues[LastType];
+    int myValues[LastType];
 };
 
 #endif

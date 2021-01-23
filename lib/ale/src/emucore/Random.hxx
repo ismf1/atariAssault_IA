@@ -19,10 +19,11 @@
 #ifndef RANDOM_HXX
 #define RANDOM_HXX
 
-#include "m6502/src/bspf/src/bspf.hxx"
 
 class Serializer;
 class Deserializer;
+
+#include <cstdint>
 
 /**
   This Random class uses a Mersenne Twister to provide pseudorandom numbers.
@@ -38,7 +39,7 @@ class Random
 
       @param value The value to seed the random number generator with
     */
-    void seed(uInt32 value);
+    void seed(uint32_t value);
 
     /**
       Create a new random number generator
@@ -52,7 +53,7 @@ class Random
 
       @return A random number
     */
-    uInt32 next();
+    uint32_t next();
 
     /**
       Answer the next random number between 0 and 1 from the random number generator
@@ -60,10 +61,6 @@ class Random
       @return A random number between 0 and 1
     */
     double nextDouble();
-
-    // Returns a static Random object. DO NOT USE THIS. This is mostly meant for use by the
-    // code for the various cartridges. 
-    static Random& getInstance();
 
     /**
       Serializes the RNG state.
@@ -80,9 +77,6 @@ class Random
     // Actual rng (implementation hidden away from the header to avoid depending on rng libraries). 
     class Impl;
     Impl *m_pimpl;
-
-    // A static Random object. Don't use this.
-    static Random s_random;
 };
 #endif
 

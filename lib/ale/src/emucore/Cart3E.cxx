@@ -18,32 +18,30 @@
 
 #include <cassert>
 
-#include "Random.hxx"
-#include "System.hxx"
-#include "TIA.hxx"
-#include "Serializer.hxx"
-#include "Deserializer.hxx"
-#include "Cart3E.hxx"
-using namespace std;
+#include "emucore/Random.hxx"
+#include "emucore/System.hxx"
+#include "emucore/TIA.hxx"
+#include "emucore/Serializer.hxx"
+#include "emucore/Deserializer.hxx"
+#include "emucore/Cart3E.hxx"
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Cartridge3E::Cartridge3E(const uInt8* image, uInt32 size)
+Cartridge3E::Cartridge3E(const uint8_t* image, uint32_t size, Random& rng)
   : mySize(size)
 {
   // Allocate array for the ROM image
-  myImage = new uInt8[mySize];
+  myImage = new uint8_t[mySize];
 
   // Copy the ROM image into my buffer
-  for(uInt32 addr = 0; addr < mySize; ++addr)
+  for(uint32_t addr = 0; addr < mySize; ++addr)
   {
     myImage[addr] = image[addr];
   }
 
   // Initialize RAM with random values
-  class Random& random = Random::getInstance();
-  for(uInt32 i = 0; i < 32768; ++i)
+  for(uint32_t i = 0; i < 32768; ++i)
   {
-    myRam[i] = random.next();
+    myRam[i] = rng.next();
   }
 }
 
@@ -70,8 +68,8 @@ void Cartridge3E::reset()
 void Cartridge3E::install(System& system)
 {
   mySystem = &system;
-  uInt16 shift = mySystem->pageShift();
-  uInt16 mask = mySystem->pageMask();
+  uint16_t shift = mySystem->pageShift();
+  uint16_t mask = mySystem->pageMask();
 
   // Make sure the system we're being installed in has a page size that'll work
   assert((0x1800 & mask) == 0);
@@ -80,7 +78,7 @@ void Cartridge3E::install(System& system)
   // I would need to chain any accesses below 0x40 to the TIA but for
   // now I'll just forget about them)
   System::PageAccess access;
-  for(uInt32 i = 0x00; i < 0x40; i += (1 << shift))
+  for(uint32_t i = 0x00; i < 0x40; i += (1 << shift))
   {
     access.directPeekBase = 0;
     access.directPokeBase = 0;
@@ -89,7 +87,7 @@ void Cartridge3E::install(System& system)
   }
 
   // Setup the second segment to always point to the last ROM slice
-  for(uInt32 j = 0x1800; j < 0x2000; j += (1 << shift))
+  for(uint32_t j = 0x1800; j < 0x2000; j += (1 << shift))
   {
     access.device = this;
     access.directPeekBase = &myImage[(mySize - 2048) + (j & 0x07FF)];
@@ -102,7 +100,7 @@ void Cartridge3E::install(System& system)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt8 Cartridge3E::peek(uInt16 address)
+uint8_t Cartridge3E::peek(uint16_t address)
 {
   address = address & 0x0FFF;
 
@@ -120,7 +118,7 @@ uInt8 Cartridge3E::peek(uInt16 address)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Cartridge3E::poke(uInt16 address, uInt8 value)
+void Cartridge3E::poke(uint16_t address, uint8_t value)
 {
   address = address & 0x0FFF;
 
@@ -145,7 +143,7 @@ void Cartridge3E::poke(uInt16 address, uInt8 value)
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool Cartridge3E::save(Serializer& out)
 {
-  string cart = name();
+  std::string cart = name();
 
   try
   {
@@ -154,17 +152,17 @@ bool Cartridge3E::save(Serializer& out)
 
     // Output RAM
     out.putInt(32768);
-    for(uInt32 addr = 0; addr < 32768; ++addr)
+    for(uint32_t addr = 0; addr < 32768; ++addr)
       out.putInt(myRam[addr]);
   }
   catch(const char* msg)
   {
-    ale::Logger::Error << msg << endl;
+    ale::Logger::Error << msg << std::endl;
     return false;
   }
   catch(...)
   {
-    ale::Logger::Error << "Unknown error in save state for " << cart << endl;
+    ale::Logger::Error << "Unknown error in save state for " << cart << std::endl;
     return false;
   }
 
@@ -174,28 +172,28 @@ bool Cartridge3E::save(Serializer& out)
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool Cartridge3E::load(Deserializer& in)
 {
-  string cart = name();
+  std::string cart = name();
 
   try
   {
     if(in.getString() != cart)
       return false;
 
-    myCurrentBank = (uInt16) in.getInt();
+    myCurrentBank = (uint16_t) in.getInt();
 
     // Input RAM
-    uInt32 limit = (uInt32) in.getInt();
-    for(uInt32 addr = 0; addr < limit; ++addr)
-      myRam[addr] = (uInt8) in.getInt();
+    uint32_t limit = (uint32_t) in.getInt();
+    for(uint32_t addr = 0; addr < limit; ++addr)
+      myRam[addr] = (uint8_t) in.getInt();
   }
   catch(const char* msg)
   {
-    ale::Logger::Error << msg << endl;
+    ale::Logger::Error << msg << std::endl;
     return false;
   }
   catch(...)
   {
-    ale::Logger::Error << "Unknown error in load state for " << cart << endl;
+    ale::Logger::Error << "Unknown error in load state for " << cart << std::endl;
     return false;
   }
 
@@ -206,14 +204,14 @@ bool Cartridge3E::load(Deserializer& in)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Cartridge3E::bank(uInt16 bank)
+void Cartridge3E::bank(uint16_t bank)
 { 
   if(bankLocked) return;
 
   if(bank < 256)
   {
     // Make sure the bank they're asking for is reasonable
-    if((uInt32)bank * 2048 < mySize)
+    if((uint32_t)bank * 2048 < mySize)
     {
       myCurrentBank = bank;
     }
@@ -224,8 +222,8 @@ void Cartridge3E::bank(uInt16 bank)
       myCurrentBank = bank % (mySize / 2048);
     }
   
-    uInt32 offset = myCurrentBank * 2048;
-    uInt16 shift = mySystem->pageShift();
+    uint32_t offset = myCurrentBank * 2048;
+    uint16_t shift = mySystem->pageShift();
   
     // Setup the page access methods for the current bank
     System::PageAccess access;
@@ -233,7 +231,7 @@ void Cartridge3E::bank(uInt16 bank)
     access.directPokeBase = 0;
   
     // Map ROM image into the system
-    for(uInt32 address = 0x1000; address < 0x1800; address += (1 << shift))
+    for(uint32_t address = 0x1000; address < 0x1800; address += (1 << shift))
     {
       access.directPeekBase = &myImage[offset + (address & 0x07FF)];
       mySystem->setPageAccess(address >> shift, access);
@@ -245,9 +243,9 @@ void Cartridge3E::bank(uInt16 bank)
     bank %= 32;
     myCurrentBank = bank + 256;
 
-    uInt32 offset = bank * 1024;
-    uInt16 shift = mySystem->pageShift();
-    uInt32 address;
+    uint32_t offset = bank * 1024;
+    uint16_t shift = mySystem->pageShift();
+    uint32_t address;
   
     // Setup the page access methods for the current bank
     System::PageAccess access;
@@ -285,7 +283,7 @@ int Cartridge3E::bankCount()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool Cartridge3E::patch(uInt16 address, uInt8 value)
+bool Cartridge3E::patch(uint16_t address, uint8_t value)
 {
   address = address & 0x0FFF;
   if(address < 0x0800)
@@ -303,7 +301,7 @@ bool Cartridge3E::patch(uInt16 address, uInt8 value)
 } 
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt8* Cartridge3E::getImage(int& size)
+uint8_t* Cartridge3E::getImage(int& size)
 {
   size = mySize;
   return &myImage[0];

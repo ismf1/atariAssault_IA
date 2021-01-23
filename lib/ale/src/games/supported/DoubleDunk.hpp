@@ -15,93 +15,95 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  * *****************************************************************************
  * A.L.E (Arcade Learning Environment)
- * Copyright (c) 2009-2013 by Yavar Naddaf, Joel Veness, Marc G. Bellemare and 
+ * Copyright (c) 2009-2013 by Yavar Naddaf, Joel Veness, Marc G. Bellemare and
  *   the Reinforcement Learning and Artificial Intelligence Laboratory
- * Released under the GNU General Public License; see License.txt for details. 
+ * Released under the GNU General Public License; see License.txt for details.
  *
  * Based on: Stella  --  "An Atari 2600 VCS Emulator"
  * Copyright (c) 1995-2007 by Bradford W. Mott and the Stella team
  *
  * *****************************************************************************
  */
+
 #ifndef __DOUBLEDUNK_HPP__
 #define __DOUBLEDUNK_HPP__
 
-#include "../RomSettings.hpp"
+#include "games/RomSettings.hpp"
 
+namespace ale {
 
 /* RL wrapper for Double Dunk settings */
 class DoubleDunkSettings : public RomSettings {
+ public:
+  DoubleDunkSettings();
 
-    public:
+  // reset
+  void reset() override;
 
-        DoubleDunkSettings();
+  // is end of game
+  bool isTerminal() const override;
 
-        // reset
-        void reset();
+  // get the most recently observed reward
+  reward_t getReward() const override;
 
-        // is end of game
-        bool isTerminal() const;
+  // the rom-name
+  const char* rom() const override { return "double_dunk"; }
 
-        // get the most recently observed reward
-        reward_t getReward() const;
+  // The md5 checksum of the ROM that this game supports
+  const char* md5() const override { return "368d88a6c071caba60b4f778615aae94"; }
 
-        // the rom-name
-        const char* rom() const { return "double_dunk"; }
+  // get the available number of modes
+  unsigned int getNumModes() const { return 16; }
 
-        // get the available number of modes
-        unsigned int getNumModes() const { return 16; }
+  // create a new instance of the rom
+  RomSettings* clone() const override;
 
-        // create a new instance of the rom
-        RomSettings* clone() const;
+  // is an action part of the minimal set?
+  bool isMinimal(const Action& a) const override;
 
-        // is an action part of the minimal set?
-        bool isMinimal(const Action& a) const;
+  // process the latest information from ALE
+  void step(const System& system) override;
 
-        // process the latest information from ALE
-        void step(const System& system);
+  // saves the state of the rom settings
+  void saveState(Serializer& ser) override;
 
-        // saves the state of the rom settings
-        void saveState(Serializer & ser);
-    
-        // loads the state of the rom settings
-        void loadState(Deserializer & ser);
+  // loads the state of the rom settings
+  void loadState(Deserializer& ser) override;
 
-        ActionVect getStartingActions();
+  ActionVect getStartingActions() override;
 
-        virtual int lives() { return 0; }
+  int lives() override { return 0; }
 
-        // returns a list of mode that the game can be played in
-        // in this game, there are 16 available modes
-        ModeVect getAvailableModes();
+  // returns a list of mode that the game can be played in
+  // in this game, there are 16 available modes
+  ModeVect getAvailableModes() override;
 
-        // set the mode of the game
-        // the given mode must be one returned by the previous function
-        void setMode(game_mode_t, System &system,
-                     std::unique_ptr<StellaEnvironmentWrapper> environment); 
+  // set the mode of the game
+  // the given mode must be one returned by the previous function
+  void setMode(game_mode_t, System& system,
+               std::unique_ptr<StellaEnvironmentWrapper> environment) override;
 
+ private:
+  bool m_terminal;
+  reward_t m_reward;
+  reward_t m_score;
 
-    private:
+  // this game has a menu that allows to define various yes/no options
+  // this function goes to the next option in the menu
+  void goDown(System& system,
+              std::unique_ptr<StellaEnvironmentWrapper>& environment);
 
-        bool m_terminal;
-        reward_t m_reward;
-        reward_t m_score;
+  // once we are at the proper option in the menu,
+  // if we want to enable it all we have to do is to go right
+  void activateOption(System& system, unsigned int bitOfInterest,
+                      std::unique_ptr<StellaEnvironmentWrapper>& environment);
 
-        // this game has a menu that allows to define various yes/no options
-        // this function goes to the next option in the menu
-        void goDown(System &system,
-            std::unique_ptr<StellaEnvironmentWrapper> &environment);
-
-        // once we are at the proper option in the menu,
-        // if we want to enable it all we have to do is to go right
-        void activateOption(System &system, unsigned int bitOfInterest,
-            std::unique_ptr<StellaEnvironmentWrapper> &environment);
-
-        // once we are at the proper optio in the menu,
-        // if we want to disable it all we have to do is to go left
-        void deactivateOption(System &system, unsigned int bitOfInterest,
-            std::unique_ptr<StellaEnvironmentWrapper> &environment);
+  // once we are at the proper optio in the menu,
+  // if we want to disable it all we have to do is to go left
+  void deactivateOption(System& system, unsigned int bitOfInterest,
+                        std::unique_ptr<StellaEnvironmentWrapper>& environment);
 };
 
-#endif // __DOUBLEDUNK_HPP__
+}  // namespace ale
 
+#endif  // __DOUBLEDUNK_HPP__

@@ -18,31 +18,28 @@
 
 #include <cassert>
 
-#include "Random.hxx"
-#include "System.hxx"
-#include "Serializer.hxx"
-#include "Deserializer.hxx"
-#include "CartCV.hxx"
-using namespace std;
+#include "emucore/Random.hxx"
+#include "emucore/System.hxx"
+#include "emucore/Serializer.hxx"
+#include "emucore/Deserializer.hxx"
+#include "emucore/CartCV.hxx"
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-CartridgeCV::CartridgeCV(const uInt8* image, uInt32 size)
+CartridgeCV::CartridgeCV(const uint8_t* image, uint32_t size, Random& rng)
 {
-  uInt32 addr;
+  uint32_t addr;
   if(size == 2048)
   {
     // Copy the ROM image into my buffer
-    for(uInt32 addr = 0; addr < 2048; ++addr)
+    for(uint32_t addr = 0; addr < 2048; ++addr)
     {
       myImage[addr] = image[addr];
     }
 
     // Initialize RAM with random values
-  class Random& random = Random::getInstance();
-
-    for(uInt32 i = 0; i < 1024; ++i)
+    for(uint32_t i = 0; i < 1024; ++i)
     {
-      myRAM[i] = random.next();
+      myRAM[i] = rng.next();
     }
   }
   else if(size == 4096)
@@ -85,8 +82,8 @@ void CartridgeCV::reset()
 void CartridgeCV::install(System& system)
 {
   mySystem = &system;
-  uInt16 shift = mySystem->pageShift();
-  uInt16 mask = mySystem->pageMask();
+  uint16_t shift = mySystem->pageShift();
+  uint16_t mask = mySystem->pageMask();
 
   // Make sure the system we're being installed in has a page size that'll work
   assert((0x1800 & mask) == 0);
@@ -96,14 +93,14 @@ void CartridgeCV::install(System& system)
   access.device = this;
 
   // Map ROM image into the system
-  for(uInt32 address = 0x1800; address < 0x2000; address += (1 << shift))
+  for(uint32_t address = 0x1800; address < 0x2000; address += (1 << shift))
   {
     access.directPeekBase = &myImage[address & 0x07FF];
     mySystem->setPageAccess(address >> mySystem->pageShift(), access);
   }
 
   // Set the page accessing method for the RAM writing pages
-  for(uInt32 j = 0x1400; j < 0x1800; j += (1 << shift))
+  for(uint32_t j = 0x1400; j < 0x1800; j += (1 << shift))
   {
     access.device = this;
     access.directPeekBase = 0;
@@ -112,7 +109,7 @@ void CartridgeCV::install(System& system)
   }
 
   // Set the page accessing method for the RAM reading pages
-  for(uInt32 k = 0x1000; k < 0x1400; k += (1 << shift))
+  for(uint32_t k = 0x1000; k < 0x1400; k += (1 << shift))
   {
     access.device = this;
     access.directPeekBase = &myRAM[k & 0x03FF];
@@ -122,13 +119,13 @@ void CartridgeCV::install(System& system)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt8 CartridgeCV::peek(uInt16 address)
+uint8_t CartridgeCV::peek(uint16_t address)
 {
   return myImage[address & 0x07FF];
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void CartridgeCV::poke(uInt16, uInt8)
+void CartridgeCV::poke(uint16_t, uint8_t)
 {
   // This is ROM so poking has no effect :-)
 }
@@ -136,7 +133,7 @@ void CartridgeCV::poke(uInt16, uInt8)
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool CartridgeCV::save(Serializer& out)
 {
-  string cart = name();
+  std::string cart = name();
 
   try
   {
@@ -144,17 +141,17 @@ bool CartridgeCV::save(Serializer& out)
 
     // Output RAM
     out.putInt(1024);
-    for(uInt32 addr = 0; addr < 1024; ++addr)
+    for(uint32_t addr = 0; addr < 1024; ++addr)
       out.putInt(myRAM[addr]);
   }
   catch(const char* msg)
   {
-    ale::Logger::Error << msg << endl;
+    ale::Logger::Error << msg << std::endl;
     return false;
   }
   catch(...)
   {
-    ale::Logger::Error << "Unknown error in save state for " << cart << endl;
+    ale::Logger::Error << "Unknown error in save state for " << cart << std::endl;
     return false;
   }
 
@@ -164,7 +161,7 @@ bool CartridgeCV::save(Serializer& out)
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool CartridgeCV::load(Deserializer& in)
 {
-  string cart = name();
+  std::string cart = name();
 
   try
   {
@@ -172,18 +169,18 @@ bool CartridgeCV::load(Deserializer& in)
       return false;
 
     // Input RAM
-    uInt32 limit = (uInt32) in.getInt();
-    for(uInt32 addr = 0; addr < limit; ++addr)
-      myRAM[addr] = (uInt8) in.getInt();
+    uint32_t limit = (uint32_t) in.getInt();
+    for(uint32_t addr = 0; addr < limit; ++addr)
+      myRAM[addr] = (uint8_t) in.getInt();
   }
   catch(const char* msg)
   {
-    ale::Logger::Error << msg << endl;
+    ale::Logger::Error << msg << std::endl;
     return false;
   }
   catch(...)
   {
-    ale::Logger::Error << "Unknown error in load state for " << cart << endl;
+    ale::Logger::Error << "Unknown error in load state for " << cart << std::endl;
     return false;
   }
 
@@ -191,7 +188,7 @@ bool CartridgeCV::load(Deserializer& in)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void CartridgeCV::bank(uInt16 bank)
+void CartridgeCV::bank(uint16_t bank)
 {
   // Doesn't support bankswitching
 }
@@ -210,14 +207,14 @@ int CartridgeCV::bankCount()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartridgeCV::patch(uInt16 address, uInt8 value)
+bool CartridgeCV::patch(uint16_t address, uint8_t value)
 {
   myImage[address & 0x07FF] = value;
   return true;
 } 
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt8* CartridgeCV::getImage(int& size)
+uint8_t* CartridgeCV::getImage(int& size)
 {
   size = 2048;
   return &myImage[0];

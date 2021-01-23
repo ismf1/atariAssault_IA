@@ -19,14 +19,14 @@
 #ifndef VIDMODE_LIST_HXX
 #define VIDMODE_LIST_HXX
 
-#include "Array.hxx"
-#include "../emucore/m6502/src/bspf/src/bspf.hxx"
+#include <vector>
+
 
 struct VideoMode {
-  uInt32 image_x, image_y, image_w, image_h;
-  uInt32 screen_w, screen_h;
-  uInt32 zoom;
-  string name;
+  uint32_t image_x, image_y, image_w, image_h;
+  uint32_t screen_w, screen_h;
+  uint32_t zoom;
+  std::string name;
 };
 
 /**
@@ -46,7 +46,7 @@ class VideoModeList
 
     bool isEmpty() const { return myModeList.isEmpty(); }
 
-    uInt32 size() const { return myModeList.size(); }
+    uint32_t size() const { return myModeList.size(); }
 
     const VideoMode& previous()
     {
@@ -66,7 +66,7 @@ class VideoModeList
       return current();
     }
 
-    void setByResolution(uInt32 width, uInt32 height)
+    void setByResolution(uint32_t width, uint32_t height)
     {
       // Find the largest resolution able to hold the given bounds
       myIdx = myModeList.size() - 1;
@@ -80,7 +80,7 @@ class VideoModeList
       }
     }
 
-    void setByZoom(uInt32 zoom)
+    void setByZoom(uint32_t zoom)
     {
       // Find the largest zoom within the given bounds
       myIdx = 0;
@@ -95,7 +95,7 @@ class VideoModeList
     }
 
   private:
-    Common::Array<VideoMode> myModeList;
+    std::vector<VideoMode> myModeList;
     int myIdx;
 };
 

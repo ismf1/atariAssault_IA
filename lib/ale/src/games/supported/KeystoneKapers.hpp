@@ -1,65 +1,70 @@
 /* *****************************************************************************
  * A.L.E (Arcade Learning Environment)
- * Copyright (c) 2009-2013 by Yavar Naddaf, Joel Veness, Marc G. Bellemare and 
+ * Copyright (c) 2009-2013 by Yavar Naddaf, Joel Veness, Marc G. Bellemare and
  *   the Reinforcement Learning and Artificial Intelligence Laboratory
- * Released under the GNU General Public License; see License.txt for details. 
+ * Released under the GNU General Public License; see License.txt for details.
  *
  * Based on: Stella  --  "An Atari 2600 VCS Emulator"
  * Copyright (c) 1995-2007 by Bradford W. Mott and the Stella team
  *
  * *****************************************************************************
  */
+
 #ifndef __KEYSTONEKAPERS_HPP__
 #define __KEYSTONEKAPERS_HPP__
 
-#include "../RomSettings.hpp"
+#include "games/RomSettings.hpp"
 
+namespace ale {
 
 /* RL wrapper for KeystoneKapers */
 class KeystoneKapersSettings : public RomSettings {
+ public:
+  KeystoneKapersSettings();
 
-    public:
-        KeystoneKapersSettings();
+  // reset
+  void reset() override;
 
-        // reset
-        void reset();
+  // is end of game
+  bool isTerminal() const override;
 
-        // is end of game
-        bool isTerminal() const;
+  // get the most recently observed reward
+  reward_t getReward() const override;
 
-        // get the most recently observed reward
-        reward_t getReward() const;
+  // the rom-name
+  // MD5 be929419902e21bd7830a7a7d746195d
+  const char* rom() const override { return "keystone_kapers"; }
 
-        // the rom-name
-		// MD5 be929419902e21bd7830a7a7d746195d
-        const char* rom() const { return "keystone_kapers"; }
+  // The md5 checksum of the ROM that this game supports
+  const char* md5() const override { return "6c1f3f2e359dbf55df462ccbcdd2f6bf"; }
 
-        // create a new instance of the rom
-        RomSettings* clone() const;
+  // create a new instance of the rom
+  RomSettings* clone() const override;
 
-        // is an action part of the minimal set?
-        bool isMinimal(const Action& a) const;
+  // is an action part of the minimal set?
+  bool isMinimal(const Action& a) const override;
 
-        // process the latest information from ALE
-        void step(const System& system);
-        
-        // saves the state of the rom settings
-        void saveState(Serializer & ser);
-    
-        // loads the state of the rom settings
-        void loadState(Deserializer & ser);
+  // process the latest information from ALE
+  void step(const System& system) override;
 
-        // Keystone Kapers requires the reset button to start the game
-        ActionVect getStartingActions();
+  // saves the state of the rom settings
+  void saveState(Serializer& ser) override;
 
-        virtual int lives() { return isTerminal() ? 0 : m_lives; }
+  // loads the state of the rom settings
+  void loadState(Deserializer& ser) override;
 
-    private:
-        bool m_terminal;
-        reward_t m_reward;
-        reward_t m_score;
-        int m_lives;
+  // Keystone Kapers requires the reset button to start the game
+  ActionVect getStartingActions() override;
+
+  int lives() override { return isTerminal() ? 0 : m_lives; }
+
+ private:
+  bool m_terminal;
+  reward_t m_reward;
+  reward_t m_score;
+  int m_lives;
 };
 
-#endif // __KEYSTONEKAPERS_HPP__
+}  // namespace ale
 
+#endif  // __KEYSTONEKAPERS_HPP__

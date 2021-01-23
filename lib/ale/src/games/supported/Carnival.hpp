@@ -15,63 +15,66 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  * *****************************************************************************
  * A.L.E (Arcade Learning Environment)
- * Copyright (c) 2009-2013 by Yavar Naddaf, Joel Veness, Marc G. Bellemare and 
+ * Copyright (c) 2009-2013 by Yavar Naddaf, Joel Veness, Marc G. Bellemare and
  *   the Reinforcement Learning and Artificial Intelligence Laboratory
- * Released under the GNU General Public License; see License.txt for details. 
+ * Released under the GNU General Public License; see License.txt for details.
  *
  * Based on: Stella  --  "An Atari 2600 VCS Emulator"
  * Copyright (c) 1995-2007 by Bradford W. Mott and the Stella team
  *
  * *****************************************************************************
  */
+
 #ifndef __CARNIVAL_HPP__
 #define __CARNIVAL_HPP__
 
-#include "../RomSettings.hpp"
+#include "games/RomSettings.hpp"
 
+namespace ale {
 
 /* RL wrapper for Carnival settings */
 class CarnivalSettings : public RomSettings {
+ public:
+  CarnivalSettings();
 
-    public:
+  // reset
+  void reset() override;
 
-        CarnivalSettings();
+  // is end of game
+  bool isTerminal() const override;
 
-        // reset
-        void reset();
+  // get the most recently observed reward
+  reward_t getReward() const override;
 
-        // is end of game
-        bool isTerminal() const;
+  // the rom-name
+  const char* rom() const override { return "carnival"; }
 
-        // get the most recently observed reward
-        reward_t getReward() const;
+  // The md5 checksum of the ROM that this game supports
+  const char* md5() const override { return "028024fb8e5e5f18ea586652f9799c96"; }
 
-        // the rom-name
-        const char* rom() const { return "carnival"; }
+  // create a new instance of the rom
+  RomSettings* clone() const override;
 
-        // create a new instance of the rom
-        RomSettings* clone() const;
+  // is an action part of the minimal set?
+  bool isMinimal(const Action& a) const override;
 
-        // is an action part of the minimal set?
-        bool isMinimal(const Action& a) const;
+  // process the latest information from ALE
+  void step(const System& system) override;
 
-        // process the latest information from ALE
-        void step(const System& system);
+  // saves the state of the rom settings
+  void saveState(Serializer& ser) override;
 
-        // saves the state of the rom settings
-        void saveState(Serializer & ser);
-    
-        // loads the state of the rom settings
-        void loadState(Deserializer & ser);
+  // loads the state of the rom settings
+  void loadState(Deserializer& ser) override;
 
-        virtual int lives() { return 0; }
+  int lives() override { return 0; }
 
-    private:
-
-        bool m_terminal;
-        reward_t m_reward;
-        reward_t m_score;
+ private:
+  bool m_terminal;
+  reward_t m_reward;
+  reward_t m_score;
 };
 
-#endif // __CARNIVAL_HPP__
+}  // namespace ale
 
+#endif  // __CARNIVAL_HPP__

@@ -16,9 +16,9 @@
 // $Id: Joystick.cxx,v 1.7 2007/01/05 17:54:23 stephena Exp $
 //============================================================================
 
-#include <assert.h>
-#include "Event.hxx"
-#include "Joystick.hxx"
+#include <cassert>
+#include "emucore/Event.hxx"
+#include "emucore/Joystick.hxx"
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Joystick::Joystick(Jack jack, const Event& event)
@@ -62,7 +62,7 @@ bool Joystick::read(DigitalPin pin)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Int32 Joystick::read(AnalogPin)
+int Joystick::read(AnalogPin)
 {
   // Analog pins are not connect in joystick so we have infinite resistance 
   return maximumResistance;

@@ -19,8 +19,7 @@
 #ifndef JOYSTICK_HXX
 #define JOYSTICK_HXX
 
-#include "m6502/src/bspf/src/bspf.hxx"
-#include "Control.hxx"
+#include "emucore/Control.hxx"
 
 /**
   The standard Atari 2600 joystick controller.
@@ -60,7 +59,7 @@ class Joystick : public Controller
       @param pin The pin of the controller jack to read
       @return The resistance at the specified pin
     */
-    virtual Int32 read(AnalogPin pin);
+    virtual int read(AnalogPin pin);
 
     /**
       Write the given value to the specified digital pin for this

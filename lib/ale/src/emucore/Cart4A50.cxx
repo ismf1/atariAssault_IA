@@ -18,13 +18,13 @@
 
 #include <cassert>
 
-#include "System.hxx"
-#include "Serializer.hxx"
-#include "Deserializer.hxx"
-#include "Cart4A50.hxx"
+#include "emucore/System.hxx"
+#include "emucore/Serializer.hxx"
+#include "emucore/Deserializer.hxx"
+#include "emucore/Cart4A50.hxx"
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Cartridge4A50::Cartridge4A50(const uInt8* image)
+Cartridge4A50::Cartridge4A50(const uint8_t* image)
 {
 }
 
@@ -50,13 +50,13 @@ void Cartridge4A50::install(System& system)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt8 Cartridge4A50::peek(uInt16 address)
+uint8_t Cartridge4A50::peek(uint16_t address)
 {
   return 0;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Cartridge4A50::poke(uInt16, uInt8)
+void Cartridge4A50::poke(uint16_t, uint8_t)
 {
 } 
 
@@ -73,7 +73,7 @@ bool Cartridge4A50::load(Deserializer& in)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Cartridge4A50::bank(uInt16 b)
+void Cartridge4A50::bank(uint16_t b)
 {
 }
 
@@ -90,13 +90,13 @@ int Cartridge4A50::bankCount()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool Cartridge4A50::patch(uInt16 address, uInt8 value)
+bool Cartridge4A50::patch(uint16_t address, uint8_t value)
 {
   return false;
 } 
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt8* Cartridge4A50::getImage(int& size)
+uint8_t* Cartridge4A50::getImage(int& size)
 {
   size = 0;
   return 0;

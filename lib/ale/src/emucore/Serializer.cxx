@@ -16,8 +16,7 @@
 // $Id: Serializer.cxx,v 1.11 2007/01/01 18:04:49 stephena Exp $
 //============================================================================
 
-#include "Serializer.hxx"
-using namespace std;
+#include "emucore/Serializer.hxx"
 
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -53,11 +52,11 @@ void Serializer::putInt(int value)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Serializer::putString(const string& str)
+void Serializer::putString(const std::string& str)
 {
     int len = str.length();
     putInt(len);
-    myStream.write(str.data(), (streamsize)len);
+    myStream.write(str.data(), (std::streamsize)len);
     
     if(myStream.bad())
         throw "Serializer: file write failed";

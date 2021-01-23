@@ -23,7 +23,6 @@ class Controller;
 class Event;
 class System;
 
-#include "m6502/src/bspf/src/bspf.hxx"
 
 /**
   A controller is a device that plugs into either the left or right 
@@ -74,8 +73,7 @@ class Controller
     */
     enum Type
     {
-      BoosterGrip, Driving, Keyboard, Paddles, Joystick,
-      TrakBall, AtariVox
+      Paddles, Joystick
     };
 
   public:
@@ -136,7 +134,7 @@ class Controller
       @param pin The pin of the controller jack to read
       @return The resistance at the specified pin
     */
-    virtual Int32 read(AnalogPin pin) = 0;
+    virtual int read(AnalogPin pin) = 0;
 
     /**
       Write the given value to the specified digital pin for this 
@@ -150,10 +148,10 @@ class Controller
 
   public:
     /// Constant which represents maximum resistance for analog pins
-    static const Int32 maximumResistance;
+    static const int maximumResistance;
 
     /// Constant which represents minimum resistance for analog pins
-    static const Int32 minimumResistance;
+    static const int minimumResistance;
 
   protected:
     /// Specifies which jack the controller is plugged in

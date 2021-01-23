@@ -16,35 +16,32 @@
 // $Id: CartAR.cxx,v 1.18 2007/01/14 16:17:53 stephena Exp $
 //============================================================================
 
-#include <string.h>
-
+#include <string>
+#include <cstring>
 #include <cassert>
 
-#include "M6502Hi.hxx"
-#include "Random.hxx"
-#include "System.hxx"
-#include "Serializer.hxx"
-#include "Deserializer.hxx"
-#include "CartAR.hxx"
-using namespace std;
+#include "emucore/M6502Hi.hxx"
+#include "emucore/Random.hxx"
+#include "emucore/System.hxx"
+#include "emucore/Serializer.hxx"
+#include "emucore/Deserializer.hxx"
+#include "emucore/CartAR.hxx"
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-CartridgeAR::CartridgeAR(const uInt8* image, uInt32 size, bool fastbios)
+CartridgeAR::CartridgeAR(const uint8_t* image, uint32_t size, bool fastbios, Random& rng)
   : my6502(0)
 {
-  uInt32 i;
+  uint32_t i;
 
   // Create a load image buffer and copy the given image
-  myLoadImages = new uInt8[size];
+  myLoadImages = new uint8_t[size];
   myNumberOfLoadImages = size / 8448;
-  memcpy(myLoadImages, image, size);
+  std::memcpy(myLoadImages, image, size);
 
   // Initialize RAM with random values
-  class Random& random = Random::getInstance();
-
   for(i = 0; i < 6 * 1024; ++i)
   {
-    myImage[i] = random.next();
+    myImage[i] = rng.next();
   }
 
   // Initialize SC BIOS ROM
@@ -82,7 +79,7 @@ void CartridgeAR::reset()
 void CartridgeAR::systemCyclesReset()
 {
   // Get the current system cycle
-  uInt32 cycles = mySystem->cycles();
+  uint32_t cycles = mySystem->cycles();
 
   // Adjust cycle values
   myPowerRomCycle -= cycles;
@@ -92,8 +89,8 @@ void CartridgeAR::systemCyclesReset()
 void CartridgeAR::install(System& system)
 {
   mySystem = &system;
-  uInt16 shift = mySystem->pageShift();
-  uInt16 mask = mySystem->pageMask();
+  uint16_t shift = mySystem->pageShift();
+  uint16_t mask = mySystem->pageMask();
 
   my6502 = &(M6502High&)mySystem->m6502();
 
@@ -101,7 +98,7 @@ void CartridgeAR::install(System& system)
   assert((0x1000 & mask) == 0);
 
   System::PageAccess access;
-  for(uInt32 i = 0x1000; i < 0x2000; i += (1 << shift))
+  for(uint32_t i = 0x1000; i < 0x2000; i += (1 << shift))
   {
     access.directPeekBase = 0;
     access.directPokeBase = 0;
@@ -113,13 +110,13 @@ void CartridgeAR::install(System& system)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt8 CartridgeAR::peek(uInt16 addr)
+uint8_t CartridgeAR::peek(uint16_t addr)
 {
   // Is the "dummy" SC BIOS hotspot for reading a load being accessed?
   if(((addr & 0x1FFF) == 0x1850) && (myImageOffset[1] == (3 * 2048)))
   {
     // Get load that's being accessed (BIOS places load number at 0x80)
-    uInt8 load = mySystem->peek(0x0080);
+    uint8_t load = mySystem->peek(0x0080);
 
     // Read the specified load into RAM
     loadIntoRAM(load);
@@ -164,7 +161,7 @@ uInt8 CartridgeAR::peek(uInt16 addr)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void CartridgeAR::poke(uInt16 addr, uInt8)
+void CartridgeAR::poke(uint16_t addr, uint8_t)
 {
   // Cancel any pending write if more than 5 distinct accesses have occurred
   // TODO: Modify to handle when the distinct counter wraps around...
@@ -201,7 +198,7 @@ void CartridgeAR::poke(uInt16 addr, uInt8)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void CartridgeAR::bankConfiguration(uInt8 configuration)
+void CartridgeAR::bankConfiguration(uint8_t configuration)
 {
   // D7-D5 of this byte: Write Pulse Delay (n/a for emulator)
   //
@@ -296,7 +293,7 @@ void CartridgeAR::bankConfiguration(uInt8 configuration)
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void CartridgeAR::initializeROM(bool fastbios)
 {
-  static uInt8 dummyROMCode[] = {
+  static uint8_t dummyROMCode[] = {
     0xa5, 0xfa, 0x85, 0x80, 0x4c, 0x18, 0xf8, 0xff, 
     0xff, 0xff, 0x78, 0xd8, 0xa0, 0x0, 0xa2, 0x0, 
     0x94, 0x0, 0xe8, 0xd0, 0xfb, 0x4c, 0x50, 0xf8, 
@@ -341,16 +338,16 @@ void CartridgeAR::initializeROM(bool fastbios)
   if(fastbios)
     dummyROMCode[189] = 0x0;
 
-  uInt32 size = sizeof(dummyROMCode);
+  uint32_t size = sizeof(dummyROMCode);
 
   // Initialize ROM with illegal 6502 opcode that causes a real 6502 to jam
-  for(uInt32 i = 0; i < 2048; ++i)
+  for(uint32_t i = 0; i < 2048; ++i)
   {
     myImage[3 * 2048 + i] = 0x02; 
   }
 
   // Copy the "dummy" Supercharger BIOS code into the ROM area
-  for(uInt32 j = 0; j < size; ++j)
+  for(uint32_t j = 0; j < size; ++j)
   {
     myImage[3 * 2048 + j] = dummyROMCode[j];
   }
@@ -363,11 +360,11 @@ void CartridgeAR::initializeROM(bool fastbios)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt8 CartridgeAR::checksum(uInt8* s, uInt16 length)
+uint8_t CartridgeAR::checksum(uint8_t* s, uint16_t length)
 {
-  uInt8 sum = 0;
+  uint8_t sum = 0;
 
-  for(uInt32 i = 0; i < length; ++i)
+  for(uint32_t i = 0; i < length; ++i)
   {
     sum += s[i];
   }
@@ -376,9 +373,9 @@ uInt8 CartridgeAR::checksum(uInt8* s, uInt16 length)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void CartridgeAR::loadIntoRAM(uInt8 load)
+void CartridgeAR::loadIntoRAM(uint8_t load)
 {
-  uInt16 image;
+  uint16_t image;
 
   // Scan through all of the loads to see if we find the one we're looking for
   for(image = 0; image < myNumberOfLoadImages; ++image)
@@ -387,7 +384,7 @@ void CartridgeAR::loadIntoRAM(uInt8 load)
     if(myLoadImages[(image * 8448) + 8192 + 5] == load)
     {
       // Copy the load's header
-      memcpy(myHeader, myLoadImages + (image * 8448) + 8192, 256);
+      std::memcpy(myHeader, myLoadImages + (image * 8448) + 8192, 256);
 
       // Verify the load's header 
       if(checksum(myHeader, 8) != 0x55)
@@ -397,12 +394,12 @@ void CartridgeAR::loadIntoRAM(uInt8 load)
 
       // Load all of the pages from the load
       bool invalidPageChecksumSeen = false;
-      for(uInt32 j = 0; j < myHeader[3]; ++j)
+      for(uint32_t j = 0; j < myHeader[3]; ++j)
       {
-        uInt32 bank = myHeader[16 + j] & 0x03;
-        uInt32 page = (myHeader[16 + j] >> 2) & 0x07;
-        uInt8* src = myLoadImages + (image * 8448) + (j * 256);
-        uInt8 sum = checksum(src, 256) + myHeader[16 + j] + myHeader[64 + j];
+        uint32_t bank = myHeader[16 + j] & 0x03;
+        uint32_t page = (myHeader[16 + j] >> 2) & 0x07;
+        uint8_t* src = myLoadImages + (image * 8448) + (j * 256);
+        uint8_t sum = checksum(src, 256) + myHeader[16 + j] + myHeader[64 + j];
 
         if(!invalidPageChecksumSeen && (sum != 0x55))
         {
@@ -413,7 +410,7 @@ void CartridgeAR::loadIntoRAM(uInt8 load)
         // Copy page to Supercharger RAM (don't allow a copy into ROM area)
         if(bank < 3)
         {
-          memcpy(myImage + (bank * 2048) + (page * 256), src, 256);
+          std::memcpy(myImage + (bank * 2048) + (page * 256), src, 256);
         }
       }
 
@@ -435,11 +432,11 @@ void CartridgeAR::loadIntoRAM(uInt8 load)
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool CartridgeAR::save(Serializer& out)
 {
-  string cart = name();
+  std::string cart = name();
 
   try
   {
-    uInt32 i;
+    uint32_t i;
 
     out.putString(cart);
 
@@ -461,7 +458,7 @@ bool CartridgeAR::save(Serializer& out)
     // All of the 8448 byte loads associated with the game 
     // Note that the size of this array is myNumberOfLoadImages * 8448
     out.putInt(myNumberOfLoadImages * 8448);
-    for(i = 0; i < (uInt32) myNumberOfLoadImages * 8448; ++i)
+    for(i = 0; i < (uint32_t) myNumberOfLoadImages * 8448; ++i)
       out.putInt(myLoadImages[i]);
 
     // Indicates how many 8448 loads there are
@@ -487,12 +484,12 @@ bool CartridgeAR::save(Serializer& out)
   }
   catch(const char* msg)
   {
-    ale::Logger::Error << msg << endl;
+    ale::Logger::Error << msg << std::endl;
     return false;
   }
   catch(...)
   {
-    ale::Logger::Error << "Unknown error in save state for " << cart << endl;
+    ale::Logger::Error << "Unknown error in save state for " << cart << std::endl;
     return false;
   }
 
@@ -502,38 +499,38 @@ bool CartridgeAR::save(Serializer& out)
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool CartridgeAR::load(Deserializer& in)
 {
-  string cart = name();
+  std::string cart = name();
 
   try
   {
     if(in.getString() != cart)
       return false;
 
-    uInt32 i, limit;
+    uint32_t i, limit;
 
     // Indicates the offest within the image for the corresponding bank
-    limit = (uInt32) in.getInt();
+    limit = (uint32_t) in.getInt();
     for(i = 0; i < limit; ++i)
-      myImageOffset[i] = (uInt32) in.getInt();
+      myImageOffset[i] = (uint32_t) in.getInt();
 
     // The 6K of RAM and 2K of ROM contained in the Supercharger
-    limit = (uInt32) in.getInt();
+    limit = (uint32_t) in.getInt();
     for(i = 0; i < limit; ++i)
-      myImage[i] = (uInt8) in.getInt();
+      myImage[i] = (uint8_t) in.getInt();
 
     // The 256 byte header for the current 8448 byte load
-    limit = (uInt32) in.getInt();
+    limit = (uint32_t) in.getInt();
     for(i = 0; i < limit; ++i)
-      myHeader[i] = (uInt8) in.getInt();
+      myHeader[i] = (uint8_t) in.getInt();
 
     // All of the 8448 byte loads associated with the game 
     // Note that the size of this array is myNumberOfLoadImages * 8448
-    limit = (uInt32) in.getInt();
+    limit = (uint32_t) in.getInt();
     for(i = 0; i < limit; ++i)
-      myLoadImages[i] = (uInt8) in.getInt();
+      myLoadImages[i] = (uint8_t) in.getInt();
 
     // Indicates how many 8448 loads there are
-    myNumberOfLoadImages = (uInt8) in.getInt();
+    myNumberOfLoadImages = (uint8_t) in.getInt();
 
     // Indicates if the RAM is write enabled
     myWriteEnabled = in.getBool();
@@ -542,25 +539,25 @@ bool CartridgeAR::load(Deserializer& in)
     myPower = in.getBool();
 
     // Indicates when the power was last turned on
-    myPowerRomCycle = (Int32) in.getInt();
+    myPowerRomCycle = (int) in.getInt();
 
     // Data hold register used for writing
-    myDataHoldRegister = (uInt8) in.getInt();
+    myDataHoldRegister = (uint8_t) in.getInt();
 
     // Indicates number of distinct accesses when data hold register was set
-    myNumberOfDistinctAccesses = (uInt32) in.getInt();
+    myNumberOfDistinctAccesses = (uint32_t) in.getInt();
 
     // Indicates if a write is pending or not
     myWritePending = in.getBool();
   }
   catch(const char* msg)
   {
-    ale::Logger::Error << msg << endl;
+    ale::Logger::Error << msg << std::endl;
     return false;
   }
   catch(...)
   {
-    ale::Logger::Error << "Unknown error in load state for " << cart << endl;
+    ale::Logger::Error << "Unknown error in load state for " << cart << std::endl;
     return false;
   }
 
@@ -568,7 +565,7 @@ bool CartridgeAR::load(Deserializer& in)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void CartridgeAR::bank(uInt16 bank)
+void CartridgeAR::bank(uint16_t bank)
 {
   if(bankLocked) return;
 
@@ -588,14 +585,14 @@ int CartridgeAR::bankCount()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartridgeAR::patch(uInt16 address, uInt8 value)
+bool CartridgeAR::patch(uint16_t address, uint8_t value)
 {
   // myImage[address & 0x0FFF] = value;
   return false;
 } 
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt8* CartridgeAR::getImage(int& size)
+uint8_t* CartridgeAR::getImage(int& size)
 {
   size = myNumberOfLoadImages * 8448;
   return &myLoadImages[0];

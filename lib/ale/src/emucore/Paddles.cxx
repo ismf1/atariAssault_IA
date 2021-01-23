@@ -16,8 +16,8 @@
 // $Id: Paddles.cxx,v 1.8 2007/01/05 17:54:23 stephena Exp $
 //============================================================================
 
-#include "Event.hxx"
-#include "Paddles.hxx"
+#include "emucore/Event.hxx"
+#include "emucore/Paddles.hxx"
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Paddles::Paddles(Jack jack, const Event& event, bool swap)
@@ -87,7 +87,7 @@ bool Paddles::read(DigitalPin pin)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Int32 Paddles::read(AnalogPin pin)
+int Paddles::read(AnalogPin pin)
 {
   switch(pin)
   {

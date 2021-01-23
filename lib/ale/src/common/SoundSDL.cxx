@@ -23,23 +23,20 @@
 #include <cmath>
 #include "SDL.h"
 
-#include "TIASnd.hxx"
+#include "emucore/TIASnd.hxx"
 // #include "FrameBuffer.hxx"
-#include "Serializer.hxx"
-#include "Deserializer.hxx"
-#include "Settings.hxx"
-#include "System.hxx"
-#include "OSystem.hxx"
+#include "emucore/Serializer.hxx"
+#include "emucore/Deserializer.hxx"
+#include "emucore/Settings.hxx"
+#include "emucore/System.hxx"
 
-#include "SoundSDL.hxx"
-#include "Log.hpp"
+#include "common/SoundSDL.hxx"
+#include "common/Log.hpp"
 
-using namespace std;
-using namespace ale;
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-SoundSDL::SoundSDL(OSystem* osystem)
-  : Sound(osystem),
-    myIsEnabled(osystem->settings().getBool("sound")),
+SoundSDL::SoundSDL(Settings* settings)
+  : Sound(settings),
+    myIsEnabled(settings->getBool("sound")),
     myIsInitializedFlag(false),
     myLastRegisterSetCycle(0),
     myDisplayFrameRate(60),
@@ -50,9 +47,9 @@ SoundSDL::SoundSDL(OSystem* osystem)
     myNumRecordSamplesNeeded(0)
 {
 
-    if (osystem->settings().getString("record_sound_filename").size() > 0) {
+    if (mySettings->getString("record_sound_filename").size() > 0) {
       
-        std::string filename = osystem->settings().getString("record_sound_filename");
+        std::string filename = mySettings->getString("record_sound_filename");
         mySoundExporter.reset(new ale::sound::SoundExporter(filename, myNumChannels));
     }
 }
@@ -68,7 +65,7 @@ SoundSDL::~SoundSDL()
 void SoundSDL::setEnabled(bool state)
 {
   myIsEnabled = state;
-  myOSystem->settings().setBool("sound", state);
+  mySettings->setBool("sound", state);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -78,8 +75,6 @@ void SoundSDL::initialize()
   if(!myIsEnabled)
   {
     close();
-    if(myOSystem->settings().getBool("showinfo"))
-      cerr << "Sound disabled." << endl << endl;
     return;
   }
 
@@ -95,15 +90,15 @@ void SoundSDL::initialize()
 
     if(SDL_InitSubSystem(SDL_INIT_AUDIO) < 0)
     {
-      Logger::Warning << "WARNING: Couldn't initialize SDL audio system! " << endl;
-      Logger::Warning << "         " << SDL_GetError() << endl;
+      ale::Logger::Warning << "WARNING: Couldn't initialize SDL audio system! " << std::endl;
+      ale::Logger::Warning << "         " << SDL_GetError() << std::endl;
       return;
     }
     else
     {
-      uInt32 fragsize = myOSystem->settings().getInt("fragsize");
-      Int32 frequency = myOSystem->settings().getInt("freq");
-      Int32 tiafreq   = myOSystem->settings().getInt("tiafreq");
+      uint32_t fragsize = mySettings->getInt("fragsize");
+      int frequency = mySettings->getInt("freq");
+      int tiafreq   = mySettings->getInt("tiafreq");
 
       SDL_AudioSpec desired;
       desired.freq   = frequency;
@@ -119,8 +114,8 @@ void SoundSDL::initialize()
 
       if(SDL_OpenAudio(&desired, &myHardwareSpec) < 0)
       {
-        Logger::Warning << "WARNING: Couldn't open SDL audio system! " << endl;
-        Logger::Warning << "         " << SDL_GetError() << endl;
+        ale::Logger::Warning << "WARNING: Couldn't open SDL audio system! " << std::endl;
+        ale::Logger::Warning << "         " << SDL_GetError() << std::endl;
         return;
       }
 
@@ -128,9 +123,9 @@ void SoundSDL::initialize()
       // will not work so we'll need to disable the audio support)
       if(((float)myHardwareSpec.samples / (float)myHardwareSpec.freq) >= 0.25)
       {
-        Logger::Warning << "WARNING: Sound device doesn't support realtime audio! Make ";
-        Logger::Warning << "sure a sound" << endl;
-        Logger::Warning << "         server isn't running.  Audio is disabled." << endl;
+        ale::Logger::Warning << "WARNING: Sound device doesn't support realtime audio! Make ";
+        ale::Logger::Warning << "sure a sound" << std::endl;
+        ale::Logger::Warning << "         server isn't running.  Audio is disabled." << std::endl;
 
         SDL_CloseAudio();
         return;
@@ -145,23 +140,12 @@ void SoundSDL::initialize()
       myTIASound.tiaFrequency(tiafreq);
       myTIASound.channels(myHardwareSpec.channels);
 
-      bool clipvol = myOSystem->settings().getBool("clipvol");
+      bool clipvol = mySettings->getBool("clipvol");
       myTIASound.clipVolume(clipvol);
 
       // Adjust volume to that defined in settings
-      myVolume = myOSystem->settings().getInt("volume");
+      myVolume = mySettings->getInt("volume");
       setVolume(myVolume);
-
-      // Show some info
-      if(myOSystem->settings().getBool("showinfo"))
-        cerr << "Sound enabled:"  << endl
-             << "  Volume     : " << myVolume << endl
-             << "  Frag size  : " << fragsize << endl
-             << "  Frequency  : " << myHardwareSpec.freq << endl
-             << "  Format     : " << myHardwareSpec.format << endl
-             << "  TIA Freq.  : " << tiafreq << endl
-             << "  Channels   : " << myNumChannels << endl
-             << "  Clip volume: " << (int)clipvol << endl << endl;
     }
   }
 
@@ -221,13 +205,13 @@ void SoundSDL::reset()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SoundSDL::setVolume(Int32 percent)
+void SoundSDL::setVolume(int percent)
 {
   if(myIsInitializedFlag)
   {
     if((percent >= 0) && (percent <= 100))
     {
-      myOSystem->settings().setInt("volume", percent);
+      mySettings->setInt("volume", percent);
       SDL_LockAudio();
       myVolume = percent;
       myTIASound.volume(percent);
@@ -237,12 +221,12 @@ void SoundSDL::setVolume(Int32 percent)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SoundSDL::adjustVolume(Int8 direction)
+void SoundSDL::adjustVolume(int8_t direction)
 {
-  ostringstream strval;
-  string message;
+  std::ostringstream strval;
+  std::string message;
 
-  Int32 percent = myVolume;
+  int percent = myVolume;
 
   if(direction == -1)
     percent -= 2;
@@ -253,29 +237,23 @@ void SoundSDL::adjustVolume(Int8 direction)
     return;
 
   setVolume(percent);
-
-  // Now show an onscreen message
-  // strval << percent;
-  // message = "Volume set to ";
-  // message += strval.str();
-  // myOSystem->frameBuffer().showMessage(message);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SoundSDL::adjustCycleCounter(Int32 amount)
+void SoundSDL::adjustCycleCounter(int amount)
 {
   myLastRegisterSetCycle += amount;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SoundSDL::setChannels(uInt32 channels)
+void SoundSDL::setChannels(uint32_t channels)
 {
   if(channels == 1 || channels == 2)
     myNumChannels = channels;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SoundSDL::setFrameRate(uInt32 framerate)
+void SoundSDL::setFrameRate(uint32_t framerate)
 {
   // FIXME, we should clear out the queue or adjust the values in it
   myDisplayFrameRate = framerate;
@@ -283,7 +261,7 @@ void SoundSDL::setFrameRate(uInt32 framerate)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SoundSDL::set(uInt16 addr, uInt8 value, Int32 cycle)
+void SoundSDL::set(uint16_t addr, uint8_t value, int cycle)
 {
   SDL_LockAudio();
 
@@ -296,7 +274,7 @@ void SoundSDL::set(uInt16 addr, uInt8 value, Int32 cycle)
   // the sound to "scale" correctly, we have to know the games real frame 
   // rate (e.g., 50 or 60) and the currently emulated frame rate. We use these
   // values to "scale" the time before the register change occurs.
-  delta = delta * (myDisplayFrameRate / (double)myOSystem->frameRate());
+  delta = delta * (myDisplayFrameRate / (double)myDisplayFrameRate);
   RegWrite info;
   info.addr = addr;
   info.value = value;
@@ -310,12 +288,12 @@ void SoundSDL::set(uInt16 addr, uInt8 value, Int32 cycle)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SoundSDL::processFragment(uInt8* stream, Int32 length)
+void SoundSDL::processFragment(uint8_t* stream, int length)
 {
   if(!myIsInitializedFlag)
     return;
 
-  uInt32 channels = myHardwareSpec.channels;
+  uint32_t channels = myHardwareSpec.channels;
   length = length / channels;
 
   // If there are excessive items on the queue then we'll remove some
@@ -342,9 +320,9 @@ void SoundSDL::processFragment(uInt8* stream, Int32 length)
     {
       // There are no more pending TIA sound register updates so we'll
       // use the current settings to finish filling the sound fragment
-//    myTIASound.process(stream + (uInt32)position, length - (uInt32)position);
-      myTIASound.process(stream + ((uInt32)position * channels),
-          length - (uInt32)position);
+//    myTIASound.process(stream + (uint32_t)position, length - (uint32_t)position);
+      myTIASound.process(stream + ((uint32_t)position * channels),
+          length - (uint32_t)position);
 
       // Since we had to fill the fragment we'll reset the cycle counter
       // to zero.  NOTE: This isn't 100% correct, however, it'll do for
@@ -372,12 +350,12 @@ void SoundSDL::processFragment(uInt8* stream, Int32 length)
           // Process the fragment upto the next TIA register write.  We
           // round the count passed to process up if needed.
           double samples = (myHardwareSpec.freq * info.delta);
-//        myTIASound.process(stream + (uInt32)position, (uInt32)samples +
-//            (uInt32)(position + samples) - 
-//            ((uInt32)position + (uInt32)samples));
-          myTIASound.process(stream + ((uInt32)position * channels),
-              (uInt32)samples + (uInt32)(position + samples) - 
-              ((uInt32)position + (uInt32)samples));
+//        myTIASound.process(stream + (uint32_t)position, (uint32_t)samples +
+//            (uint32_t)(position + samples) - 
+//            ((uint32_t)position + (uint32_t)samples));
+          myTIASound.process(stream + ((uint32_t)position * channels),
+              (uint32_t)samples + (uint32_t)(position + samples) - 
+              ((uint32_t)position + (uint32_t)samples));
 
           position += samples;
           remaining -= samples;
@@ -390,9 +368,9 @@ void SoundSDL::processFragment(uInt8* stream, Int32 length)
         // The next register update occurs in the next fragment so finish
         // this fragment with the current TIA settings and reduce the register
         // update delay by the corresponding amount of time
-//      myTIASound.process(stream + (uInt32)position, length - (uInt32)position);
-        myTIASound.process(stream + ((uInt32)position * channels),
-            length - (uInt32)position);
+//      myTIASound.process(stream + (uint32_t)position, length - (uint32_t)position);
+        myTIASound.process(stream + ((uint32_t)position * channels),
+            length - (uint32_t)position);
         info.delta -= duration;
         break;
       }
@@ -418,51 +396,31 @@ void SoundSDL::recordNextFrame() {
 
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SoundSDL::callback(void* udata, uInt8* stream, int len)
+void SoundSDL::callback(void* udata, uint8_t* stream, int len)
 {
   SoundSDL* sound = (SoundSDL*)udata;
-  sound->processFragment(stream, (Int32)len);
-#ifdef ATARIVOX_SUPPORT
-  Logger::Info << "SoundSDL::callback(): len==" << len << endl;
-
-  // See if we need sound from the AtariVox
-  AtariVox *vox = sound->myOSystem->console().atariVox();
-  if(vox)
-  {
-    // If so, mix 'em together (this is a crappy way to mix audio streams...)
-    uInt8 *s = stream;
-    for(int i=0; i<len/OUTPUT_BUFFER_SIZE; i++)
-    {
-      int count;
-      uInt8 *voxSamples = vox->getSpeakJet()->getSamples(&count);
-      if(!count)
-        break;
-      SDL_MixAudio(s, voxSamples, OUTPUT_BUFFER_SIZE, SDL_MIX_MAXVOLUME);
-      s += OUTPUT_BUFFER_SIZE;
-    }
-  }
-#endif
+  sound->processFragment(stream, (int)len);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool SoundSDL::load(Deserializer& in)
 {
-  string device = "TIASound";
+  std::string device = "TIASound";
 
   try
   {
     if(in.getString() != device)
       return false;
 
-    uInt8 reg1 = 0, reg2 = 0, reg3 = 0, reg4 = 0, reg5 = 0, reg6 = 0;
-    reg1 = (uInt8) in.getInt();
-    reg2 = (uInt8) in.getInt();
-    reg3 = (uInt8) in.getInt();
-    reg4 = (uInt8) in.getInt();
-    reg5 = (uInt8) in.getInt();
-    reg6 = (uInt8) in.getInt();
+    uint8_t reg1 = 0, reg2 = 0, reg3 = 0, reg4 = 0, reg5 = 0, reg6 = 0;
+    reg1 = (uint8_t) in.getInt();
+    reg2 = (uint8_t) in.getInt();
+    reg3 = (uint8_t) in.getInt();
+    reg4 = (uint8_t) in.getInt();
+    reg5 = (uint8_t) in.getInt();
+    reg6 = (uint8_t) in.getInt();
 
-    myLastRegisterSetCycle = (Int32) in.getInt();
+    myLastRegisterSetCycle = (int) in.getInt();
 
     // Only update the TIA sound registers if sound is enabled
     // Make sure to empty the queue of previous sound fragments
@@ -481,12 +439,12 @@ bool SoundSDL::load(Deserializer& in)
   }
   catch(char *msg)
   {
-    Logger::Error << msg << endl;
+    ale::Logger::Error << msg << std::endl;
     return false;
   }
   catch(...)
   {
-    Logger::Error << "Unknown error in load state for " << device << endl;
+    ale::Logger::Error << "Unknown error in load state for " << device << std::endl;
     return false;
   }
 
@@ -496,13 +454,13 @@ bool SoundSDL::load(Deserializer& in)
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool SoundSDL::save(Serializer& out)
 {
-  string device = "TIASound";
+  std::string device = "TIASound";
 
   try
   {
     out.putString(device);
 
-    uInt8 reg1 = 0, reg2 = 0, reg3 = 0, reg4 = 0, reg5 = 0, reg6 = 0;
+    uint8_t reg1 = 0, reg2 = 0, reg3 = 0, reg4 = 0, reg5 = 0, reg6 = 0;
 
     // Only get the TIA sound registers if sound is enabled
     if(myIsInitializedFlag)
@@ -526,12 +484,12 @@ bool SoundSDL::save(Serializer& out)
   }
   catch(char *msg)
   {
-    Logger::Error << msg << endl;
+    ale::Logger::Error << msg << std::endl;
     return false;
   }
   catch(...)
   {
-    Logger::Error << "Unknown error in save state for " << device << endl;
+    ale::Logger::Error << "Unknown error in save state for " << device << std::endl;
     return false;
   }
 
@@ -539,7 +497,7 @@ bool SoundSDL::save(Serializer& out)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-SoundSDL::RegWriteQueue::RegWriteQueue(uInt32 capacity)
+SoundSDL::RegWriteQueue::RegWriteQueue(uint32_t capacity)
   : myCapacity(capacity),
     myBuffer(0),
     mySize(0),
@@ -575,7 +533,7 @@ void SoundSDL::RegWriteQueue::dequeue()
 double SoundSDL::RegWriteQueue::duration()
 {
   double duration = 0.0;
-  for(uInt32 i = 0; i < mySize; ++i)
+  for(uint32_t i = 0; i < mySize; ++i)
   {
     duration += myBuffer[(myHead + i) % myCapacity].delta;
   }
@@ -605,7 +563,7 @@ SoundSDL::RegWrite& SoundSDL::RegWriteQueue::front()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt32 SoundSDL::RegWriteQueue::size() const
+uint32_t SoundSDL::RegWriteQueue::size() const
 {
   return mySize;
 }
@@ -614,7 +572,7 @@ uInt32 SoundSDL::RegWriteQueue::size() const
 void SoundSDL::RegWriteQueue::grow()
 {
   RegWrite* buffer = new RegWrite[myCapacity * 2];
-  for(uInt32 i = 0; i < mySize; ++i)
+  for(uint32_t i = 0; i < mySize; ++i)
   {
     buffer[i] = myBuffer[(myHead + i) % myCapacity];
   }
