@@ -46,10 +46,10 @@ void GA::breed(const VecIndividual &parents) {
 
 Individual GA::evolve(uint16_t maxIterations, int16_t show) {
     for (size_t i = 0; i < maxIterations; i++) {
-        std::for_each(std::execution::par, population.begin(), population.end(), [](Individual &e) { e.fitness(); });
+        std::for_each(population.begin(), population.end(), [](Individual &e) { e.fitness(); });
         auto parents = selection();
 
-        if (show != -1 && maxIterations % show == 0) {
+        if (show != -1 && i % show == 0) {
             parents.front().fitness(true);
         }
 

@@ -11,8 +11,11 @@ class Individual {
 
     public: 
 
-        double reward;
-        NNet nn;
+    double reward;
+    double movesLeft;
+    double movesRight;
+    NNet nn;
+
     explicit Individual();
     explicit Individual(const VecWeights &);
     Individual(const Individual &);

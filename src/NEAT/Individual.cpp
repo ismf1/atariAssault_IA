@@ -16,14 +16,16 @@ Individual::Individual(const VecWeights &weights) {
     nn = NNet(TOPOLOGY, actf, weights);
 }
 
+Individual::Individual() {
+    nn = NNet(TOPOLOGY, actf);
+}
+
 Individual::Individual(const Individual &o) {
     nn = o.nn;
     fit = o.fit;
     reward = o.reward;
-}
-
-Individual::Individual() {
-    nn = NNet(TOPOLOGY, actf);
+    movesLeft = o.movesLeft;
+    movesRight = o.movesRight;
 }
 
 const std::vector<double> Individual::getState(ALEInterface &alei) {
@@ -46,8 +48,15 @@ double Individual::agentStep(ALEInterface &alei) {
    if(res[0] > 0.5) reward += alei.act(PLAYER_A_RIGHTFIRE);
    if(res[1] > 0.5) reward += alei.act(PLAYER_A_LEFTFIRE);
    if(res[2] > 0.5) reward += alei.act(PLAYER_A_UPFIRE);
-   if(res[3] > 0.5) reward += alei.act(PLAYER_A_LEFT);
-   if(res[4] > 0.5) reward += alei.act(PLAYER_A_RIGHT);
+   if(res[3] > 0.5) {
+        movesLeft++;
+        reward += alei.act(PLAYER_A_LEFT);
+   } 
+   if(res[4] > 0.5) {
+        movesRight++;
+        reward += alei.act(PLAYER_A_RIGHT);
+   }
+   
    
    return (reward + alei.act(PLAYER_A_NOOP));
 }
@@ -87,27 +96,38 @@ Individual Individual::crossover(const Individual &other, double mutateRate) {
 
 double Individual::fitness(bool display)
 {
-    std::cerr.setstate(std::ios_base::failbit);
+    for (size_t i = 0; i < 3; i++) {
+        std::cerr.setstate(std::ios_base::failbit);
 
-    ALEInterface alei;
+        ALEInterface alei;
 
-    alei.setFloat("repeat_action_probability", 0);
-    alei.setBool("display_screen", display);
-    alei.setBool("sound", false);
-    alei.loadROM("assets/supported/assault.bin");
+        alei.setFloat("repeat_action_probability", 0);
+        alei.setBool("display_screen", display);
+        alei.setBool("sound", false);
+        alei.loadROM("assets/supported/assault.bin");
 
-    std::cerr.clear();
+        std::cerr.clear();
 
-    double step = 0;
-    double totalReward = 0;
-    for (step = 0;!alei.game_over();++step)
-    {
-        totalReward += agentStep(alei); //Movimiento
+        reward = 0; 
+        fit = 0;
+
+        double totalReward = 0;
+        double step = 0;
+        movesLeft = 0;
+        movesRight = 0;
+        for (step = 0;!alei.game_over();++step)
+        {
+            totalReward += agentStep(alei); //Movimiento
+        }
+        reward += totalReward;
+        fit += ((movesLeft + movesRight) * 0.1) + totalReward * 1.3;
+        //fit = ;
     }
 
-    reward = totalReward;
-    fit = (-step * 0.01 + 1000) + totalReward * 1.3;
+    reward /= 3;
+    fit /= 3;
+    //fit = step;
     // totalReward = totalReward < 100? -10000 : totalReward;
     // fit = step;
-    return totalReward;
+    return reward;
 }
