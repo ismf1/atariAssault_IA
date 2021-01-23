@@ -2,6 +2,9 @@
 
 #include <NeuralNetworkv2/Matrix.hpp>
 #include <Utils/Normalize.hpp>
+#include <ale_interface.hpp>
+
+using namespace ale;
 
 using Vec2d      = Vector<double>;
 using Mat2d      = Matrix<double>;

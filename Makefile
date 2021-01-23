@@ -1,6 +1,6 @@
 CXX      := -c++
 CXXFLAGS := -pedantic-errors -Wall -Wextra -std=c++2a -fconcepts -O3 -ftree-vectorize -ftree-vectorizer-verbose=1 -msse2 -funroll-loops -fopenmp -mfpmath=sse -march=native
-LDFLAGS  := -L/usr/lib -L./lib/ale -lale -lSDL -lstdc++ -lm -ltbb
+LDFLAGS  := -L/usr/lib -L./lib/ale -lale -lSDL -lstdc++ -lm -ltbb -lz
 BUILD    := ./build
 OBJ_DIR  := $(BUILD)/obj
 APP_DIR  := .

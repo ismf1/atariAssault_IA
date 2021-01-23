@@ -100,16 +100,12 @@ double Individual::fitness(bool display)
     fit = 0;
 
     for (size_t i = 0; i < 3; i++) {
-        std::cerr.setstate(std::ios_base::failbit);
-
         ALEInterface alei;
 
         alei.setFloat("repeat_action_probability", 0);
         alei.setBool("display_screen", i == 0? display : false);
         alei.setBool("sound", false);
         alei.loadROM("assets/supported/assault.bin");
-
-        std::cerr.clear();
 
         double totalReward = 0;
         double step = 0;

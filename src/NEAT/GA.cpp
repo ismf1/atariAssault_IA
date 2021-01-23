@@ -46,7 +46,10 @@ void GA::breed(const VecIndividual &parents) {
 
 Individual GA::evolve(uint16_t maxIterations, int16_t show) {
     for (size_t i = 0; i < maxIterations; i++) {
-        std::for_each(population.begin(), population.end(), [](Individual &e) { e.fitness(); });
+        std::cerr.setstate(std::ios_base::failbit);
+        std::for_each(std::execution::par_unseq, population.begin(), population.end(), [](Individual &e) { e.fitness(); });
+        std::cerr.clear();
+
         auto parents = selection();
 
         if (show != -1 && i % show == 0) {
