@@ -1,7 +1,8 @@
 {
-    "jupyter.jupyterServerType": "local",
     "files.associations": {
-        "ostream": "cpp",
+        "random": "cpp",
+        "limits": "cpp",
+        "valarray": "cpp",
         "cctype": "cpp",
         "clocale": "cpp",
         "cmath": "cpp",
@@ -17,6 +18,9 @@
         "atomic": "cpp",
         "bit": "cpp",
         "*.tcc": "cpp",
+        "chrono": "cpp",
+        "codecvt": "cpp",
+        "condition_variable": "cpp",
         "cstdint": "cpp",
         "deque": "cpp",
         "list": "cpp",
@@ -31,7 +35,7 @@
         "memory_resource": "cpp",
         "numeric": "cpp",
         "optional": "cpp",
-        "random": "cpp",
+        "ratio": "cpp",
         "string": "cpp",
         "string_view": "cpp",
         "system_error": "cpp",
@@ -44,13 +48,17 @@
         "iosfwd": "cpp",
         "iostream": "cpp",
         "istream": "cpp",
-        "limits": "cpp",
+        "mutex": "cpp",
         "new": "cpp",
+        "ostream": "cpp",
         "sstream": "cpp",
         "stdexcept": "cpp",
         "streambuf": "cpp",
+        "thread": "cpp",
         "cinttypes": "cpp",
         "typeinfo": "cpp",
-        "valarray": "cpp"
-    }
+        "cassert": "cpp",
+        "*.def": "cpp"
+    },
+    "python.pythonPath": "/usr/bin/python3"
 }

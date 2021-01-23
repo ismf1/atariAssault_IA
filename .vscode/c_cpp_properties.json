@@ -1,0 +1,32 @@
+{
+    "env": {
+        "myDefaultIncludePath": [
+            "${workspaceFolder}",
+            "${workspaceFolder}/include", 
+            "${workspaceFolder}/include/NeuralNetwork", 
+            "${workspaceFolder}/include/NeuralNetworkv2", 
+            "${workspaceFolder}/include/Utils",
+            "${workspaceFolder}/lib/ale/src"
+        ]
+    },
+    "configurations": [
+        {
+            "name": "Linux",
+            "intelliSenseMode": "clang-x64",
+            "includePath": [
+                "${myDefaultIncludePath}"
+            ],
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "c17",
+            "cppStandard": "c++20",
+            "browse": {
+                "path": [
+                    "${workspaceFolder}"
+                ],
+                "limitSymbolsToIncludedHeaders": true,
+                "databaseFilename": ""
+            }
+        }
+    ],
+    "version": 4
+}
