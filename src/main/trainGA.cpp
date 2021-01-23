@@ -4,10 +4,10 @@
 using namespace std;
 
 int main() {
-    GA ga(10, 0.1, 0.3);
-    auto result = ga.evolve(100);
+    GA ga(15, 0.2, 0.3);
+    auto result = ga.evolve(500, 10);
 
-    cout << result.getFitness() << endl;
+    cout << result.nn << endl;
 
     return 0;
 }

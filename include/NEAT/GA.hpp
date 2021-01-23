@@ -16,5 +16,5 @@ class GA
         explicit GA(uint16_t popSize, double mutate, double elite);
         auto selection();
         void breed(const VecIndividual &parents);
-        Individual evolve(uint16_t maxIterations);
+        Individual evolve(uint16_t maxIterations, int16_t show = -1);
 };

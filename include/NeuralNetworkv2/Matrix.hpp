@@ -243,14 +243,14 @@ public:
         Matrix temp(nrow, other.ncol);
         
         size_t i, k, j;
-        # pragma omp parallel shared ( temp, mat, other) private(i, k, j)
-        {
-            # pragma omp for simd
+        // # pragma omp parallel shared ( temp, mat, other) private(i, k, j)
+        // {
+        //     # pragma omp for simd
             for (i = 0; i < nrow; i++)
                 for (k = 0; k < ncol; k++)
                     for (j = 0; j < other.ncol; j++)
                         temp[i][j] += mat[i][k] * other[k][j];
-        }
+        // }
 
         return temp;
     }

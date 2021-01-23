@@ -19,6 +19,7 @@ Individual::Individual(const VecWeights &weights) {
 Individual::Individual(const Individual &o) {
     nn = o.nn;
     fit = o.fit;
+    reward = o.reward;
 }
 
 Individual::Individual() {
@@ -52,10 +53,9 @@ double Individual::agentStep(ALEInterface &alei) {
 }
 
 bool Individual::operator<(const Individual& other) const {
-    return fit < other.fit;
+    return fit > other.fit;
 }
 
-// TODO: REVISAR Y TENED EN CUENTA EL BIAS
 Individual Individual::crossover(const Individual &other, double mutateRate) {
 
     VecWeights weights(nn.size());
@@ -85,26 +85,29 @@ Individual Individual::crossover(const Individual &other, double mutateRate) {
     return Individual(weights);
 }
 
-double Individual::fitness()
+double Individual::fitness(bool display)
 {
     std::cerr.setstate(std::ios_base::failbit);
 
     ALEInterface alei;
 
     alei.setFloat("repeat_action_probability", 0);
-    alei.setBool("display_screen", false);
+    alei.setBool("display_screen", display);
     alei.setBool("sound", false);
     alei.loadROM("assets/supported/assault.bin");
 
     std::cerr.clear();
 
-    uint16_t step = 0;
-    uint16_t totalReward = 0;
+    double step = 0;
+    double totalReward = 0;
     for (step = 0;!alei.game_over();++step)
     {
         totalReward += agentStep(alei); //Movimiento
     }
 
-    fit = totalReward;
+    reward = totalReward;
+    fit = (-step * 0.01 + 1000) + totalReward * 1.3;
+    // totalReward = totalReward < 100? -10000 : totalReward;
+    // fit = step;
     return totalReward;
 }
