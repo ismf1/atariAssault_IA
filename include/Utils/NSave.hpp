@@ -16,9 +16,5 @@ class NSave
 
     explicit NSave(const std::string &s) : fileName(s) {}
     void write(const Data &v, const Func &t) const;
-<<<<<<< HEAD:guardar/NSave.hpp
-    std::tuple<Data,Func> read() const;
-=======
     std::tuple<Data, Func> read() const;
->>>>>>> carlos:include/Utils/NSave.hpp
 };
