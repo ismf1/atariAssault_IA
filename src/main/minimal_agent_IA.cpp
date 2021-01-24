@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 using namespace std;
+using namespace ale;
 
 // Global vars
 const int maxSteps = 7500;
