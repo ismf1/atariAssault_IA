@@ -45,9 +45,18 @@ double Individual::agentStep(ALEInterface &alei) {
    double reward = 0;
    std::vector<double> res = nn.predict(getState(alei));
 
-   if(res[0] > 0.5) reward += alei.act(PLAYER_A_RIGHTFIRE);
-   if(res[1] > 0.5) reward += alei.act(PLAYER_A_LEFTFIRE);
-   if(res[2] > 0.5) reward += alei.act(PLAYER_A_UPFIRE);
+   if(res[0] > 0.5) {
+       reward += alei.act(PLAYER_A_RIGHTFIRE);
+        shoots++;
+    }
+   if(res[1] > 0.5) {
+       reward += alei.act(PLAYER_A_LEFTFIRE);
+        shoots++;
+    }
+   if(res[2] > 0.5) {
+       reward += alei.act(PLAYER_A_UPFIRE);
+        shoots++;
+    }
    if(res[3] > 0.5) {
         movesLeft++;
         reward += alei.act(PLAYER_A_LEFT);
@@ -82,7 +91,7 @@ Individual Individual::crossover(const Individual &other, double mutateRate) {
                 auto x = ((double) rand() / (RAND_MAX));                
                 nw[k] =  x < mutateRate?
                         Functions::rand(-1, 1) :
-                        Functions::randomChoice(lw1[i][j], lw2[i][j]);  
+                        Functions::randomChoice(lw1[j][k], lw2[j][k]);  
             }
 
             lw[j] = nw;
@@ -99,6 +108,7 @@ double Individual::fitness(bool display)
     reward = 0; 
     fit = 0;
 
+
     for (size_t i = 0; i < 3; i++) {
         ALEInterface alei;
 
@@ -109,17 +119,25 @@ double Individual::fitness(bool display)
 
         double totalReward = 0;
         double step = 0;
+        double acc = 0;
         movesLeft = 0;
         movesRight = 0;
-        for (step = 0;!alei.game_over();++step)
+        shoots = 0;
+        
+        for (step = 0;!alei.game_over() && step < 1000000;++step)
         {
+            double t = totalReward;
             totalReward += agentStep(alei); //Movimiento
+            if (t != totalReward)
+                acc++;
         }
         reward += totalReward;
         //fit += std::abs() * 0.1 + std::pow(totalReward, 1.2);
-        //fit = ;
-        fit += (totalReward) * (movesLeft + movesRight) / step;
-        //fit += totalReward;
+        fit += std::pow(totalReward, 2) / 2 + (movesRight + movesLeft) ;
+        //fit += (totalReward) * (movesLeft + movesRight) / step;
+        //fit += (std::pow(totalReward, 3.54f) + std::pow(movesLeft + movesRight, 2)) / step;
+        //fit += -(shoots - acc) + totalReward * (acc / (shoots - acc));
+        //fit += totalReward; 
     }
 
     reward /= 3;

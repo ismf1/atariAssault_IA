@@ -14,6 +14,7 @@ class Individual {
     double reward;
     double movesLeft;
     double movesRight;
+    double shoots;
     NNet nn;
 
     explicit Individual();

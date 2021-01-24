@@ -58,7 +58,14 @@
         "cinttypes": "cpp",
         "typeinfo": "cpp",
         "cassert": "cpp",
-        "*.def": "cpp"
+        "*.def": "cpp",
+        "bitset": "cpp",
+        "complex": "cpp",
+        "forward_list": "cpp",
+        "set": "cpp",
+        "unordered_set": "cpp",
+        "typeindex": "cpp",
+        "variant": "cpp"
     },
     "python.pythonPath": "/usr/bin/python3"
 }
