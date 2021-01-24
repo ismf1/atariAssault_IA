@@ -3,11 +3,19 @@
 #include <vector>
 #include <execution>
 #include <parallel/algorithm>
+#include <thread>
+#include <Utils/NSave.hpp>
 
 GA::GA(uint16_t popSize, double mutateRate, double elite)
     : popSize(popSize), mutateRate(mutateRate), elite(elite * popSize), population(popSize)
 {
     std::generate(population.begin(), population.end(), []() { return Individual(); });
+}
+
+GA::GA(uint16_t popSize, double mutateRate, double elite, const VecWeights &w)
+    : popSize(popSize), mutateRate(mutateRate), elite(elite * popSize), population(popSize)
+{
+    std::generate(population.begin(), population.end(), [&w]() { return Individual(w); });
 }
 
 auto GA::selection() {
@@ -52,9 +60,17 @@ Individual GA::evolve(uint16_t maxIterations, int16_t show) {
 
         auto parents = selection();
 
-        if (show != -1 && i % show == 0) {
-            parents.front().fitness(true);
+        if (show != -1 && i % 20 == 0) {
+            std::thread t1([&parents] { 
+                parents.front().fitness(true);
+            });
+            t1.join();
+            //std::cout << parents.front().nn << std::endl;
         }
+        //if (i % 1 == 0) {
+            NSave prueba("results/prueba_" + std::to_string(parents.front().getReward()) + ".model");
+            prueba.write(parents.front().nn.getWeights(), NSave::Func({ NSave::en::RELU, NSave::en::RELU, NSave::en::SIGM }));
+        //}
 
         std::cout << "Best " << i << " fitness: " << parents.front().getFitness() << std::endl;
         std::cout << "Best " << i << " reward: " << parents.front().getReward() << std::endl;
