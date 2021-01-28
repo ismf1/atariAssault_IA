@@ -11,6 +11,16 @@ class Functions {
 
     public: 
 
+    template <class T> 
+    static T randomChoice(const std::vector<T> &x) {
+        return x[rand(0, x.size())];
+    }
+
+    template <class T> 
+    static T randomChoice(const T &x, const T &y) {
+        return rand(0, 1)? x : y;
+    }
+
     static double rand(double min, double max){
         static std::random_device dev;  //Coge numero de dispositivo hardware preparado para generacion de aleatorios
         static std::mt19937 rng(dev()); //Algoritmo pseudoaleatorio
@@ -41,5 +51,13 @@ class Functions {
 
     static Mat2d mseD(Mat2d yp, Mat2d yr) {
         return yp - yr;
+    }
+
+    static ActFunc sigmF() {
+        return { sigm, sigmD };
+    }
+
+    static ActFunc reluF() {
+        return { relu, reluD };
     }
 };

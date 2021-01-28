@@ -248,12 +248,20 @@ class Vector {
         return mat;
     }
 
+    std::vector<W> toSTLVector() {
+        return v;
+    }
+
     size_t countIf(auto x) const {
         return std::count_if(v.begin(), v.end(), x);
     }
 
     bool empty() const {
         return v.empty();
+    }
+
+    auto clear() {
+        return v.clear();
     }
 
     friend std::ostream& operator<<(std::ostream &os, const Vector &v) {

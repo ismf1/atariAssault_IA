@@ -1,5 +1,5 @@
-CXX      := -c++
-CXXFLAGS := -pedantic-errors -Wall -Wextra -std=c++2a -fconcepts -O3 -funroll-loops
+CXX      := -g++
+CXXFLAGS := -pedantic-errors -Wall -Wextra -std=c++2a -fconcepts -O3 -funroll-loops -Wno-reorder
 LDFLAGS  := -L/usr/lib -L./lib/ale -lale -lSDL -lstdc++ -lm
 BUILD    := ./build
 OBJ_DIR  := $(BUILD)/obj
@@ -7,7 +7,7 @@ APP_DIR  := .
 TARGET   := $(basename $(notdir $(main)))
 SRC_FILES_NN := $(wildcard ./src/**/*.cpp)
 INCLUDE  := -I./include -I./lib/ale/src
-SRC      := $(filter-out $(filter-out $(main), $(wildcard ./src/main/*.cpp)), $(SRC_FILES_NN))
+SRC      := $(filter-out $(filter-out $(main), $(wildcard ./src/Main/*.cpp)), $(SRC_FILES_NN))
 OBJECTS  := $(SRC:%.cpp=$(OBJ_DIR)/%.o)
 DEPENDENCIES := $(OBJECTS:.o=.d)
 
@@ -29,28 +29,37 @@ build:
 	@mkdir -p $(APP_DIR)
 	@mkdir -p $(OBJ_DIR)
 
-debug: CXXFLAGS += -DDEBUG -g
-debug: all
+trainNN: 
+	make main=./src/Main/TrainNN.cpp
 
-release: CXXFLAGS += -O2
-release: all
+trainNN2: 
+	make main=./src/Main/TrainNN2.cpp
 
-trainv2: 
-	make main=./src/main/trainNeuralNetwork.cpp
-train: 
-	make main=./src/main/trainNeuralNetworkv2.cpp
+trainPerceptron: 
+	make main=./src/Main/TrainPerceptron.cpp
 
-run: 
-	make main=./src/main/minimal_agent_IA_nn_c.cpp
-	LD_LIBRARY_PATH="./lib/ale" ./minimal_agent_IA_nn_c assets/supported/assault.bin $(file) $(type)
+trainGA: 
+	make main=./src/Main/TrainGA.cpp
 
+agentGA:
+	make main=./src/Main/AgentGA.cpp
+
+agentManual:
+	make main=./src/Main/AgentManual.cpp
+
+agentNN:
+	make main=./src/Main/AgentNN.cpp
+
+agentPerceptron:
+	make main=./src/Main/AgentPerceptron.cpp
+    
 clean:
 	-@rm -rvf $(OBJ_DIR)/*
-	-@rm -rvf trainNeuralNetwork
-	-@rm -rvf trainNeuralNetworkv2
-	-@rm -rvf nn
-	-@rm -rvf trainNeuralNetworkv2.o
-	-@rm -rvf minimal_agent_IA_nn_c
+	-@rm -rvf TrainNN
+	-@rm -rvf TrainNN2
+	-@rm -rvf TrainPerceptron
+	-@rm -rvf TrainGA
+	-@rm -rvf Agent*
 
 info:
 	@echo "[*] Object dir:      ${OBJ_DIR}     "

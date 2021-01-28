@@ -12,12 +12,11 @@
 using namespace std;
 
 // Global vars
-const int maxSteps = 7500;
 const char splitSymbol = ';';
 int lastLives;
 float totalReward;
 ALEInterface alei;
-
+Scaler2d scaler;
 std::vector<double> state;
 
 vector<int> nImp = {//Muy importantes
@@ -110,17 +109,14 @@ void showRAM(){
    return net.feedforward(X)[neuron];
 }*/
 
-float agentStep(Network *net) {
+float agentStep(NNet &net) {
    
    float reward = 0;
-   
-   std::cout << state.size() << std::endl;
+   std::vector<double> res = net.predict(state);
 
-   std::vector<double> res = net->predict(state);
-
-   /*if(res[0]>0.5) reward+=alei.act(PLAYER_A_RIGHTFIRE);
-   if(res[1]>0.5) reward+=alei.act(PLAYER_A_LEFTFIRE);*/
-   if(res[2]>0.5) reward+=alei.act(PLAYER_A_UPFIRE);
+   if(res[0]>0.5) reward += alei.act(PLAYER_A_RIGHTFIRE);
+   if(res[1]>0.5) reward += alei.act(PLAYER_A_LEFTFIRE);
+   if(res[2]>0.5) reward += alei.act(PLAYER_A_UPFIRE);
    if(res[3]>0.5) reward += alei.act(PLAYER_A_LEFT);
    if(res[4]>0.5) reward += alei.act(PLAYER_A_RIGHT);
    
@@ -142,15 +138,12 @@ void usage(char* pname) {
 ///////////////////////////////////////////////////////////////////////////////
 
 void updateState(){
-   state.resize(0);
-   int ramValue;
-
    const auto& RAM = alei.getRAM();
 
-   for(size_t i=0;i<nImp.size();i++){
-      ramValue=(int)RAM.get(nImp[i]+1);
-      state.push_back((float)ramValue);
-      // state.push_back((float)ramValue/255); //Scaled
+   state.clear();
+   for(size_t i=0;i< RAM.size();i++){
+      double ramValue = (double)RAM.get(i+1);
+      state.push_back(ramValue / 255); //Scaled
    }
    
 }
@@ -160,18 +153,13 @@ void updateState(){
 ///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char **argv) {
 
-   if (argc != 4)
+   if (argc != 3)
       usage(argv[0]);
 
-   Network *net;
-   std::string type = argv[3];
+   NNet net;
 
-   if (type == "ivan")
-      net = new NeuralNetwork_t;
-   else
-      net = new NNet();
-
-   net->load(argv[2]);
+   net.load(argv[2]);
+   std::cout << net << std::endl;
 
    // Create alei object.
    alei.setInt("random_seed", 0);
@@ -188,7 +176,7 @@ int main(int argc, char **argv) {
    // Main loop
    int step;
    for (step = 0; 
-        !alei.game_over() && step < maxSteps; 
+        !alei.game_over() && step < 20000;
         ++step) 
    {
       updateState();
@@ -198,8 +186,6 @@ int main(int argc, char **argv) {
 
    std::cout << "Steps: " << step << std::endl;
    std::cout << "Reward: " << totalReward << std::endl;
-
-   delete net;
 
    return 0;
 }

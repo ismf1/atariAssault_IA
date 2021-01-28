@@ -12,10 +12,10 @@ class Data{
         static const int MAXCHAR = 1000;
         const char* filename;
         int size;
-        vector<vector<float>> X;
-        vector<vector<int>> Y;
-        vector<int> Yneg;
-        vector<int> Ypos;
+        vector<vector<double>> X;
+        vector<vector<double>> Y;
+        vector<double> Yneg;
+        vector<double> Ypos;
 
         Data();
         int countLinesFile();

@@ -1,6 +1,13 @@
-#include <NeuralNetwork/Data.h>
+#include <Utils/Data.hpp>
+#include <NeuralNetworkv2/Types.hpp>
 #include <stdlib.h>
 #include <stdio.h>
+#include <iostream>
+#include <fstream>
+#include <cassert>
+#include <sstream>
+
+using BufferIt = std::istreambuf_iterator<char>;
 
 Data::Data(){
 
@@ -31,8 +38,8 @@ void Data::init(const char* filename,const int tamXi,const int tamYi){
     this->tamYi=tamYi;
 
     this->size=countLinesFile();
-    this->X.resize(this->size,vector<float>(tamXi));
-    this->Y.resize(this->size,vector<int>(tamYi));
+    this->X.resize(this->size,vector<double>(tamXi));
+    this->Y.resize(this->size,vector<double>(tamYi));
     this->Yneg.resize(tamYi);
     this->Ypos.resize(tamYi);
 
@@ -57,7 +64,7 @@ void Data::init(const char* filename,const int tamXi,const int tamYi){
     fclose(fp);
 }
 
-void Data:: splitData(char str[],int line){
+void Data::splitData(char str[],int line){
 
     int i=0;
     float n=-1;
@@ -75,7 +82,8 @@ void Data:: splitData(char str[],int line){
             strAux[nAux]=str[i];
             nAux++;
             i++;
-        }i++;
+        }
+        i++;
         strAux[nAux]='\0';
 
         n=atof(strAux);

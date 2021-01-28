@@ -13,7 +13,6 @@ class NNet : public Network
 {
     using NeuralNetwork = std::vector<NeuralLayer>;
     using VecFordward   = std::vector<Mat2d>;
-    using VecWeights    = std::vector<std::vector<std::vector<double>>>;
 
 private:
     NeuralNetwork nn;
@@ -24,6 +23,7 @@ private:
 public:
     explicit NNet(const std::vector<int16_t> &topology, const VecActFunc &vecAct);
     explicit NNet(const std::vector<int16_t> &topology, const ActFunc &actf);
+    explicit NNet(const std::vector<int16_t> &topology, const VecActFunc &vecAct, const VecWeights &weights);
     explicit NNet();
 
     void train(const Mat2d &X, const Mat2d &y, const CostFunc &costf, size_t epochs, double lr=0.1f, const Vec2d& initialBias=Vec2d());
